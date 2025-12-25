@@ -52,6 +52,14 @@ Generated\ Files/
 TestResult.xml
 nunit-*.xml
 
+bin/
+obj/
+.vs/
+*.user
+*.suo
+appsettings.*.json
+
+
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/
