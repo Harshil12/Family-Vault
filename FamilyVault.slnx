@@ -6,7 +6,7 @@
     <Project Path="src/FamilyValult.Application/FamilyVault.Application.csproj" />
   </Folder>
   <Folder Name="/FamilyValult.Infrastructure/">
-    <Project Path="src/FamilyVault.Infrastructure/FamilyVault.Infrastructure/FamilyVault.Infrastructure.csproj" Id="fc922173-372e-42f6-a51c-bc2b147274ef" />
+    <Project Path="src/FamilyVault.Infrastructure/FamilyVault.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/FamilyVault.API/">
     <Project Path="src/FamilyVault.API/FamilyVault.API.csproj" />
