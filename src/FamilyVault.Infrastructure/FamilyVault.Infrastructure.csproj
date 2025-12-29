@@ -7,21 +7,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Repositories\**" />
-	  <EmbeddedResource Remove="Repositories\**" />
-	  <None Remove="Repositories\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\FamilyVault.Domain\FamilyVault.Domain.csproj" />
+	  <ProjectReference Include="..\FamilyValult.Application\FamilyVault.Application.csproj" />
+	  <ProjectReference Include="..\FamilyVault.Domain\FamilyVault.Domain.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

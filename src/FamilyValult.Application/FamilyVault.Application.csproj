@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FamilyVault.Domain\FamilyVault.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Interfaces\Repositories\IFamilyRepository.cs" />
+  </ItemGroup>
+
 </Project>
