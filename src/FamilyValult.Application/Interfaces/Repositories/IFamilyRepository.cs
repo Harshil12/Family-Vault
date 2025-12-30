@@ -54,6 +54,6 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// <returns>
         /// A task representing the asynchronous operation.
         /// </returns>
-        public Task DeleteFamilyByIdAsync(Guid familyId);
+        public Task DeleteFamilyByIdAsync(Guid familyId, string user);
     }
 }

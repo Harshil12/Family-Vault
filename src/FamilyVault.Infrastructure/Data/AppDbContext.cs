@@ -32,5 +32,21 @@ public class AppDbContext : DbContext
                   .HasConversion<byte>()
                   .HasColumnType("TINYINT");
         });
+
+        modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+        modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+        modelBuilder.Entity<Family>().HasIndex(f => f.Name).IsUnique();
+
+        modelBuilder.Entity<FamilyMember>().HasIndex(f => f.PAN).IsUnique();
+        modelBuilder.Entity<FamilyMember>().HasIndex(f => f.Aadhar).IsUnique();
+        modelBuilder.Entity<FamilyMember>().HasIndex(f => new { f.FirstName, f.LastName }).IsUnique();
+
+
+
+        modelBuilder.Entity<User>().HasQueryFilter(d => !d.IsDeleted);
+        modelBuilder.Entity<Family>().HasQueryFilter(d => !d.IsDeleted);
+        modelBuilder.Entity<FamilyMember>().HasQueryFilter(d => !d.IsDeleted);
+        modelBuilder.Entity<DocumentDetails>().HasQueryFilter(d => !d.IsDeleted);
     }
 }

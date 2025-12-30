@@ -35,17 +35,31 @@ public class UserRepository : IUserRepository
 
     public async Task<User> UpdateUserAsync(User user)
     {
-        _appDbContext.Update(user);
+        var existingUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id)
+     ?? throw new InvalidOperationException("User not found");
+
+        existingUser.FirstName = user.FirstName;
+        existingUser.LastName = user.LastName;
+        existingUser.Email = user.Email;
+        existingUser.CountryCode = user.CountryCode;
+        existingUser.Mobile = user.Mobile;
+        existingUser.Username = user.Username;
+        existingUser.Password = user.Password;
+        existingUser.UpdatedAt = DateTimeOffset.UtcNow;
+        existingUser.UpdatedBy = user.UpdatedBy;
+
         await _appDbContext.SaveChangesAsync();
-        return user;
+        return existingUser;
     }
-    public async Task DeleteUserByIdAsync(Guid userId)
+    public async Task DeleteUserByIdAsync(Guid userId, string user)
     {
-        _appDbContext.Users.Remove(
-            await _appDbContext.Users
-                .FirstOrDefaultAsync(u => u.Id == userId) ??
-            throw new InvalidOperationException("User not found"));
+        var existingUser = await _appDbContext.Users
+           .FirstOrDefaultAsync(u => u.Id == userId) ?? throw new InvalidOperationException("User not found");
+
+        existingUser.IsDeleted = true;
+        existingUser.UpdatedAt = DateTimeOffset.UtcNow;
+        existingUser.UpdatedBy = user;
+
+        await _appDbContext.SaveChangesAsync();
     }
-
-
 }

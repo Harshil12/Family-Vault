@@ -54,6 +54,11 @@ public class FamilyMember : BaseEntity
     public BloodGroups? BloodGroup { get; set; }
 
     /// <summary>
+    /// User's email address used for contact, notifications, and as an alternate identifier.
+    /// </summary>
+    public string? Email { get; set; }
+
+    /// <summary>
     /// Permanent Account Number (PAN) issued by the Income Tax Department of India.
     /// This is a 10-character alphanumeric identifier (e.g., ABCDE1234F).
     /// </summary>

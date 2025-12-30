@@ -25,6 +25,17 @@ public abstract class BaseEntity
     public DateTimeOffset? UpdatedAt { get; set; }
 
     /// <summary>
+    /// Repressent who has created the user
+    /// </summary>
+    public string CreatedBy { get; set; } = null!;
+
+    /// <summary>
+    /// Repressent who has updated the user
+    /// </summary>
+    public string? UpdatedBy { get; set; }
+
+
+    /// <summary>
     /// Gets or sets a value indicating whether the entity
     /// has been soft-deleted.
     /// When true, the record should be excluded from

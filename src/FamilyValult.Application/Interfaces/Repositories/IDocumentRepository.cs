@@ -54,5 +54,5 @@ public interface IDocumentRepository
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
-    public Task DeleteDocumentsDetailsByIdAsync(Guid documentId);
+    public Task DeleteDocumentsDetailsByIdAsync(Guid documentId, string user);
 }

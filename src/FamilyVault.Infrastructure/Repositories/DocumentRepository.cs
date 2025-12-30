@@ -30,18 +30,31 @@ internal class DocumentRepository(AppDbContext appDbContext) : IDocumentReposito
 
     public async Task<DocumentDetails> UpdateDocumentsDetailsAsync(DocumentDetails documentDetails)
     {
-        _appDbContext.Documents.Update(documentDetails);
+        var existingDocument = await _appDbContext.Documents
+            .FirstOrDefaultAsync(d => d.Id == documentDetails.Id) ?? throw new InvalidOperationException("Document not found");
+
+        existingDocument.DocumentType = documentDetails.DocumentType;
+        existingDocument.DocumentNumber = documentDetails.DocumentNumber;
+        existingDocument.IssueDate = documentDetails.IssueDate;
+        existingDocument.ExpiryDate = documentDetails.ExpiryDate;
+        existingDocument.SavedLocation = documentDetails.SavedLocation;
+        existingDocument.UpdatedAt = DateTimeOffset.UtcNow;
+        existingDocument.UpdatedBy = documentDetails.UpdatedBy;
+
         await _appDbContext.SaveChangesAsync();
         return documentDetails;
     }
 
-    public async Task DeleteDocumentsDetailsByIdAsync(Guid documentId)
+    public async Task DeleteDocumentsDetailsByIdAsync(Guid documentId, string user)
     {
-       _appDbContext.Documents.Remove(
-            await _appDbContext.Documents
-                .FirstOrDefaultAsync(d => d.Id == documentId) ?? 
-            throw new InvalidOperationException("Document not found")); 
+        var document = await _appDbContext.Documents
+            .FirstOrDefaultAsync(d => d.Id == documentId) ?? throw new InvalidOperationException("Document not found");
+
+        document.IsDeleted = true;
+        document.UpdatedAt = DateTimeOffset.UtcNow;
+        document.UpdatedBy = user;
+
+        await _appDbContext.SaveChangesAsync();
     }
 
-    
 }
