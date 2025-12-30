@@ -1,4 +1,7 @@
 
+using FamilyVault.Application.Interfaces.Services;
+using FamilyVault.Application.Services;
+using FamilyVault.Infrastructure;
 using FamilyVault.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,14 +19,11 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         //builder.Services.AddOpenApi();
 
-        // 1. Get connection string from appsettings.json
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-
-        // 2. Register DbContext
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(connectionString));
-
+        builder.Services.AddInfrastructureServices(builder.Configuration);
+        builder.Services.AddScoped<IUserService, Userservice>();
+        builder.Services.AddScoped<IFamilymemeberService, FamilyMemberService>();
+        builder.Services.AddScoped<IFamilyService, FamilyService>();
+        builder.Services.AddScoped<IDocumentService, DocumentService>();
 
         var app = builder.Build();
 

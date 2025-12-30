@@ -16,7 +16,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the <see cref="Family"/> entity if found.
         /// </returns>
-        public Task<Family> GetFamilyByIdAsync(Guid familyId);
+        public Task<Family?> GetFamilyByIdAsync(Guid familyId);
 
         /// <summary>
         /// Retrieves all families from the repository.
@@ -28,16 +28,6 @@ namespace FamilyVault.Application.Interfaces.Repositories
         public Task<IReadOnlyList<Family>> GetFamilyAsync();
 
         /// <summary>
-        /// Updates the details of an existing family.
-        /// </summary>
-        /// <param name="family">The family entity with updated details.</param>
-        /// <returns>
-        /// A task representing the asynchronous operation. 
-        /// The task result contains the updated <see cref="Family"/> entity.
-        /// </returns>
-        public Task<Family> UpdateFamilyAsync(Family family);
-
-        /// <summary>
         /// Creates a new family record in the repository.
         /// </summary>
         /// <param name="family">The family entity to create.</param>
@@ -46,6 +36,16 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// The task result contains the newly created <see cref="Family"/> entity.
         /// </returns>
         public Task<Family> CreateFamilyAsync(Family family);
+
+        /// <summary>
+        /// Updates the details of an existing family.
+        /// </summary>
+        /// <param name="family">The family entity with updated details.</param>
+        /// <returns>
+        /// A task representing the asynchronous operation. 
+        /// The task result contains the updated <see cref="Family"/> entity.
+        /// </returns>
+        public Task<Family> UpdateFamilyAsync(Family family);               
 
         /// <summary>
         /// Deletes a family from the repository using its unique identifier.

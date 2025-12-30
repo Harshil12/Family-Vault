@@ -1,32 +1,46 @@
 ﻿using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Domain.Entities;
+using FamilyVault.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
-public class FamilyMemberRepository : IFamilyMemberRepository
+public class FamilyMemberRepository(AppDbContext appContext) : IFamilyMemberRepository
 {
-    public Task<FamilyMember> CreateFamilyMemberAsync(FamilyMember familyMember)
+    private readonly AppDbContext _appDbContext = appContext;
+
+
+    public async Task<FamilyMember> CreateFamilyMemberAsync(FamilyMember familyMember)
     {
-        throw new NotImplementedException();
+        _appDbContext.FamilyMembers.Add(familyMember);
+        await _appDbContext.SaveChangesAsync();
+        return familyMember;
     }
 
-    public Task DeleteFamilyMemberByIdAsync(Guid familyMemberId)
+    public async Task DeleteFamilyMemberByIdAsync(Guid familyMemberId)
     {
-        throw new NotImplementedException();
+        _appDbContext.FamilyMembers.Remove(await _appDbContext.
+                        FamilyMembers.FirstOrDefaultAsync(fm => fm.Id == familyMemberId)
+                        ?? throw new Exception("No family member found"));
     }
 
-    public Task<FamilyMember> GetFamilyMemberByIdAsync(Guid familyMemberId)
+    public async Task<FamilyMember?> GetFamilyMemberByIdAsync(Guid familyMemberId)
     {
-        throw new NotImplementedException();
+        return await _appDbContext.FamilyMembers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(fm => fm.Id == familyMemberId);
+
     }
 
-    public Task<IReadOnlyList<FamilyMember>> GetFamilyMembersAsync()
+    public async Task<IReadOnlyList<FamilyMember>> GetFamilyMembersAsync()
     {
-        throw new NotImplementedException();
+       return await _appDbContext.FamilyMembers.AsNoTracking().ToListAsync();
     }
 
-    public Task<FamilyMember> UpdateFamilyMemberAsync(FamilyMember familyMember)
+    public async Task<FamilyMember> UpdateFamilyMemberAsync(FamilyMember familyMember)
     {
-        throw new NotImplementedException();
+        _appDbContext.FamilyMembers.Update(familyMember);
+        await _appDbContext.SaveChangesAsync();
+        return familyMember;
     }
 }

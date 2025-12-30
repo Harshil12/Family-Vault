@@ -1,10 +1,17 @@
 ﻿using FamilyVault.Application.DTOs.Family;
+using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
 
 namespace FamilyVault.Application.Services;
 
 public class FamilyService : IFamilyService
 {
+    private readonly IFamilyRepository _familyrepository;
+
+    public FamilyService(IFamilyRepository familyRepository)
+    {
+        _familyrepository = familyRepository;
+    }
     public Task<FamilyDto> CreateFamilyAsync(UpdateFamlyRequest updateFamlyRequest)
     {
         throw new NotImplementedException();

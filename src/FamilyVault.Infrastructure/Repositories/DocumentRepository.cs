@@ -1,32 +1,47 @@
 ﻿using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Domain.Entities;
+using FamilyVault.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
-internal class DocumentRepository : IdocumentRepository
+internal class DocumentRepository(AppDbContext appDbContext) : IDocumentRepository
 {
-    public Task<DocumentDetails> CreateDocumentsDetailsAsync(DocumentDetails documentDetails)
+    private readonly AppDbContext _appDbContext = appDbContext;
+
+    public async Task<IReadOnlyList<DocumentDetails>> GetDocumentsDetailsAsync()
     {
-        throw new NotImplementedException();
+        return await _appDbContext.Documents.AsNoTracking().ToListAsync();
     }
 
-    public Task DeleteDocumentsDetailsByIdAsync(Guid documentId)
+    public async Task<DocumentDetails?> GetDocumentsDetailsByIdAsync(Guid documentId)
     {
-        throw new NotImplementedException();
+        return await _appDbContext.Documents
+            .AsNoTracking()
+            .FirstOrDefaultAsync(d => d.Id == documentId);
     }
 
-    public Task<IReadOnlyList<DocumentDetails>> GetDocumentsDetailsAsync()
+    public async Task<DocumentDetails> CreateDocumentsDetailsAsync(DocumentDetails documentDetails)
     {
-        throw new NotImplementedException();
+        _appDbContext.Documents.Add(documentDetails);
+        await _appDbContext.SaveChangesAsync();
+        return documentDetails;
     }
 
-    public Task<DocumentDetails> GetDocumentsDetailsByIdAsync(Guid documentId)
+    public async Task<DocumentDetails> UpdateDocumentsDetailsAsync(DocumentDetails documentDetails)
     {
-        throw new NotImplementedException();
+        _appDbContext.Documents.Update(documentDetails);
+        await _appDbContext.SaveChangesAsync();
+        return documentDetails;
     }
 
-    public Task<DocumentDetails> UpdateDocumentsDetailsAsync(DocumentDetails documentDetails)
+    public async Task DeleteDocumentsDetailsByIdAsync(Guid documentId)
     {
-        throw new NotImplementedException();
+       _appDbContext.Documents.Remove(
+            await _appDbContext.Documents
+                .FirstOrDefaultAsync(d => d.Id == documentId) ?? 
+            throw new InvalidOperationException("Document not found")); 
     }
+
+    
 }

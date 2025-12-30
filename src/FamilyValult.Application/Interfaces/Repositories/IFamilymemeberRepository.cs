@@ -16,7 +16,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the <see cref="FamilyMember"/> entity if found.
         /// </returns>
-        public Task<FamilyMember> GetFamilyMemberByIdAsync(Guid familyMemberId);
+        public Task<FamilyMember?> GetFamilyMemberByIdAsync(Guid familyMemberId);
 
         /// <summary>
         /// Retrieves all family members from the repository.
@@ -28,16 +28,6 @@ namespace FamilyVault.Application.Interfaces.Repositories
         public Task<IReadOnlyList<FamilyMember>> GetFamilyMembersAsync();
 
         /// <summary>
-        /// Updates the details of an existing family member.
-        /// </summary>
-        /// <param name="familyMember">The family member entity with updated details.</param>
-        /// <returns>
-        /// A task representing the asynchronous operation. 
-        /// The task result contains the updated <see cref="FamilyMember"/> entity.
-        /// </returns>
-        public Task<FamilyMember> UpdateFamilyMemberAsync(FamilyMember familyMember);
-
-        /// <summary>
         /// Creates a new family member record in the repository.
         /// </summary>
         /// <param name="familyMember">The family member entity to create.</param>
@@ -47,6 +37,16 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// </returns>
         public Task<FamilyMember> CreateFamilyMemberAsync(FamilyMember familyMember);
 
+        /// <summary>
+        /// Updates the details of an existing family member.
+        /// </summary>
+        /// <param name="familyMember">The family member entity with updated details.</param>
+        /// <returns>
+        /// A task representing the asynchronous operation. 
+        /// The task result contains the updated <see cref="FamilyMember"/> entity.
+        /// </returns>
+        public Task<FamilyMember> UpdateFamilyMemberAsync(FamilyMember familyMember);
+                
         /// <summary>
         /// Deletes a family member from the repository using their unique identifier.
         /// </summary>

@@ -1,32 +1,40 @@
 ﻿using FamilyVault.Application.DTOs.Documents;
+using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
 
 namespace FamilyVault.Application.Services;
 
 public class DocumentService : IDocumentService
 {
+    private readonly IDocumentRepository _documentReppository;
+    public DocumentService(IDocumentRepository documentRepository)
+    {
+        _documentReppository = documentRepository;
+    }
     public Task<DocumentDetailsDto> CreateDocumentsDetailsAsync(CreateDocumentRequest createDocumentRequest)
     {
-        throw new NotImplementedException();
+        
+        return Task.FromResult(new DocumentDetailsDto());
     }
 
     public Task DeleteDocumentsDetailsByIdAsync(Guid documentId)
     {
-        throw new NotImplementedException();
+        
+        return Task.FromResult(new DocumentDetailsDto());
     }
 
     public Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync()
     {
-        throw new NotImplementedException();
+       throw new NotImplementedException();
     }
 
     public Task<DocumentDetailsDto> GetDocumentsDetailsByIdAsync(Guid documentId)
     {
-        throw new NotImplementedException();
+        return Task.FromResult(new DocumentDetailsDto());
     }
 
     public Task<DocumentDetailsDto> UpdateDocumentsDetailsAsync(UpdateDocumentRequest updateDocumentRequest)
     {
-        throw new NotImplementedException();
+        return Task.FromResult(new DocumentDetailsDto());
     }
 }

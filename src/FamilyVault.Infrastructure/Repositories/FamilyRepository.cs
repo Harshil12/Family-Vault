@@ -1,32 +1,48 @@
 ﻿using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Domain.Entities;
+using FamilyVault.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
 public class FamilyRepository : IFamilyRepository
 {
-    public Task<Family> CreateFamilyAsync(Family family)
+    private readonly AppDbContext _appDbContext;
+
+    public FamilyRepository(AppDbContext appDbContext)
     {
-        throw new NotImplementedException();
+        _appDbContext = appDbContext;
     }
 
-    public Task DeleteFamilyByIdAsync(Guid familyId)
+    public async Task<IReadOnlyList<Family>> GetFamilyAsync()
     {
-        throw new NotImplementedException();
+        return await _appDbContext.Families.AsNoTracking().ToListAsync();
     }
 
-    public Task<IReadOnlyList<Family>> GetFamilyAsync()
+    public async Task<Family?> GetFamilyByIdAsync(Guid familyId)
     {
-        throw new NotImplementedException();
+        return await _appDbContext.Families.FirstOrDefaultAsync(x=>x.Id == familyId);
     }
 
-    public Task<Family> GetFamilyByIdAsync(Guid familyId)
+    public async Task<Family> CreateFamilyAsync(Family family)
     {
-        throw new NotImplementedException();
+        _appDbContext.Families.Add(family);
+        await _appDbContext.SaveChangesAsync();
+        return family;
+    }    
+
+    public async Task<Family> UpdateFamilyAsync(Family family)
+    {
+        _appDbContext.Families.Update(family);
+        await _appDbContext.SaveChangesAsync();
+        return family;
     }
 
-    public Task<Family> UpdateFamilyAsync(Family family)
+    public async Task DeleteFamilyByIdAsync(Guid familyId)
     {
-        throw new NotImplementedException();
+        _appDbContext.Families.Remove(
+            await _appDbContext.Families
+                .FirstOrDefaultAsync(f => f.Id == familyId) ?? 
+            throw new InvalidOperationException("Family not found"));   
     }
 }
