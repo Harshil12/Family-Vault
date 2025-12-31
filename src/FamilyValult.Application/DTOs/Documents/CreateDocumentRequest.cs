@@ -1,5 +1,4 @@
 ﻿using FamilyVault.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace FamilyVault.Application.DTOs.Documents;
 

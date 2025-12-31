@@ -1,12 +1,6 @@
 ﻿using FamilyVault.Application.DTOs.FamilyMembers;
-using FamilyVault.Application.DTOs.User;
 using FamilyVault.Domain.Enums;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FamilyVault.Application.Validators.FamilyMembers;
 

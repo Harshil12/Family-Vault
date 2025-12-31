@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace FamilyVault.Application.DTOs.Family;
+﻿namespace FamilyVault.Application.DTOs.Family;
 
 public class UpdateFamlyRequest
 {

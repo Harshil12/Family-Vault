@@ -2,8 +2,8 @@
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Application.Services;
 using FamilyVault.Infrastructure;
-using FamilyVault.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 namespace FamilyVault.API;
 
@@ -15,7 +15,9 @@ public class Program
 
         // Add services to the container.
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddFluentValidationAutoValidation()
+            .AddFluentValidationClientsideAdapters();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         //builder.Services.AddOpenApi();
 

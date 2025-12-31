@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace FamilyVault.Application.DTOs.User;
+﻿namespace FamilyVault.Application.DTOs.User;
 
 public class CreateUserRequest
 {
