@@ -80,7 +80,7 @@ partial class MigrationV1
                 b.Property<bool>("IsDeleted")
                     .HasColumnType("bit");
 
-                b.Property<string>("Name")
+                b.Property<string>("FamilyName")
                     .IsRequired()
                     .HasMaxLength(100)
                     .HasColumnType("nvarchar(100)");

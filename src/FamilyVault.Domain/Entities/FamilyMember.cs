@@ -63,7 +63,7 @@ public class FamilyMember : BaseEntity
     /// This is a 10-character alphanumeric identifier (e.g., ABCDE1234F).
     /// </summary>
     [MaxLength(10)]
-    public long? PAN { get; set; }
+    public string? PAN { get; set; }
 
     /// <summary>
     ///Unique identifier for individuals issued by the Government of India.

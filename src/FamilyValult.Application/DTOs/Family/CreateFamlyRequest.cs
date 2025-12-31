@@ -1,5 +1,11 @@
-﻿namespace FamilyVault.Application.DTOs.Family;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FamilyVault.Application.DTOs.Family;
 
 public class CreateFamlyRequest
 {
+    /// <summary>
+    /// Human-readable name of the family (e.g. "Smith Family").
+    /// </summary>
+    public string FamilyName { get; set; } = null!;
 }

@@ -47,6 +47,6 @@ public class User : BaseEntity
     /// User's phone number.
     /// </summary>
     [MaxLength(10)]
-    public long? Mobile { get; set; }
+    public string? Mobile { get; set; }
 }
 
