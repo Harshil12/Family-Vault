@@ -16,7 +16,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the <see cref="User"/> entity if found.
         /// </returns>
-        public Task<User?> GetUserByIdAsync(Guid userId);
+        public Task<User?> GetByIdAsync(Guid userId);
 
         /// <summary>
         /// Retrieves all users from the repository.
@@ -25,7 +25,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains a read-only list of <see cref="User"/> entities.
         /// </returns>
-        public Task<IReadOnlyList<User>> GetUserAsync();
+        public Task<IReadOnlyList<User>> GetAllAsync();
 
         /// <summary>
         /// Creates a new user record in the repository.
@@ -35,7 +35,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the newly created <see cref="User"/> entity.
         /// </returns>
-        public Task<User> CreateUserAsync(User user);
+        public Task<User> AddAsync(User user);
 
         /// <summary>
         /// Updates the details of an existing user.
@@ -45,7 +45,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the updated <see cref="User"/> entity.
         /// </returns>
-        public Task<User> UpdateUserAsync(User user);       
+        public Task<User> UpdateAsync(User user);       
 
         /// <summary>
         /// Deletes a user from the repository using their unique identifier.
@@ -54,6 +54,6 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// <returns>
         /// A task representing the asynchronous operation.
         /// </returns>
-        public Task DeleteUserByIdAsync(Guid userId, string user);
+        public Task DeleteByIdAsync(Guid userId, string user);
     }
 }

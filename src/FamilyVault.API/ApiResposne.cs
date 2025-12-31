@@ -1,4 +1,4 @@
-﻿namespace FamilyVault.Application.DTOs;
+﻿namespace FamilyVault.API;
 
 public class ApiResposne<T>
 {

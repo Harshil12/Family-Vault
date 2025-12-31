@@ -10,27 +10,26 @@ public class FamilyMemberRepository(AppDbContext appContext) : IFamilyMemberRepo
     private readonly AppDbContext _appDbContext = appContext;
 
 
-    public async Task<FamilyMember> CreateFamilyMemberAsync(FamilyMember familyMember)
+    public async Task<FamilyMember> AddAsync(FamilyMember familyMember)
     {
         _appDbContext.FamilyMembers.Add(familyMember);
         await _appDbContext.SaveChangesAsync();
         return familyMember;
     }
 
-    public async Task<FamilyMember?> GetFamilyMemberByIdAsync(Guid familyMemberId)
+    public async Task<FamilyMember?> GetByIdAsync(Guid familyMemberId)
     {
         return await _appDbContext.FamilyMembers
             .AsNoTracking()
             .FirstOrDefaultAsync(fm => fm.Id == familyMemberId);
-
     }
 
-    public async Task<IReadOnlyList<FamilyMember>> GetFamilyMembersAsync()
+    public async Task<IReadOnlyList<FamilyMember>> GetAllAsync()
     {
         return await _appDbContext.FamilyMembers.AsNoTracking().ToListAsync();
     }
 
-    public async Task<FamilyMember> UpdateFamilyMemberAsync(FamilyMember familyMember)
+    public async Task<FamilyMember> UpdateAsync(FamilyMember familyMember)
     {
         var existingFamilyMember = await _appDbContext.FamilyMembers
             .FirstOrDefaultAsync(fm => fm.Id == familyMember.Id) ?? throw new InvalidOperationException("Family member not found");
@@ -53,7 +52,7 @@ public class FamilyMemberRepository(AppDbContext appContext) : IFamilyMemberRepo
         return familyMember;
     }
 
-    public async Task DeleteFamilyMemberByIdAsync(Guid familyMemberId, string user)
+    public async Task DeleteByIdAsync(Guid familyMemberId, string user)
     {
         var familyMember = await _appDbContext.FamilyMembers
             .FirstOrDefaultAsync(fm => fm.Id == familyMemberId) ?? throw new InvalidOperationException("Family member not found");

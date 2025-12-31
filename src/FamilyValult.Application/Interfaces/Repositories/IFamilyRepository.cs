@@ -16,7 +16,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the <see cref="Family"/> entity if found.
         /// </returns>
-        public Task<Family?> GetFamilyByIdAsync(Guid familyId);
+        public Task<Family?> GetByIdAsync(Guid familyId);
 
         /// <summary>
         /// Retrieves all families from the repository.
@@ -25,7 +25,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains a read-only list of <see cref="Family"/> entities.
         /// </returns>
-        public Task<IReadOnlyList<Family>> GetFamilyAsync();
+        public Task<IReadOnlyList<Family>> GetAllAsync();
 
         /// <summary>
         /// Creates a new family record in the repository.
@@ -35,7 +35,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the newly created <see cref="Family"/> entity.
         /// </returns>
-        public Task<Family> CreateFamilyAsync(Family family);
+        public Task<Family> AddAsync(Family family);
 
         /// <summary>
         /// Updates the details of an existing family.
@@ -45,7 +45,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the updated <see cref="Family"/> entity.
         /// </returns>
-        public Task<Family> UpdateFamilyAsync(Family family);               
+        public Task<Family> UpdateAsync(Family family);               
 
         /// <summary>
         /// Deletes a family from the repository using its unique identifier.
@@ -54,6 +54,6 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// <returns>
         /// A task representing the asynchronous operation.
         /// </returns>
-        public Task DeleteFamilyByIdAsync(Guid familyId, string user);
+        public Task DeleteByIdAsync(Guid familyId, string user);
     }
 }

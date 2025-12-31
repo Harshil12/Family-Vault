@@ -1,6 +1,6 @@
 ﻿namespace FamilyVault.Application.DTOs.Family;
 
-public class CreateFamlyRequest
+public class CreateFamilyRequest
 {
     /// <summary>
     /// Human-readable name of the family (e.g. "Smith Family").

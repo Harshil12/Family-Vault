@@ -16,7 +16,7 @@ public abstract class BaseEntity
     /// Gets or sets the date and time when the entity was created.
     /// Stored in UTC.
     /// </summary>
-    public DateTimeOffset? CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the entity was last updated.

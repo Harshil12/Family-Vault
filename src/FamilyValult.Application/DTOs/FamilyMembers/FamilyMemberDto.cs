@@ -2,7 +2,7 @@
 
 namespace FamilyVault.Application.DTOs.FamilyMembers;
 
-public class FamilyMemberDto
+public class FamilyMemberDto: BaseDto 
 {
     public Guid Id { get; set; }
 
@@ -28,13 +28,4 @@ public class FamilyMemberDto
 
     public long? Aadhar { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public string CreatedBy { get; set; } = null!;
-
-    public string? UpdatedBy { get; set; }
 }

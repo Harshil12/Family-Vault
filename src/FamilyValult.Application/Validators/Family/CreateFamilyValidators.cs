@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace FamilyVault.Application.Validators.Family;
 
-public class CreateFamilyValidators : AbstractValidator<CreateFamlyRequest>
+public class CreateFamilyValidators : AbstractValidator<CreateFamilyRequest>
 {
     public CreateFamilyValidators()
     {

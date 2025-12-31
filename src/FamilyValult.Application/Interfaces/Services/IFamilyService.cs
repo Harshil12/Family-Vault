@@ -27,18 +27,18 @@ public interface IFamilyService
     /// <summary>
     /// Updates the details of an existing family asynchronously using the specified request data.
     /// </summary>
-    /// <param name="createFamlyRequest">The request containing the updated family information. Cannot be null.</param>
+    /// <param name="updateFamlyRequest">The request containing the updated family information. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyDto"/> with the
     /// updated family details.</returns>
-    public Task<FamilyDto> UpdateFamilyAsync(CreateFamlyRequest createFamlyRequest);
+    public Task<FamilyDto> UpdateFamilyAsync(UpdateFamlyRequest updateFamlyRequest);
 
     /// <summary>
     /// Creates a new family record asynchronously using the specified update request.
     /// </summary>
-    /// <param name="updateFamlyRequest">An object containing the details required to create the family. Cannot be null.</param>
+    /// <param name="createFamlyRequest">An object containing the details required to create the family. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyDto"/>
     /// representing the newly created family.</returns>
-    public Task<FamilyDto> CreateFamilyAsync(UpdateFamlyRequest updateFamlyRequest);
+    public Task<FamilyDto> CreateFamilyAsync(CreateFamilyRequest createFamlyRequest);
 
     /// <summary>
     /// Deletes the family with the specified unique identifier asynchronously.

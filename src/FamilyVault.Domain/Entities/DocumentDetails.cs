@@ -4,6 +4,7 @@ namespace FamilyVault.Domain.Entities;
 
 public class DocumentDetails : BaseEntity
 {
+  
     /// <summary>
     /// Represents the type of the document (e.g., Passport, ID Card, License).
     /// Uses the <see cref="DocumentTypes"/> enum to represent common relationships

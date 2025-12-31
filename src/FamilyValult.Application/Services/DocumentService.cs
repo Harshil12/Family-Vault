@@ -1,40 +1,47 @@
 ﻿using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
+using FamilyVault.Domain.Entities;
+using AutoMapper;
 
 namespace FamilyVault.Application.Services;
 
 public class DocumentService : IDocumentService
 {
     private readonly IDocumentRepository _documentReppository;
-    public DocumentService(IDocumentRepository documentRepository)
+    private readonly IMapper _mapper;
+
+    public DocumentService(IDocumentRepository documentRepository, IMapper mapper)
     {
         _documentReppository = documentRepository;
+        _mapper = mapper;
     }
-    public Task<DocumentDetailsDto> CreateDocumentsDetailsAsync(CreateDocumentRequest createDocumentRequest)
+    public async Task<DocumentDetailsDto> CreateDocumentDetailsAsync(CreateDocumentRequest createDocumentRequest)
     {
-        
-        return Task.FromResult(new DocumentDetailsDto());
-    }
-
-    public Task DeleteDocumentsDetailsByIdAsync(Guid documentId)
-    {
-        
-        return Task.FromResult(new DocumentDetailsDto());
+        var result = await _documentReppository.AddAsync(_mapper.Map<DocumentDetails>(createDocumentRequest));
+        return _mapper.Map<DocumentDetailsDto>(result);
     }
 
-    public Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync()
+    public async Task DeleteDocumentDetailsByIdAsync(Guid documentId)
     {
-       throw new NotImplementedException();
+        await _documentReppository.DeleteByIdAsync(documentId,"Harshil");
     }
 
-    public Task<DocumentDetailsDto> GetDocumentsDetailsByIdAsync(Guid documentId)
+    public async Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync()
     {
-        return Task.FromResult(new DocumentDetailsDto());
+        var result = await _documentReppository.GetAllAsync();
+        return _mapper.Map<List<DocumentDetailsDto>>(result);
     }
 
-    public Task<DocumentDetailsDto> UpdateDocumentsDetailsAsync(UpdateDocumentRequest updateDocumentRequest)
+    public async Task<DocumentDetailsDto> GetDocumentDetailsByIdAsync(Guid documentId)
     {
-        return Task.FromResult(new DocumentDetailsDto());
+        var result = await _documentReppository.GetAsyncbyId(documentId);
+        return _mapper.Map<DocumentDetailsDto>(result);
+    }
+
+    public async Task<DocumentDetailsDto> UpdateDocumentDetailsAsync(UpdateDocumentRequest updateDocumentRequest)
+    {
+        var result = await _documentReppository.AddAsync(_mapper.Map<DocumentDetails>(updateDocumentRequest));
+        return _mapper.Map<DocumentDetailsDto>(result);
     }
 }

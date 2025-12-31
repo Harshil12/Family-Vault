@@ -29,23 +29,23 @@ public interface IUserService
 
     /// <summary>
     /// Updates an existing user using the provided create-style request.
-    /// Note: the request type is named <see cref="CreateUserRequest"/>; callers should provide the appropriate data expected by implementations.
+    /// Note: the request type is named <see cref="updateUserRequest"/>; callers should provide the appropriate data expected by implementations.
     /// </summary>
-    /// <param name="createUserRequest">The request containing user data to update.</param>
+    /// <param name="updateUserRequest">The request containing user data to update.</param>
     /// <returns>
     /// A <see cref="Task{UserDto}"/> that completes with the updated <see cref="UserDto"/>.
     /// </returns>
-    public Task<UserDto> UpdateuUerAsync(CreateUserRequest createUserRequest);
+    public Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest);
 
     /// <summary>
     /// Creates a new user using the provided update-style request.
-    /// Note: the request type is named <see cref="UpdateUserRequest"/>; callers should provide the appropriate data expected by implementations.
+    /// Note: the request type is named <see cref="createUserRequest"/>; callers should provide the appropriate data expected by implementations.
     /// </summary>
-    /// <param name="updateUserRequest">The request containing data for the new user.</param>
+    /// <param name="createUserRequest">The request containing data for the new user.</param>
     /// <returns>
     /// A <see cref="Task{UserDto}"/> that completes with the newly created <see cref="UserDto"/>.
     /// </returns>
-    public Task<UserDto> CreateUserAsync(UpdateUserRequest updateUserRequest);
+    public Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest);
 
     /// <summary>
     /// Deletes the user with the specified unique identifier.

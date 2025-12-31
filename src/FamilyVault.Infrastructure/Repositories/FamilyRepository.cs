@@ -14,24 +14,24 @@ public class FamilyRepository : IFamilyRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task<IReadOnlyList<Family>> GetFamilyAsync()
+    public async Task<IReadOnlyList<Family>> GetAllAsync()
     {
         return await _appDbContext.Families.AsNoTracking().ToListAsync();
     }
 
-    public async Task<Family?> GetFamilyByIdAsync(Guid familyId)
+    public async Task<Family?> GetByIdAsync(Guid familyId)
     {
         return await _appDbContext.Families.FirstOrDefaultAsync(x => x.Id == familyId);
     }
 
-    public async Task<Family> CreateFamilyAsync(Family family)
+    public async Task<Family> AddAsync(Family family)
     {
         _appDbContext.Families.Add(family);
         await _appDbContext.SaveChangesAsync();
         return family;
     }
 
-    public async Task<Family> UpdateFamilyAsync(Family family)
+    public async Task<Family> UpdateAsync(Family family)
     {
         var existingFamily = await _appDbContext.Families
             .FirstOrDefaultAsync(fm => fm.Id == family.Id) ?? throw new InvalidOperationException("Family not found");
@@ -45,7 +45,7 @@ public class FamilyRepository : IFamilyRepository
         return family;
     }
 
-    public async Task DeleteFamilyByIdAsync(Guid familyId, string user)
+    public async Task DeleteByIdAsync(Guid familyId, string user)
     {
         var family = await _appDbContext.Families
             .FirstOrDefaultAsync(fm => fm.Id == familyId) ?? throw new InvalidOperationException("Family not found");

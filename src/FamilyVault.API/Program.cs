@@ -1,6 +1,7 @@
-
+﻿using FamilyVault.Application;
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Application.Services;
+using FamilyVault.Application.Validators.Document;
 using FamilyVault.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -15,9 +16,12 @@ public class Program
 
         // Add services to the container.
 
-        builder.Services.AddControllers()
-            .AddFluentValidationAutoValidation()
-            .AddFluentValidationClientsideAdapters();
+        builder.Services.AddControllers();
+        builder.Services.AddFluentValidationAutoValidation();
+        builder.Services.AddFluentValidationClientsideAdapters();
+
+        builder.Services.AddValidatorsFromAssemblyContaining<CreateDocumentValidators>();
+
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         //builder.Services.AddOpenApi();
 
@@ -27,12 +31,15 @@ public class Program
         builder.Services.AddScoped<IFamilyService, FamilyService>();
         builder.Services.AddScoped<IDocumentService, DocumentService>();
 
+
+        builder.Services.AddAutoMapper(typeof(ApplicationAssemblyMarker));
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-           // app.MapOpenApi();
+            // app.MapOpenApi();
         }
 
         app.UseHttpsRedirection();

@@ -1,39 +1,47 @@
-﻿using FamilyVault.Application.DTOs.User;
+﻿using AutoMapper;
+using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
+using FamilyVault.Domain.Entities;
 
 namespace FamilyVault.Application.Services;
 
 public class Userservice : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
 
-    public Userservice(IUserRepository userRepository)
+    public Userservice(IUserRepository userRepository, IMapper mapper)
     {
         _userRepository = userRepository;
+        _mapper = mapper;
     }
-    public Task<UserDto> CreateUserAsync(UpdateUserRequest updateUserRequest)
+    public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task DeleteUserByIdAsync(Guid userId)
-    {
-        throw new NotImplementedException();
+        var result = await  _userRepository.AddAsync(_mapper.Map<Domain.Entities.User>(createUserRequest));
+        return _mapper.Map<UserDto>(result);
     }
 
-    public Task<IReadOnlyList<UserDto>> GetUserAsync()
+    public async Task DeleteUserByIdAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        await _userRepository.DeleteByIdAsync(userId, "Harshil");
     }
 
-    public Task<UserDto> GetUserByIdAsync(Guid userId)
+    public async Task<IReadOnlyList<UserDto>> GetUserAsync()
     {
-        throw new NotImplementedException();
+        var users = await _userRepository.GetAllAsync();    
+        return _mapper.Map<IReadOnlyList<UserDto>>(users);
     }
 
-    public Task<UserDto> UpdateuUerAsync(CreateUserRequest createUserRequest)
+    public async Task<UserDto> GetUserByIdAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        var user = await _userRepository.GetByIdAsync(userId);
+        return _mapper.Map<UserDto>(user);
+    }
+
+    public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest)
+    {
+        var user = await _userRepository.UpdateAsync(_mapper.Map<User>(updateUserRequest));
+        return _mapper.Map<UserDto>(user);
     }
 }

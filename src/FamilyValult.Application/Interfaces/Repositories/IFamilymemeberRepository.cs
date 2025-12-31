@@ -16,7 +16,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the <see cref="FamilyMember"/> entity if found.
         /// </returns>
-        public Task<FamilyMember?> GetFamilyMemberByIdAsync(Guid familyMemberId);
+        public Task<FamilyMember?> GetByIdAsync(Guid familyMemberId);
 
         /// <summary>
         /// Retrieves all family members from the repository.
@@ -25,7 +25,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains a read-only list of <see cref="FamilyMember"/> entities.
         /// </returns>
-        public Task<IReadOnlyList<FamilyMember>> GetFamilyMembersAsync();
+        public Task<IReadOnlyList<FamilyMember>> GetAllAsync();
 
         /// <summary>
         /// Creates a new family member record in the repository.
@@ -35,7 +35,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the newly created <see cref="FamilyMember"/> entity.
         /// </returns>
-        public Task<FamilyMember> CreateFamilyMemberAsync(FamilyMember familyMember);
+        public Task<FamilyMember> AddAsync(FamilyMember familyMember);
 
         /// <summary>
         /// Updates the details of an existing family member.
@@ -45,7 +45,7 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// A task representing the asynchronous operation. 
         /// The task result contains the updated <see cref="FamilyMember"/> entity.
         /// </returns>
-        public Task<FamilyMember> UpdateFamilyMemberAsync(FamilyMember familyMember);
+        public Task<FamilyMember> UpdateAsync(FamilyMember familyMember);
                 
         /// <summary>
         /// Deletes a family member from the repository using their unique identifier.
@@ -54,6 +54,6 @@ namespace FamilyVault.Application.Interfaces.Repositories
         /// <returns>
         /// A task representing the asynchronous operation.
         /// </returns>
-        public Task DeleteFamilyMemberByIdAsync(Guid familyMemberId, string user);
+        public Task DeleteByIdAsync(Guid familyMemberId, string user);
     }
 }

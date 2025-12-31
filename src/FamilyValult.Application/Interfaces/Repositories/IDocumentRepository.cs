@@ -16,7 +16,7 @@ public interface IDocumentRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains the <see cref="DocumentDetails"/> of the specified document.
     /// </returns>
-    public Task<DocumentDetails?> GetDocumentsDetailsByIdAsync(Guid documentId);
+    public Task<DocumentDetails?> GetAsyncbyId(Guid documentId);
 
     /// <summary>
     /// Retrieves the details of all documents in the repository.
@@ -25,7 +25,7 @@ public interface IDocumentRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains a read-only list of <see cref="DocumentDetails"/>.
     /// </returns>
-    public Task<IReadOnlyList<DocumentDetails>> GetDocumentsDetailsAsync();
+    public Task<IReadOnlyList<DocumentDetails>> GetAllAsync();
 
     /// <summary>
     /// Creates a new document record in the repository.
@@ -35,7 +35,7 @@ public interface IDocumentRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains the newly created <see cref="DocumentDetails"/>.
     /// </returns>
-    public Task<DocumentDetails> CreateDocumentsDetailsAsync(DocumentDetails documentDetails);
+    public Task<DocumentDetails> AddAsync(DocumentDetails documentDetails);
 
     /// <summary>
     /// Updates the details of an existing document in the repository.
@@ -45,7 +45,7 @@ public interface IDocumentRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains the updated <see cref="DocumentDetails"/>.
     /// </returns>
-    public Task<DocumentDetails> UpdateDocumentsDetailsAsync(DocumentDetails documentDetails);
+    public Task<DocumentDetails> UpdateAsync(DocumentDetails documentDetails);
 
     /// <summary>
     /// Deletes a document from the repository using its unique identifier.
@@ -54,5 +54,5 @@ public interface IDocumentRepository
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
-    public Task DeleteDocumentsDetailsByIdAsync(Guid documentId, string user);
+    public Task DeleteByIdAsync(Guid documentId, string user);
 }

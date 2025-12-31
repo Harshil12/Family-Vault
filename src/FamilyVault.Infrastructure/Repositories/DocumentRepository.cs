@@ -9,26 +9,26 @@ internal class DocumentRepository(AppDbContext appDbContext) : IDocumentReposito
 {
     private readonly AppDbContext _appDbContext = appDbContext;
 
-    public async Task<IReadOnlyList<DocumentDetails>> GetDocumentsDetailsAsync()
+    public async Task<IReadOnlyList<DocumentDetails>> GetAllAsync()
     {
         return await _appDbContext.Documents.AsNoTracking().ToListAsync();
     }
 
-    public async Task<DocumentDetails?> GetDocumentsDetailsByIdAsync(Guid documentId)
+    public async Task<DocumentDetails?> GetAsyncbyId(Guid documentId)
     {
         return await _appDbContext.Documents
             .AsNoTracking()
             .FirstOrDefaultAsync(d => d.Id == documentId);
     }
 
-    public async Task<DocumentDetails> CreateDocumentsDetailsAsync(DocumentDetails documentDetails)
+    public async Task<DocumentDetails> AddAsync(DocumentDetails documentDetails)
     {
         _appDbContext.Documents.Add(documentDetails);
         await _appDbContext.SaveChangesAsync();
         return documentDetails;
     }
 
-    public async Task<DocumentDetails> UpdateDocumentsDetailsAsync(DocumentDetails documentDetails)
+    public async Task<DocumentDetails> UpdateAsync(DocumentDetails documentDetails)
     {
         var existingDocument = await _appDbContext.Documents
             .FirstOrDefaultAsync(d => d.Id == documentDetails.Id) ?? throw new InvalidOperationException("Document not found");
@@ -45,7 +45,7 @@ internal class DocumentRepository(AppDbContext appDbContext) : IDocumentReposito
         return documentDetails;
     }
 
-    public async Task DeleteDocumentsDetailsByIdAsync(Guid documentId, string user)
+    public async Task DeleteByIdAsync(Guid documentId, string user)
     {
         var document = await _appDbContext.Documents
             .FirstOrDefaultAsync(d => d.Id == documentId) ?? throw new InvalidOperationException("Document not found");
