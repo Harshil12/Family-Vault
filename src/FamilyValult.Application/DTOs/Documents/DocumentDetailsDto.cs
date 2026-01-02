@@ -4,7 +4,6 @@ namespace FamilyVault.Application.DTOs.Documents;
 
 public class DocumentDetailsDto : BaseDto
 {
-    public Guid Id { get; set; }
 
     public DocumentTypes DocumentType { get; set; }
 

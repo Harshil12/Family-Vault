@@ -3,6 +3,7 @@ using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace FamilyVault.Application.Services;
 
@@ -10,21 +11,32 @@ public class Userservice : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
+    private readonly ILogger _logger;
 
-    public Userservice(IUserRepository userRepository, IMapper mapper)
+    public Userservice(IUserRepository userRepository, IMapper mapper, ILogger logger)
     {
         _userRepository = userRepository;
         _mapper = mapper;
+        _logger = logger;
     }
     public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest)
     {
+        _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
+
         var result = await  _userRepository.AddAsync(_mapper.Map<Domain.Entities.User>(createUserRequest));
+        
+        _logger.LogInformation("User created successfully with ID: {UserId}", result.Id);
+
         return _mapper.Map<UserDto>(result);
     }
 
     public async Task DeleteUserByIdAsync(Guid userId)
     {
+        _logger.LogInformation("Deleting user with ID: {UserId}", userId);
+
         await _userRepository.DeleteByIdAsync(userId, "Harshil");
+    
+        _logger.LogInformation("User with ID: {UserId} deleted successfully", userId);
     }
 
     public async Task<IReadOnlyList<UserDto>> GetUserAsync()
@@ -41,7 +53,12 @@ public class Userservice : IUserService
 
     public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest)
     {
+        _logger.LogInformation("Updating user with ID: {UserId}", updateUserRequest.Id);
+        
         var user = await _userRepository.UpdateAsync(_mapper.Map<User>(updateUserRequest));
+        
+        _logger.LogInformation("User with ID: {UserId} updated successfully", updateUserRequest.Id);
+        
         return _mapper.Map<UserDto>(user);
     }
 }

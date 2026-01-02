@@ -4,7 +4,6 @@ namespace FamilyVault.Application.DTOs.FamilyMembers;
 
 public class FamilyMemberDto: BaseDto 
 {
-    public Guid Id { get; set; }
 
     public Guid FamilyId { get; set; }
 
