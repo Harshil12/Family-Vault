@@ -9,11 +9,11 @@ public static class FamilyMemberEvents
     {
         var familyGroup = app.MapGroup("/familymember");
 
-        familyGroup.MapGet("/", async (IFamilymemeberService familyService, HttpContext httpContext, ILogger logger) =>
+        familyGroup.MapGet("/", async (IFamilymemeberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory) =>
         {
             var traceId = httpContext.TraceIdentifier;
             var result = await familyService.GetFamilyMembersAsync();
-
+            var logger = loggerFactory.CreateLogger("FamilyMemberEvents");
             if (result is null || !result.Any())
             {
                 logger.LogWarning($"No family members found. TraceId: {traceId}");
@@ -23,10 +23,11 @@ public static class FamilyMemberEvents
             return Results.Ok(ApiResponse<IReadOnlyList<FamilyMemberDto>>.Success(result, string.Empty, traceId));
         });
 
-        familyGroup.MapGet("/{id:Guid}", async (Guid id, IFamilymemeberService familyService, HttpContext httpContext, ILogger logger) =>
+        familyGroup.MapGet("/{id:Guid}", async (Guid id, IFamilymemeberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory) =>
         {
             var traceId = httpContext.TraceIdentifier;
             var result = await familyService.GetFamilyMemberByIdAsync(id);
+            var logger = loggerFactory.CreateLogger("FamilyMemberEvents");
 
             if (result is null)
             {
@@ -40,7 +41,7 @@ public static class FamilyMemberEvents
             return Results.Ok(ApiResponse<FamilyMemberDto>.Success(result, string.Empty, traceId));
         });
 
-        familyGroup.MapDelete("/{id:guid}", async (Guid id, IFamilymemeberService familyService, HttpContext httpContext, ILogger logger) =>
+        familyGroup.MapDelete("/{id:guid}", async (Guid id, IFamilymemeberService familyService, HttpContext httpContext) =>
         {
             var traceId = httpContext.TraceIdentifier;
             await familyService.DeleteFamilyMemberByIdAsync(id);
@@ -48,7 +49,7 @@ public static class FamilyMemberEvents
             return Results.Ok(ApiResponse<FamilyMemberDto>.Success(null, "Family member has been successfully deleted.", traceId));
         });
 
-        familyGroup.MapPost("/familymember", async (CreateFamilyMememberRequest createFamilyRequest, IFamilymemeberService familyService, HttpContext httpContext, ILogger logger) =>
+        familyGroup.MapPost("/familymember", async (CreateFamilyMememberRequest createFamilyRequest, IFamilymemeberService familyService, HttpContext httpContext) =>
         {
             var traceId = httpContext.TraceIdentifier;
             var created = await familyService.CreateFamilyMemberAsync(createFamilyRequest);
@@ -57,7 +58,7 @@ public static class FamilyMemberEvents
                     ApiResponse<FamilyMemberDto>.Success(created, "Family member has been successfully created.", traceId));
         });
 
-        familyGroup.MapPut("/familymember/{id:guid}", async (UpdateFamilyMememberRequest updateFamlyRequest, IFamilymemeberService familyService, HttpContext httpContext, ILogger logger) =>
+        familyGroup.MapPut("/familymember/{id:guid}", async (UpdateFamilyMememberRequest updateFamlyRequest, IFamilymemeberService familyService, HttpContext httpContext) =>
         {
             var traceId = httpContext.TraceIdentifier;
             var updated = await familyService.UpdateFamilyMemberAsync(updateFamlyRequest);

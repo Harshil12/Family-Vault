@@ -23,8 +23,4 @@
 		<ProjectReference Include="..\FamilyVault.Infrastructure\FamilyVault.Infrastructure.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Controllers\" />
-	</ItemGroup>
-
 </Project>
