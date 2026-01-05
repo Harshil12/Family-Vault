@@ -1,28 +1,30 @@
-﻿namespace FamilyVault.API;
-
-public class ApiResposne<T>
+﻿public class ApiResponse<T>
 {
     public bool IsSuccess { get; set; }
     public string? Message { get; set; }
+    public string? ErrorCode { get; set; }   // Useful for mapping business/domain errors
+    public string? TraceId { get; set; }     // Correlation ID for logging/tracing
+    public T? Data { get; set; }
 
-    public T? Data { get; set; }    
-
-    public ApiResposne<T> Success(T data, string? message = null)
+    public static ApiResponse<T> Success(T data, string? message = null, string? traceId = null) 
     {
-        return new ApiResposne<T>
+        return new ApiResponse<T>
         {
             IsSuccess = true,
             Data = data,
-            Message = message
+            Message = message,
+            TraceId = traceId
         };
     }
-    
-    public ApiResposne<T> Failure(string? message = null)
+
+    public static ApiResponse<T> Failure(string? message = null, string? errorCode = null, string? traceId = null)
     {
-        return new ApiResposne<T>
+        return new ApiResponse<T>
         {
             IsSuccess = false,
-            Message = message
+            Message = message,
+            ErrorCode = errorCode,
+            TraceId = traceId
         };
     }
 }

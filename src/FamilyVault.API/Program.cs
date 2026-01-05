@@ -1,10 +1,12 @@
-﻿using FamilyVault.Application;
+﻿using FamilyVault.API.EndPoints.Document;
+using FamilyVault.Application;
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Application.Services;
 using FamilyVault.Application.Validators.Document;
 using FamilyVault.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Http;
 
 namespace FamilyVault.API;
 
@@ -36,6 +38,8 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseMiddleware<MiddlewearGlobalExceaption>();
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -46,8 +50,16 @@ public class Program
 
         app.UseAuthorization();
 
+        //app.MapControllers();
 
-        app.MapControllers();
+        //app.MapGet("/test", () =>
+        //{
+        //    var response = ApiResponse<string>.Success("Service is working fine.", "Wow");
+
+        //    return Results.Ok(response); // HTTP 200
+        //});
+
+        app.MapDocumentEndPoints(); 
 
         app.Run();
     }
