@@ -25,9 +25,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Controllers\" />
-	  <Folder Include="EndPoints\Family\" />
-	  <Folder Include="EndPoints\FamilyMeMber\" />
-	  <Folder Include="EndPoints\User\" />
 	</ItemGroup>
 
 </Project>

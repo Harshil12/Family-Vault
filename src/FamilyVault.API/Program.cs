@@ -1,4 +1,4 @@
-﻿using FamilyVault.API.EndPoints.Document;
+﻿using FamilyVault.API.EndPoints;
 using FamilyVault.Application;
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Application.Services;
@@ -6,7 +6,6 @@ using FamilyVault.Application.Validators.Document;
 using FamilyVault.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Http;
 
 namespace FamilyVault.API;
 
@@ -59,7 +58,7 @@ public class Program
         //    return Results.Ok(response); // HTTP 200
         //});
 
-        app.MapDocumentEndPoints(); 
+        app.MapAllEndpoints();
 
         app.Run();
     }

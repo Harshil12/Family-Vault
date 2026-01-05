@@ -6,7 +6,7 @@
     public string? TraceId { get; set; }     // Correlation ID for logging/tracing
     public T? Data { get; set; }
 
-    public static ApiResponse<T> Success(T data, string? message = null, string? traceId = null) 
+    public static ApiResponse<T> Success(T? data, string? message = null, string? traceId = null) 
     {
         return new ApiResponse<T>
         {
