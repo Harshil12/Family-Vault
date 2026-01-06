@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.DTOs.FamilyMembers;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
@@ -24,11 +23,11 @@ public class FamilyMemberService : IFamilymemeberService
     {
         _logger.LogInformation("Creating a new family member: {FirstName} {LastName}", createFamilyMememberRequest.FirstName, createFamilyMememberRequest.LastName);
 
-        var entity = _mapper.Map<FamilyMember>(createFamilyMememberRequest);
-        entity.CreatedAt = DateTimeOffset.Now;
-        entity.CreatedBy = "Harshil";
+        var familMemberToCreate = _mapper.Map<FamilyMember>(createFamilyMememberRequest);
+        familMemberToCreate.CreatedAt = DateTimeOffset.Now;
+        familMemberToCreate.CreatedBy = "Harshil";
 
-        var result = await _familyMemberRepository.AddAsync(entity);
+        var result = await _familyMemberRepository.AddAsync(familMemberToCreate);
 
         _logger.LogInformation("Successfully created family member with ID: {FamilyMemberId}", result.Id);
         
@@ -60,11 +59,11 @@ public class FamilyMemberService : IFamilymemeberService
     {
         _logger.LogInformation("Updating family member with ID: {FamilyMemberId}", updateFamilyMememberRequest.Id);
 
-        var entity = _mapper.Map<FamilyMember>(updateFamilyMememberRequest);
-        entity.UpdatedAt = DateTimeOffset.Now;
-        entity.UpdatedBy = "Harshil";
+        var familMemberToUpdate = _mapper.Map<FamilyMember>(updateFamilyMememberRequest);
+        familMemberToUpdate.UpdatedAt = DateTimeOffset.Now;
+        familMemberToUpdate.UpdatedBy = "Harshil";
 
-        var result = await _familyMemberRepository.UpdateAsync(entity);
+        var result = await _familyMemberRepository.UpdateAsync(familMemberToUpdate);
         
         _logger.LogInformation("Successfully updated family member with ID: {FamilyMemberId}", result.Id);
 

@@ -22,23 +22,23 @@ public class DocumentService : IDocumentService
     public async Task<DocumentDetailsDto> CreateDocumentDetailsAsync(CreateDocumentRequest createDocumentRequest)
     {
         _logger.LogInformation("Creating a new document for FamilyMemberId: {FamilyMemberId}", createDocumentRequest.FamilyMemberId);
-        
-        var entity = _mapper.Map<DocumentDetails>(createDocumentRequest);
-        entity.CreatedAt = DateTimeOffset.Now;
-        entity.CreatedBy = "Harshil";
-       
-        var result = await _documentReppository.AddAsync(entity);
+
+        var documentToCreate = _mapper.Map<DocumentDetails>(createDocumentRequest);
+        documentToCreate.CreatedAt = DateTimeOffset.Now;
+        documentToCreate.CreatedBy = "Harshil";
+
+        var result = await _documentReppository.AddAsync(documentToCreate);
 
         _logger.LogInformation("Document created with Id: {DocumentId}", result.Id);
 
-        return _mapper.Map<DocumentDetailsDto>(result);        
+        return _mapper.Map<DocumentDetailsDto>(result);
     }
 
     public async Task DeleteDocumentDetailsByIdAsync(Guid documentId)
     {
         _logger.LogInformation("Deleting document with Id: {DocumentId}", documentId);
 
-        await _documentReppository.DeleteByIdAsync(documentId,"Harshil");
+        await _documentReppository.DeleteByIdAsync(documentId, "Harshil");
 
         _logger.LogInformation("Document with Id: {DocumentId} deleted successfully", documentId);
     }
@@ -59,11 +59,11 @@ public class DocumentService : IDocumentService
     {
         _logger.LogInformation("Updating document with Id: {DocumentId}", updateDocumentRequest.Id);
 
-        var entity = _mapper.Map<DocumentDetails>(updateDocumentRequest);
-        entity.UpdatedAt = DateTimeOffset.Now;
-        entity.UpdatedBy = "Harshil";
+        var documentToUpdate = _mapper.Map<DocumentDetails>(updateDocumentRequest);
+        documentToUpdate.UpdatedAt = DateTimeOffset.Now;
+        documentToUpdate.UpdatedBy = "Harshil";
 
-        var result = await _documentReppository.UpdateAsync(entity);
+        var result = await _documentReppository.UpdateAsync(documentToUpdate);
 
         _logger.LogInformation("Document with Id: {DocumentId} updated successfully", result.Id);
 

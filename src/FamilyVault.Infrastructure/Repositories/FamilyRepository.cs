@@ -45,12 +45,12 @@ public class FamilyRepository : IFamilyRepository
 
     public async Task DeleteByIdAsync(Guid familyId, string user)
     {
-        var family = await _appDbContext.Families
+        var existingFamily = await _appDbContext.Families
             .FirstOrDefaultAsync(fm => fm.Id == familyId) ?? throw new KeyNotFoundException("Family not found");
 
-        family.IsDeleted = true;
-        family.UpdatedAt = DateTimeOffset.UtcNow;
-        family.UpdatedBy = user;
+        existingFamily.IsDeleted = true;
+        existingFamily.UpdatedAt = DateTimeOffset.UtcNow;
+        existingFamily.UpdatedBy = user;
 
         await _appDbContext.SaveChangesAsync();
     }

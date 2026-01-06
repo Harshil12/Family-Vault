@@ -52,12 +52,12 @@ public class FamilyMemberRepository(AppDbContext appContext) : IFamilyMemberRepo
 
     public async Task DeleteByIdAsync(Guid familyMemberId, string user)
     {
-        var familyMember = await _appDbContext.FamilyMembers
+        var existingFamilyMember = await _appDbContext.FamilyMembers
             .FirstOrDefaultAsync(fm => fm.Id == familyMemberId) ?? throw new KeyNotFoundException("Family member not found");
 
-        familyMember.IsDeleted = true;
-        familyMember.UpdatedAt = DateTimeOffset.UtcNow;
-        familyMember.UpdatedBy = user;
+        existingFamilyMember.IsDeleted = true;
+        existingFamilyMember.UpdatedAt = DateTimeOffset.UtcNow;
+        existingFamilyMember.UpdatedBy = user;
 
         await _appDbContext.SaveChangesAsync();
     }

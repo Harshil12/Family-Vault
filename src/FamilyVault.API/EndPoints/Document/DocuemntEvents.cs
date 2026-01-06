@@ -15,15 +15,16 @@ public static class DocumentEvents
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("DocumentEvents");
 
-            var result = await _documentService.GetDocumentsDetailsAsync();
+            var documentDetails = await _documentService.GetDocumentsDetailsAsync();
 
-            if (result is null || !result.Any())
+            if (documentDetails is null || !documentDetails.Any())
             {
                 logger.LogWarning($"No documents found. TraceId: {traceId}");
+          
                 return Results.Ok(ApiResponse<IReadOnlyList<DocumentDetailsDto>>.Success(Array.Empty<DocumentDetailsDto>(), string.Empty, traceId));
             }
             
-            return Results.Ok(ApiResponse<IReadOnlyList<DocumentDetailsDto>>.Success(result, string.Empty, traceId));
+            return Results.Ok(ApiResponse<IReadOnlyList<DocumentDetailsDto>>.Success(documentDetails, string.Empty, traceId));
         });
 
         documentGroup.MapGet("/{id:guid}", async (Guid id, IDocumentService _documentService, HttpContext httpContext, ILoggerFactory loggerFactory) =>
@@ -31,23 +32,25 @@ public static class DocumentEvents
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("DocumentEvents");
 
-            var result = await _documentService.GetDocumentDetailsByIdAsync(id);
+            var documentDetail = await _documentService.GetDocumentDetailsByIdAsync(id);
 
-            if (result is null)
+            if (documentDetail is null)
             {
                 logger.LogWarning($"No documents found for id - {id}. TraceId: {traceId}");
+             
                 return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
                         message: "No documents found for given id",
                         errorCode: "DOC_NOT_FOUND",
                         traceId: traceId));
             }
 
-            return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(result, string.Empty, traceId));
+            return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(documentDetail, string.Empty, traceId));
         });
 
         documentGroup.MapDelete("/{id:guid}", async (Guid id, IDocumentService _documentService, HttpContext httpContext) =>
         {
             var traceId = httpContext.TraceIdentifier;
+        
             await _documentService.DeleteDocumentDetailsByIdAsync(id);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(null, "Document has been successfully deleted.", traceId));
@@ -56,18 +59,20 @@ public static class DocumentEvents
         documentGroup.MapPost("/documents", async (CreateDocumentRequest createDocumentRequest, IDocumentService _documentService, HttpContext httpContext) =>
         {
             var traceId = httpContext.TraceIdentifier;
-            var created = await _documentService.CreateDocumentDetailsAsync(createDocumentRequest);
+     
+            var createdDocument = await _documentService.CreateDocumentDetailsAsync(createDocumentRequest);
 
-            return Results.Created($"/documents/{created.Id}",
-                ApiResponse<DocumentDetailsDto>.Success(created, "Document has been successfully created.", traceId));
+            return Results.Created($"/documents/{createdDocument.Id}",
+                ApiResponse<DocumentDetailsDto>.Success(createdDocument, "Document has been successfully createdDocument.", traceId));
         });
 
         documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest, IDocumentService _documentService, HttpContext httpContext) =>
         {
             var traceId = httpContext.TraceIdentifier;
-            var updated = await _documentService.UpdateDocumentDetailsAsync(updateDocumentRequest);
+     
+            var updatedDocument = await _documentService.UpdateDocumentDetailsAsync(updateDocumentRequest);
 
-            return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updated, "Document has been successfully updated.", traceId));
+            return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updatedDocument, "Document has been successfully updatedDocument.", traceId));
         });
     }
 }

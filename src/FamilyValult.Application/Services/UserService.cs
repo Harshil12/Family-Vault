@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FamilyVault.Application.DTOs.Family;
 using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
@@ -24,11 +23,11 @@ public class Userservice : IUserService
     {
         _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
 
-        var entity = _mapper.Map<User>(createUserRequest);
-        entity.CreatedAt = DateTimeOffset.Now;
-        entity.CreatedBy = "Harshil";
+        var userToCreate = _mapper.Map<User>(createUserRequest);
+        userToCreate.CreatedAt = DateTimeOffset.Now;
+        userToCreate.CreatedBy = "Harshil";
 
-        var result = await _userRepository.AddAsync(entity);
+        var result = await _userRepository.AddAsync(userToCreate);
 
         _logger.LogInformation("User created successfully with ID: {UserId}", result.Id);
 
@@ -60,11 +59,11 @@ public class Userservice : IUserService
     {
         _logger.LogInformation("Updating user with ID: {UserId}", updateUserRequest.Id);
        
-        var entity = _mapper.Map<User>(updateUserRequest);
-        entity.UpdatedAt = DateTimeOffset.Now;
-        entity.UpdatedBy = "Harshil";
+        var userToUpdate = _mapper.Map<User>(updateUserRequest);
+        userToUpdate.UpdatedAt = DateTimeOffset.Now;
+        userToUpdate.UpdatedBy = "Harshil";
 
-        var user = await _userRepository.UpdateAsync(entity);
+        var user = await _userRepository.UpdateAsync(userToUpdate);
 
         _logger.LogInformation("User with ID: {UserId} updated successfully", updateUserRequest.Id);
         

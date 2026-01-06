@@ -45,12 +45,12 @@ internal class DocumentRepository(AppDbContext appDbContext) : IDocumentReposito
 
     public async Task DeleteByIdAsync(Guid documentId, string user)
     {
-        var document = await _appDbContext.Documents
+        var existingDocument = await _appDbContext.Documents
             .FirstOrDefaultAsync(d => d.Id == documentId) ?? throw new KeyNotFoundException("Document not found");
 
-        document.IsDeleted = true;
-        document.UpdatedAt = DateTimeOffset.UtcNow;
-        document.UpdatedBy = user;
+        existingDocument.IsDeleted = true;
+        existingDocument.UpdatedAt = DateTimeOffset.UtcNow;
+        existingDocument.UpdatedBy = user;
 
         await _appDbContext.SaveChangesAsync();
     }

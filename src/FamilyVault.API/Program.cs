@@ -15,6 +15,19 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        var allowedUrls = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+        var allowedMethods = builder.Configuration.GetSection("Cors:AllowedMethods").Get<string[]>();
+
+        builder.Services.AddCors(option =>
+            {
+                option.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.WithOrigins(allowedUrls ?? Array.Empty<string>())
+                          .WithMethods(allowedMethods ?? Array.Empty<string>())
+                          .AllowAnyHeader();
+                });
+            });
+
         // Add services to the container.
 
         builder.Services.AddControllers();
@@ -42,6 +55,7 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseCors("CorsPolicy");
         app.UseMiddleware<MiddlewearGlobalExceaption>();
 
         // Configure the HTTP request pipeline.

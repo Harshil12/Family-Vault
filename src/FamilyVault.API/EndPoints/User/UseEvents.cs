@@ -12,38 +12,44 @@ public static class MapAllEndpoints
         familyGroup.MapGet("/", async (IUserService userService, HttpContext httpContext, ILoggerFactory loggerFactory) =>
         {
             var traceId = httpContext.TraceIdentifier;
-            var result = await userService.GetUserAsync();
             var logger = loggerFactory.CreateLogger("GetUsersEndpoint");
 
-            if (result is null || !result.Any())
+            var usersDetails = await userService.GetUserAsync();
+
+            if (usersDetails is null || !usersDetails.Any())
             {
                 logger.LogWarning($"No user found. TraceId: {traceId}");
+          
                 return Results.Ok(ApiResponse<IReadOnlyList<UserDto>>.Success(Array.Empty<UserDto>(), string.Empty, traceId));
             }
 
-            return Results.Ok(ApiResponse<IReadOnlyList<UserDto>>.Success(result, string.Empty, traceId));
+            return Results.Ok(ApiResponse<IReadOnlyList<UserDto>>.Success(usersDetails, string.Empty, traceId));
         });
 
         familyGroup.MapGet("/{id:Guid}", async (Guid id, IUserService userService, HttpContext httpContext, ILoggerFactory loggerFactory) =>
         {
             var traceId = httpContext.TraceIdentifier;
-            var result = await userService.GetUserByIdAsync(id);
             var logger = loggerFactory.CreateLogger("GetUserByIdEndpoint");
-            if (result is null)
+
+            var userDetail = await userService.GetUserByIdAsync(id);
+
+            if (userDetail is null)
             {
                 logger.LogWarning($"No user found for id - {id}. TraceId: {traceId}");
+           
                 return Results.NotFound(ApiResponse<UserDto>.Failure(
                         message: "No user found for given id",
                         errorCode: "USER_NOT_FOUND",
                         traceId: traceId));
             }
 
-            return Results.Ok(ApiResponse<UserDto>.Success(result, string.Empty, traceId));
+            return Results.Ok(ApiResponse<UserDto>.Success(userDetail, string.Empty, traceId));
         });
 
         familyGroup.MapDelete("/{id:guid}", async (Guid id, IUserService userService, HttpContext httpContext) =>
         {
             var traceId = httpContext.TraceIdentifier;
+        
             await userService.DeleteUserByIdAsync(id);
 
             return Results.Ok(ApiResponse<UserDto>.Success(null, "User has been successfully deleted.", traceId));
@@ -52,18 +58,20 @@ public static class MapAllEndpoints
         familyGroup.MapPost("/user", async (CreateUserRequest createUserRequest, IUserService userService, HttpContext httpContext) =>
         {
             var traceId = httpContext.TraceIdentifier;
-            var created = await userService.CreateUserAsync(createUserRequest);
+        
+            var createdUser = await userService.CreateUserAsync(createUserRequest);
 
-            return Results.Created($"/user/{created.Id}",
-                    ApiResponse<UserDto>.Success(created, "User has been successfully created.", traceId));
+            return Results.Created($"/user/{createdUser.Id}",
+                    ApiResponse<UserDto>.Success(createdUser, "User has been successfully createdUser.", traceId));
         });
 
         familyGroup.MapPut("/user/{id:guid}", async (UpdateUserRequest updateUserRequest, IUserService userService, HttpContext httpContext) =>
         {
             var traceId = httpContext.TraceIdentifier;
-            var updated = await userService.UpdateuUerAsync(updateUserRequest);
+      
+            var updatedUser = await userService.UpdateuUerAsync(updateUserRequest);
 
-            return Results.Ok(ApiResponse<UserDto>.Success(updated, "Update has been successfully updated.", traceId));
+            return Results.Ok(ApiResponse<UserDto>.Success(updatedUser, "Update has been successfully updatedUser.", traceId));
         });
     }
 }
