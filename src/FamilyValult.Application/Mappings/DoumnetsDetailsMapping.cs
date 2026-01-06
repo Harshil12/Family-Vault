@@ -9,6 +9,6 @@ public class DoumnetsDetailsMapping : Profile
     {
         CreateMap<CreateDocumentRequest, DocumentDetails>();
         CreateMap<UpdateDocumentRequest, DocumentDetails>();
-        CreateMap<DocumentDetails, DocumentDetailsDto>();
+        CreateMap<DocumentDetails, DocumentDetailsDto>().ReverseMap();
     }
 }

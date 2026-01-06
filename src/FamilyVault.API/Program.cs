@@ -35,6 +35,11 @@ public class Program
 
         builder.Services.AddAutoMapper(typeof(ApplicationAssemblyMarker));
 
+        // Register swagger services
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+
+
         var app = builder.Build();
 
         app.UseMiddleware<MiddlewearGlobalExceaption>();
@@ -42,21 +47,14 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            // app.MapOpenApi();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
 
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
 
-        //app.MapControllers();
-
-        //app.MapGet("/test", () =>
-        //{
-        //    var response = ApiResponse<string>.Success("Service is working fine.", "Wow");
-
-        //    return Results.Ok(response); // HTTP 200
-        //});
 
         app.MapAllEndpoints();
 

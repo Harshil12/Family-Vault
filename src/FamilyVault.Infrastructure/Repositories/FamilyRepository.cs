@@ -34,10 +34,8 @@ public class FamilyRepository : IFamilyRepository
     public async Task<Family> UpdateAsync(Family family)
     {
         var existingFamily = await _appDbContext.Families
-            .FirstOrDefaultAsync(fm => fm.Id == family.Id) ?? throw new InvalidOperationException("Family not found");
+            .FirstOrDefaultAsync(fm => fm.Id == family.Id) ?? throw new KeyNotFoundException("Family not found");
         existingFamily.Name = family.Name;
-        existingFamily.UpdatedAt = DateTimeOffset.UtcNow;
-        existingFamily.UpdatedBy = family.UpdatedBy;
         existingFamily.UserId = family.UserId;
 
         await _appDbContext.SaveChangesAsync();
@@ -48,7 +46,7 @@ public class FamilyRepository : IFamilyRepository
     public async Task DeleteByIdAsync(Guid familyId, string user)
     {
         var family = await _appDbContext.Families
-            .FirstOrDefaultAsync(fm => fm.Id == familyId) ?? throw new InvalidOperationException("Family not found");
+            .FirstOrDefaultAsync(fm => fm.Id == familyId) ?? throw new KeyNotFoundException("Family not found");
 
         family.IsDeleted = true;
         family.UpdatedAt = DateTimeOffset.UtcNow;

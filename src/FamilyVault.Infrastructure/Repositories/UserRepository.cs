@@ -36,7 +36,7 @@ public class UserRepository : IUserRepository
     public async Task<User> UpdateAsync(User user)
     {
         var existingUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id)
-     ?? throw new InvalidOperationException("User not found");
+     ?? throw new KeyNotFoundException("User not found");
 
         existingUser.FirstName = user.FirstName;
         existingUser.LastName = user.LastName;
@@ -45,16 +45,14 @@ public class UserRepository : IUserRepository
         existingUser.Mobile = user.Mobile;
         existingUser.Username = user.Username;
         existingUser.Password = user.Password;
-        existingUser.UpdatedAt = DateTimeOffset.UtcNow;
-        existingUser.UpdatedBy = user.UpdatedBy;
-
+   
         await _appDbContext.SaveChangesAsync();
         return existingUser;
     }
     public async Task DeleteByIdAsync(Guid userId, string user)
     {
         var existingUser = await _appDbContext.Users
-           .FirstOrDefaultAsync(u => u.Id == userId) ?? throw new InvalidOperationException("User not found");
+           .FirstOrDefaultAsync(u => u.Id == userId) ?? throw new KeyNotFoundException("User not found");
 
         existingUser.IsDeleted = true;
         existingUser.UpdatedAt = DateTimeOffset.UtcNow;

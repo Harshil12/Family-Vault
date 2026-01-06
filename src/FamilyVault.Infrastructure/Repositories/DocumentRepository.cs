@@ -31,16 +31,14 @@ internal class DocumentRepository(AppDbContext appDbContext) : IDocumentReposito
     public async Task<DocumentDetails> UpdateAsync(DocumentDetails documentDetails)
     {
         var existingDocument = await _appDbContext.Documents
-            .FirstOrDefaultAsync(d => d.Id == documentDetails.Id) ?? throw new InvalidOperationException("Document not found");
+            .FirstOrDefaultAsync(d => d.Id == documentDetails.Id) ?? throw new KeyNotFoundException("Document not found");
 
         existingDocument.DocumentType = documentDetails.DocumentType;
         existingDocument.DocumentNumber = documentDetails.DocumentNumber;
         existingDocument.IssueDate = documentDetails.IssueDate;
         existingDocument.ExpiryDate = documentDetails.ExpiryDate;
         existingDocument.SavedLocation = documentDetails.SavedLocation;
-        existingDocument.UpdatedAt = DateTimeOffset.UtcNow;
-        existingDocument.UpdatedBy = documentDetails.UpdatedBy;
-
+    
         await _appDbContext.SaveChangesAsync();
         return documentDetails;
     }
@@ -48,7 +46,7 @@ internal class DocumentRepository(AppDbContext appDbContext) : IDocumentReposito
     public async Task DeleteByIdAsync(Guid documentId, string user)
     {
         var document = await _appDbContext.Documents
-            .FirstOrDefaultAsync(d => d.Id == documentId) ?? throw new InvalidOperationException("Document not found");
+            .FirstOrDefaultAsync(d => d.Id == documentId) ?? throw new KeyNotFoundException("Document not found");
 
         document.IsDeleted = true;
         document.UpdatedAt = DateTimeOffset.UtcNow;

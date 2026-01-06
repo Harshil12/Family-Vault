@@ -9,6 +9,6 @@ public class FamilyMembersMapping : Profile
     {
         CreateMap<CreateFamilyMememberRequest, FamilyMember>();
         CreateMap<UpdateFamilyMememberRequest, FamilyMember>();
-        CreateMap<FamilyMember, FamilyMemberDto>();
+        CreateMap<FamilyMember, FamilyMemberDto>().ReverseMap();
     }    
 }

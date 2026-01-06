@@ -23,7 +23,11 @@ public class DocumentService : IDocumentService
     {
         _logger.LogInformation("Creating a new document for FamilyMemberId: {FamilyMemberId}", createDocumentRequest.FamilyMemberId);
         
-        var result = await _documentReppository.AddAsync(_mapper.Map<DocumentDetails>(createDocumentRequest));
+        var entity = _mapper.Map<DocumentDetails>(createDocumentRequest);
+        entity.CreatedAt = DateTimeOffset.Now;
+        entity.CreatedBy = "Harshil";
+       
+        var result = await _documentReppository.AddAsync(entity);
 
         _logger.LogInformation("Document created with Id: {DocumentId}", result.Id);
 
@@ -54,9 +58,13 @@ public class DocumentService : IDocumentService
     public async Task<DocumentDetailsDto> UpdateDocumentDetailsAsync(UpdateDocumentRequest updateDocumentRequest)
     {
         _logger.LogInformation("Updating document with Id: {DocumentId}", updateDocumentRequest.Id);
-        
-        var result = await _documentReppository.AddAsync(_mapper.Map<DocumentDetails>(updateDocumentRequest));
-       
+
+        var entity = _mapper.Map<DocumentDetails>(updateDocumentRequest);
+        entity.UpdatedAt = DateTimeOffset.Now;
+        entity.UpdatedBy = "Harshil";
+
+        var result = await _documentReppository.UpdateAsync(entity);
+
         _logger.LogInformation("Document with Id: {DocumentId} updated successfully", result.Id);
 
         return _mapper.Map<DocumentDetailsDto>(result);

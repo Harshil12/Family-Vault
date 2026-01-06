@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FamilyVault.Application.DTOs.Family;
+using FamilyVault.Application.DTOs.FamilyMembers;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Domain.Entities;
@@ -23,8 +24,12 @@ public class FamilyService : IFamilyService
     {
         _logger.LogInformation("Creating a new family with name: {FamilyName}", createFamilyRequest.FamilyName);
 
-        var result = await _familyrepository.AddAsync(_mapper.Map<Family>(createFamilyRequest));
-                
+        var entity = _mapper.Map<Family>(createFamilyRequest);
+        entity.CreatedAt = DateTimeOffset.Now;
+        entity.CreatedBy = "Harshil";
+
+        var result = await _familyrepository.AddAsync(entity);
+
         _logger.LogInformation("Successfully created family with ID: {FamilyId}", result.Id);
         
         return _mapper.Map<FamilyDto>(result);
@@ -55,7 +60,11 @@ public class FamilyService : IFamilyService
     {
         _logger.LogInformation("Updating family with ID: {FamilyId}", updateFamlyRequest.Id);
 
-        var family = await _familyrepository.UpdateAsync(_mapper.Map<Family>(updateFamlyRequest));
+        var entity = _mapper.Map<Family>(updateFamlyRequest);
+        entity.UpdatedAt = DateTimeOffset.Now;
+        entity.UpdatedBy = "Harshil";
+
+        var family = await _familyrepository.UpdateAsync(entity);
 
         _logger.LogInformation("Successfully updated family with ID: {FamilyId}", family.Id);
 

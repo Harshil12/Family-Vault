@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FamilyVault.Application.DTOs.Family;
 using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
@@ -23,8 +24,12 @@ public class Userservice : IUserService
     {
         _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
 
-        var result = await  _userRepository.AddAsync(_mapper.Map<Domain.Entities.User>(createUserRequest));
-        
+        var entity = _mapper.Map<User>(createUserRequest);
+        entity.CreatedAt = DateTimeOffset.Now;
+        entity.CreatedBy = "Harshil";
+
+        var result = await _userRepository.AddAsync(entity);
+
         _logger.LogInformation("User created successfully with ID: {UserId}", result.Id);
 
         return _mapper.Map<UserDto>(result);
@@ -54,9 +59,13 @@ public class Userservice : IUserService
     public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest)
     {
         _logger.LogInformation("Updating user with ID: {UserId}", updateUserRequest.Id);
-        
-        var user = await _userRepository.UpdateAsync(_mapper.Map<User>(updateUserRequest));
-        
+       
+        var entity = _mapper.Map<User>(updateUserRequest);
+        entity.UpdatedAt = DateTimeOffset.Now;
+        entity.UpdatedBy = "Harshil";
+
+        var user = await _userRepository.UpdateAsync(entity);
+
         _logger.LogInformation("User with ID: {UserId} updated successfully", updateUserRequest.Id);
         
         return _mapper.Map<UserDto>(user);
