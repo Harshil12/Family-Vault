@@ -12,7 +12,7 @@ public class UpdateDocumentrValidators : AbstractValidator<UpdateDocumentRequest
 
         RuleFor(x => x.DocumentNumber).NotEmpty().WithMessage("Document number is required.");
 
-        RuleFor(x => x.DocumentType).NotEmpty().WithMessage("DocumentType is required.");
+        RuleFor(x => x.DocumentType).NotEmpty().WithMessage("Type is required.");
 
         RuleFor(x => x.FamilyMemberId).NotEmpty().WithMessage("Family member is required.");    
 

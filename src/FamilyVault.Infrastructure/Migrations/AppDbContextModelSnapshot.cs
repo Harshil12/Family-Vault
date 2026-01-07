@@ -35,11 +35,11 @@ namespace FamilyVault.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DocumentNumber")
+                    b.Property<string>("Number")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte>("DocumentType")
+                    b.Property<byte>("Type")
                         .HasColumnType("TINYINT");
 
                     b.Property<DateTimeOffset?>("ExpiryDate")

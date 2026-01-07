@@ -15,14 +15,14 @@ public interface IFamilyService
     /// <param name="familyId">The unique identifier of the family to retrieve.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyDto"/>
     /// representing the family if found; otherwise, <c>null</c>.</returns>
-    public Task<FamilyDto> GetFamilyByIdAsync(Guid familyId);
+    public Task<FamilyDto> GetFamilyByIdAsync(Guid familyId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously retrieves a read-only list of families.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains a read-only list of <see
     /// cref="FamilyDto"/> objects representing the families. The list is empty if no families are found.</returns>
-    public Task<IReadOnlyList<FamilyDto>> GetFamilyAsync();
+    public Task<IReadOnlyList<FamilyDto>> GetFamilyAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates the details of an existing family asynchronously using the specified request data.
@@ -30,7 +30,7 @@ public interface IFamilyService
     /// <param name="updateFamlyRequest">The request containing the updated family information. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyDto"/> with the
     /// updated family details.</returns>
-    public Task<FamilyDto> UpdateFamilyAsync(UpdateFamlyRequest updateFamlyRequest);
+    public Task<FamilyDto> UpdateFamilyAsync(UpdateFamlyRequest updateFamlyRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new family record asynchronously using the specified update request.
@@ -38,13 +38,13 @@ public interface IFamilyService
     /// <param name="createFamlyRequest">An object containing the details required to create the family. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyDto"/>
     /// representing the newly created family.</returns>
-    public Task<FamilyDto> CreateFamilyAsync(CreateFamilyRequest createFamlyRequest);
+    public Task<FamilyDto> CreateFamilyAsync(CreateFamilyRequest createFamlyRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes the family with the specified unique identifier asynchronously.
     /// </summary>
     /// <param name="familyId">The unique identifier of the family to delete.</param>
     /// <returns>A task that represents the asynchronous delete operation.</returns>
-    public Task DeleteFamilyByIdAsync(Guid familyId);
+    public Task DeleteFamilyByIdAsync(Guid familyId, CancellationToken cancellationToken);
 }
 

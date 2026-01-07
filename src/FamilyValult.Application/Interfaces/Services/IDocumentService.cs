@@ -18,7 +18,7 @@ public interface IDocumentService
     /// <param name="documentId">The unique identifier of the document to retrieve details for.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="DocumentDetailsDto"/>
     /// with the details of the specified document, or <see langword="null"/> if the document does not exist.</returns>
-    public Task<DocumentDetailsDto> GetDocumentDetailsByIdAsync(Guid documentId);
+    public Task<DocumentDetailsDto> GetDocumentDetailsByIdAsync(Guid documentId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously retrieves detailed information for all available documents.
@@ -26,7 +26,7 @@ public interface IDocumentService
     /// <returns>A task that represents the asynchronous operation. The task result contains a read-only list of <see
     /// cref="DocumentDetailsDto"/> objects, each representing the details of a document. The list is empty if no
     /// documents are available.</returns>
-    public Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync();
+    public Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously updates the details of a document based on the specified update request.
@@ -34,7 +34,7 @@ public interface IDocumentService
     /// <param name="updateDocumentRequest">An object containing the updated information for the document. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="DocumentDetailsDto"/>
     /// with the updated document details.</returns>
-    public Task<DocumentDetailsDto> UpdateDocumentDetailsAsync(UpdateDocumentRequest updateDocumentRequest);
+    public Task<DocumentDetailsDto> UpdateDocumentDetailsAsync(UpdateDocumentRequest updateDocumentRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new document and returns detailed information about the created document.
@@ -42,12 +42,12 @@ public interface IDocumentService
     /// <param name="createDocumentRequest">The request containing the data required to create the document. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="DocumentDetailsDto"/>
     /// with details of the newly created document.</returns>
-    public Task<DocumentDetailsDto> CreateDocumentDetailsAsync(CreateDocumentRequest createDocumentRequest);
+    public Task<DocumentDetailsDto> CreateDocumentDetailsAsync(CreateDocumentRequest createDocumentRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously deletes the details of the document identified by the specified unique identifier.
     /// </summary>
     /// <param name="documentId">The unique identifier of the document whose details are to be deleted.</param>
     /// <returns>A task that represents the asynchronous delete operation.</returns>
-    public Task DeleteDocumentDetailsByIdAsync(Guid documentId);
+    public Task DeleteDocumentDetailsByIdAsync(Guid documentId, CancellationToken cancellationToken);
 }

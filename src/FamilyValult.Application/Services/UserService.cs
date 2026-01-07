@@ -19,7 +19,7 @@ public class Userservice : IUserService
         _mapper = mapper;
         _logger = logger;
     }
-    public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest)
+    public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
 
@@ -27,46 +27,48 @@ public class Userservice : IUserService
         userToCreate.CreatedAt = DateTimeOffset.Now;
         userToCreate.CreatedBy = "Harshil";
 
-        var result = await _userRepository.AddAsync(userToCreate);
+        var result = await _userRepository.AddAsync(userToCreate, cancellationToken);
 
         _logger.LogInformation("User created successfully with ID: {UserId}", result.Id);
 
         return _mapper.Map<UserDto>(result);
     }
 
-    public async Task DeleteUserByIdAsync(Guid userId)
+    public async Task DeleteUserByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Deleting user with ID: {UserId}", userId);
 
-        await _userRepository.DeleteByIdAsync(userId, "Harshil");
-    
+        await _userRepository.DeleteByIdAsync(userId, "Harshil", cancellationToken);
+
         _logger.LogInformation("User with ID: {UserId} deleted successfully", userId);
     }
 
-    public async Task<IReadOnlyList<UserDto>> GetUserAsync()
+    public async Task<IReadOnlyList<UserDto>> GetUserAsync(CancellationToken cancellationToken)
     {
-        var users = await _userRepository.GetAllAsync();    
+        var users = await _userRepository.GetAllAsync(cancellationToken);
+
         return _mapper.Map<IReadOnlyList<UserDto>>(users);
     }
 
-    public async Task<UserDto> GetUserByIdAsync(Guid userId)
+    public async Task<UserDto> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+
         return _mapper.Map<UserDto>(user);
     }
 
-    public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest)
+    public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Updating user with ID: {UserId}", updateUserRequest.Id);
-       
+
         var userToUpdate = _mapper.Map<User>(updateUserRequest);
         userToUpdate.UpdatedAt = DateTimeOffset.Now;
         userToUpdate.UpdatedBy = "Harshil";
 
-        var user = await _userRepository.UpdateAsync(userToUpdate);
+        var user = await _userRepository.UpdateAsync(userToUpdate, cancellationToken);
 
         _logger.LogInformation("User with ID: {UserId} updated successfully", updateUserRequest.Id);
-        
+
         return _mapper.Map<UserDto>(user);
     }
 }

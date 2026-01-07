@@ -16,7 +16,7 @@ public interface IFamilyRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains the <see cref="Family"/> entity if found.
     /// </returns>
-    public Task<Family?> GetByIdAsync(Guid familyId);
+    public Task<Family?> GetByIdAsync(Guid familyId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Retrieves all families from the repository.
@@ -25,7 +25,7 @@ public interface IFamilyRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains a read-only list of <see cref="Family"/> entities.
     /// </returns>
-    public Task<IReadOnlyList<Family>> GetAllAsync();
+    public Task<IReadOnlyList<Family>> GetAllAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new family record in the repository.
@@ -35,7 +35,7 @@ public interface IFamilyRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains the newly created <see cref="Family"/> entity.
     /// </returns>
-    public Task<Family> AddAsync(Family family);
+    public Task<Family> AddAsync(Family family, CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates the details of an existing family.
@@ -45,7 +45,7 @@ public interface IFamilyRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains the updated <see cref="Family"/> entity.
     /// </returns>
-    public Task<Family> UpdateAsync(Family family);               
+    public Task<Family> UpdateAsync(Family family, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes a family from the repository using its unique identifier.
@@ -54,5 +54,5 @@ public interface IFamilyRepository
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
-    public Task DeleteByIdAsync(Guid familyId, string user);
+    public Task DeleteByIdAsync(Guid familyId, string user, CancellationToken cancellationToken);
 }

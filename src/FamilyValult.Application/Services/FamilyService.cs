@@ -13,13 +13,13 @@ public class FamilyService : IFamilyService
     private readonly IMapper _mapper;
     private readonly ILogger<FamilyService> _logger;
 
-    public FamilyService(IFamilyRepository familyRepository, IMapper mapper,ILogger<FamilyService> logger)
+    public FamilyService(IFamilyRepository familyRepository, IMapper mapper, ILogger<FamilyService> logger)
     {
         _familyrepository = familyRepository;
         _mapper = mapper;
         _logger = logger;
     }
-    public async Task<FamilyDto> CreateFamilyAsync(CreateFamilyRequest createFamilyRequest)
+    public async Task<FamilyDto> CreateFamilyAsync(CreateFamilyRequest createFamilyRequest, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Creating a new family with name: {FamilyName}", createFamilyRequest.FamilyName);
 
@@ -27,35 +27,37 @@ public class FamilyService : IFamilyService
         familyToCreate.CreatedAt = DateTimeOffset.Now;
         familyToCreate.CreatedBy = "Harshil";
 
-        var result = await _familyrepository.AddAsync(familyToCreate);
+        var result = await _familyrepository.AddAsync(familyToCreate, cancellationToken);
 
         _logger.LogInformation("Successfully created family with ID: {FamilyId}", result.Id);
-        
+
         return _mapper.Map<FamilyDto>(result);
     }
 
-    public async Task DeleteFamilyByIdAsync(Guid familyId)
+    public async Task DeleteFamilyByIdAsync(Guid familyId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Deleting family with ID: {FamilyId}", familyId);
 
-        await _familyrepository.DeleteByIdAsync(familyId, "Harshil");
-    
+        await _familyrepository.DeleteByIdAsync(familyId, "Harshil", cancellationToken);
+
         _logger.LogInformation("Successfully deleted family with ID: {FamilyId}", familyId);
     }
 
-    public async Task<IReadOnlyList<FamilyDto>> GetFamilyAsync()
+    public async Task<IReadOnlyList<FamilyDto>> GetFamilyAsync(CancellationToken cancellationToken)
     {
-        var result = await _familyrepository.GetAllAsync();
+        var result = await _familyrepository.GetAllAsync(cancellationToken);
+
         return _mapper.Map<IReadOnlyList<FamilyDto>>(result);
     }
 
-    public async Task<FamilyDto> GetFamilyByIdAsync(Guid familyId)
+    public async Task<FamilyDto> GetFamilyByIdAsync(Guid familyId, CancellationToken cancellationToken)
     {
-        var result = await _familyrepository.GetByIdAsync(familyId);
+        var result = await _familyrepository.GetByIdAsync(familyId, cancellationToken);
+
         return _mapper.Map<FamilyDto>(result);
     }
 
-    public async Task<FamilyDto> UpdateFamilyAsync(UpdateFamlyRequest updateFamlyRequest)
+    public async Task<FamilyDto> UpdateFamilyAsync(UpdateFamlyRequest updateFamlyRequest, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Updating family with ID: {FamilyId}", updateFamlyRequest.Id);
 
@@ -63,7 +65,7 @@ public class FamilyService : IFamilyService
         familyToUpdate.UpdatedAt = DateTimeOffset.Now;
         familyToUpdate.UpdatedBy = "Harshil";
 
-        var family = await _familyrepository.UpdateAsync(familyToUpdate);
+        var family = await _familyrepository.UpdateAsync(familyToUpdate, cancellationToken);
 
         _logger.LogInformation("Successfully updated family with ID: {FamilyId}", family.Id);
 

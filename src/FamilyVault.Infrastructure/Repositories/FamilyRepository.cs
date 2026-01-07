@@ -14,44 +14,46 @@ public class FamilyRepository : IFamilyRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task<IReadOnlyList<Family>> GetAllAsync()
+    public async Task<IReadOnlyList<Family>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _appDbContext.Families.AsNoTracking().ToListAsync();
+        return await _appDbContext.Families.AsNoTracking().ToListAsync(cancellationToken);
     }
 
-    public async Task<Family?> GetByIdAsync(Guid familyId)
+    public async Task<Family?> GetByIdAsync(Guid familyId, CancellationToken cancellationToken)
     {
-        return await _appDbContext.Families.FirstOrDefaultAsync(x => x.Id == familyId);
+        return await _appDbContext.Families.FirstOrDefaultAsync(x => x.Id == familyId, cancellationToken);
     }
 
-    public async Task<Family> AddAsync(Family family)
+    public async Task<Family> AddAsync(Family family, CancellationToken cancellationToken)
     {
-        _appDbContext.Families.Add(family);
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.Families.AddAsync(family, cancellationToken);
+        await _appDbContext.SaveChangesAsync(cancellationToken);
+
         return family;
     }
 
-    public async Task<Family> UpdateAsync(Family family)
+    public async Task<Family> UpdateAsync(Family family, CancellationToken cancellationToken)
     {
         var existingFamily = await _appDbContext.Families
-            .FirstOrDefaultAsync(fm => fm.Id == family.Id) ?? throw new KeyNotFoundException("Family not found");
+            .FirstOrDefaultAsync(fm => fm.Id == family.Id, cancellationToken) ?? throw new KeyNotFoundException("Family not found");
+
         existingFamily.Name = family.Name;
         existingFamily.UserId = family.UserId;
 
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.SaveChangesAsync(cancellationToken);
 
         return family;
     }
 
-    public async Task DeleteByIdAsync(Guid familyId, string user)
+    public async Task DeleteByIdAsync(Guid familyId, string user, CancellationToken cancellationToken)
     {
         var existingFamily = await _appDbContext.Families
-            .FirstOrDefaultAsync(fm => fm.Id == familyId) ?? throw new KeyNotFoundException("Family not found");
+            .FirstOrDefaultAsync(fm => fm.Id == familyId, cancellationToken) ?? throw new KeyNotFoundException("Family not found");
 
         existingFamily.IsDeleted = true;
         existingFamily.UpdatedAt = DateTimeOffset.UtcNow;
         existingFamily.UpdatedBy = user;
 
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.SaveChangesAsync(cancellationToken);
     }
 }

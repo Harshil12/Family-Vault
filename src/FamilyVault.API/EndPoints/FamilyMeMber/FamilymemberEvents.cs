@@ -9,13 +9,13 @@ public static class FamilyMemberEvents
     {
         var familyGroup = app.MapGroup("/familymember");
 
-        familyGroup.MapGet("/", async (IFamilymemeberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory) =>
+        familyGroup.MapGet("/", async (IFamilymemeberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
             
             var logger = loggerFactory.CreateLogger("FamilyMemberEvents");
 
-            var familyMembers = await familyService.GetFamilyMembersAsync();
+            var familyMembers = await familyService.GetFamilyMembersAsync(cancellationToken);
 
             if (familyMembers is null || !familyMembers.Any())
             {
@@ -25,15 +25,17 @@ public static class FamilyMemberEvents
             }
 
             return Results.Ok(ApiResponse<IReadOnlyList<FamilyMemberDto>>.Success(familyMembers, string.Empty, traceId));
+
         });
 
-        familyGroup.MapGet("/{id:Guid}", async (Guid id, IFamilymemeberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory) =>
+        familyGroup.MapGet("/{id:Guid}", async (Guid id, IFamilymemeberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
-            var result = await familyService.GetFamilyMemberByIdAsync(id);
             var logger = loggerFactory.CreateLogger("FamilyMemberEvents");
 
-            if (result is null)
+            var familyMember = await familyService.GetFamilyMemberByIdAsync(id, cancellationToken);
+
+            if (familyMember is null)
             {
                 logger.LogWarning($"No family member found for id - {id}. TraceId: {traceId}");
                 return Results.NotFound(ApiResponse<FamilyMemberDto>.Failure(
@@ -42,35 +44,39 @@ public static class FamilyMemberEvents
                         traceId: traceId));
             }
 
-            return Results.Ok(ApiResponse<FamilyMemberDto>.Success(result, string.Empty, traceId));
+            return Results.Ok(ApiResponse<FamilyMemberDto>.Success(familyMember, string.Empty, traceId));
+
         });
 
-        familyGroup.MapDelete("/{id:guid}", async (Guid id, IFamilymemeberService familyService, HttpContext httpContext) =>
+        familyGroup.MapDelete("/{id:guid}", async (Guid id, IFamilymemeberService familyService, HttpContext httpContext, CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
       
-            await familyService.DeleteFamilyMemberByIdAsync(id);
+            await familyService.DeleteFamilyMemberByIdAsync(id, cancellationToken);
 
             return Results.Ok(ApiResponse<FamilyMemberDto>.Success(null, "Family member has been successfully deleted.", traceId));
+
         });
 
-        familyGroup.MapPost("/familymember", async (CreateFamilyMememberRequest createFamilyRequest, IFamilymemeberService familyService, HttpContext httpContext) =>
+        familyGroup.MapPost("/familymember", async (CreateFamilyMememberRequest createFamilyRequest, IFamilymemeberService familyService, HttpContext httpContext, CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
        
-            var createdFamilyMember = await familyService.CreateFamilyMemberAsync(createFamilyRequest);
+            var createdFamilyMember = await familyService.CreateFamilyMemberAsync(createFamilyRequest, cancellationToken);
 
             return Results.Created($"/familymember/{createdFamilyMember.Id}",
                     ApiResponse<FamilyMemberDto>.Success(createdFamilyMember, "Family member has been successfully createdFamilyMember.", traceId));
+
         }).AddEndpointFilter<ValidationFilter<CreateFamilyMememberRequest>>();
 
-        familyGroup.MapPut("/familymember/{id:guid}", async (UpdateFamilyMememberRequest updateFamlyRequest, IFamilymemeberService familyService, HttpContext httpContext) =>
+        familyGroup.MapPut("/familymember/{id:guid}", async (UpdateFamilyMememberRequest updateFamlyRequest, IFamilymemeberService familyService, HttpContext httpContext, CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
         
-            var updatedFamilyMember = await familyService.UpdateFamilyMemberAsync(updateFamlyRequest);
+            var updatedFamilyMember = await familyService.UpdateFamilyMemberAsync(updateFamlyRequest, cancellationToken);
 
             return Results.Ok(ApiResponse<FamilyMemberDto>.Success(updatedFamilyMember, "Family member has been successfully updatedFamilyMember.", traceId));
+
         }).AddEndpointFilter<ValidationFilter<UpdateFamilyMememberRequest>>();
     }
 }

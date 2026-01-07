@@ -1,5 +1,6 @@
 ﻿using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Services;
+using System.Threading;
 
 namespace FamilyVault.API.EndPoints.Document;
 
@@ -10,12 +11,15 @@ public static class DocumentEvents
     {
         var documentGroup = app.MapGroup("/documents");
 
-        documentGroup.MapGet("/", async (IDocumentService _documentService, HttpContext httpContext, ILoggerFactory loggerFactory) =>
+        documentGroup.MapGet("/", async (IDocumentService _documentService, 
+            HttpContext httpContext, 
+            ILoggerFactory loggerFactory, 
+            CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("DocumentEvents");
 
-            var documentDetails = await _documentService.GetDocumentsDetailsAsync();
+            var documentDetails = await _documentService.GetDocumentsDetailsAsync(cancellationToken);
 
             if (documentDetails is null || !documentDetails.Any())
             {
@@ -25,14 +29,18 @@ public static class DocumentEvents
             }
             
             return Results.Ok(ApiResponse<IReadOnlyList<DocumentDetailsDto>>.Success(documentDetails, string.Empty, traceId));
+
         });
 
-        documentGroup.MapGet("/{id:guid}", async (Guid id, IDocumentService _documentService, HttpContext httpContext, ILoggerFactory loggerFactory) =>
+        documentGroup.MapGet("/{id:guid}", async (Guid id, IDocumentService _documentService,
+            HttpContext httpContext,
+            ILoggerFactory loggerFactory,
+            CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("DocumentEvents");
 
-            var documentDetail = await _documentService.GetDocumentDetailsByIdAsync(id);
+            var documentDetail = await _documentService.GetDocumentDetailsByIdAsync(id, cancellationToken);
 
             if (documentDetail is null)
             {
@@ -45,34 +53,43 @@ public static class DocumentEvents
             }
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(documentDetail, string.Empty, traceId));
+
         });
 
-        documentGroup.MapDelete("/{id:guid}", async (Guid id, IDocumentService _documentService, HttpContext httpContext) =>
+        documentGroup.MapDelete("/{id:guid}", async (Guid id, IDocumentService _documentService,
+            HttpContext httpContext,
+            CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
         
-            await _documentService.DeleteDocumentDetailsByIdAsync(id);
+            await _documentService.DeleteDocumentDetailsByIdAsync(id, cancellationToken);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(null, "Document has been successfully deleted.", traceId));
+
         });
 
-        documentGroup.MapPost("/documents", async (CreateDocumentRequest createDocumentRequest, IDocumentService _documentService, HttpContext httpContext) =>
+        documentGroup.MapPost("/documents", async (CreateDocumentRequest createDocumentRequest, 
+            IDocumentService _documentService, 
+            HttpContext httpContext, 
+            CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
      
-            var createdDocument = await _documentService.CreateDocumentDetailsAsync(createDocumentRequest);
+            var createdDocument = await _documentService.CreateDocumentDetailsAsync(createDocumentRequest, cancellationToken);
 
             return Results.Created($"/documents/{createdDocument.Id}",
                 ApiResponse<DocumentDetailsDto>.Success(createdDocument, "Document has been successfully createdDocument.", traceId));
+
         }).AddEndpointFilter<ValidationFilter<CreateDocumentRequest>>(); 
 
-        documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest, IDocumentService _documentService, HttpContext httpContext) =>
+        documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest, IDocumentService _documentService, HttpContext httpContext, CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
      
-            var updatedDocument = await _documentService.UpdateDocumentDetailsAsync(updateDocumentRequest);
+            var updatedDocument = await _documentService.UpdateDocumentDetailsAsync(updateDocumentRequest, cancellationToken);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updatedDocument, "Document has been successfully updatedDocument.", traceId));
+
         }).AddEndpointFilter<ValidationFilter<UpdateDocumentRequest>>(); ;
     }
 }

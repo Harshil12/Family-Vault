@@ -19,7 +19,7 @@ public class DocumentService : IDocumentService
         _mapper = mapper;
         _logger = logger;
     }
-    public async Task<DocumentDetailsDto> CreateDocumentDetailsAsync(CreateDocumentRequest createDocumentRequest)
+    public async Task<DocumentDetailsDto> CreateDocumentDetailsAsync(CreateDocumentRequest createDocumentRequest, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Creating a new document for FamilyMemberId: {FamilyMemberId}", createDocumentRequest.FamilyMemberId);
 
@@ -27,35 +27,37 @@ public class DocumentService : IDocumentService
         documentToCreate.CreatedAt = DateTimeOffset.Now;
         documentToCreate.CreatedBy = "Harshil";
 
-        var result = await _documentReppository.AddAsync(documentToCreate);
+        var result = await _documentReppository.AddAsync(documentToCreate, cancellationToken);
 
         _logger.LogInformation("Document created with Id: {DocumentId}", result.Id);
 
         return _mapper.Map<DocumentDetailsDto>(result);
     }
 
-    public async Task DeleteDocumentDetailsByIdAsync(Guid documentId)
+    public async Task DeleteDocumentDetailsByIdAsync(Guid documentId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Deleting document with Id: {DocumentId}", documentId);
 
-        await _documentReppository.DeleteByIdAsync(documentId, "Harshil");
+        await _documentReppository.DeleteByIdAsync(documentId, "Harshil", cancellationToken);
 
         _logger.LogInformation("Document with Id: {DocumentId} deleted successfully", documentId);
     }
 
-    public async Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync()
+    public async Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync(CancellationToken cancellationToken)
     {
-        var result = await _documentReppository.GetAllAsync();
+        var result = await _documentReppository.GetAllAsync(cancellationToken);
+
         return _mapper.Map<List<DocumentDetailsDto>>(result);
     }
 
-    public async Task<DocumentDetailsDto> GetDocumentDetailsByIdAsync(Guid documentId)
+    public async Task<DocumentDetailsDto> GetDocumentDetailsByIdAsync(Guid documentId, CancellationToken cancellationToken)
     {
-        var result = await _documentReppository.GetAsyncbyId(documentId);
+        var result = await _documentReppository.GetAsyncbyId(documentId, cancellationToken);
+
         return _mapper.Map<DocumentDetailsDto>(result);
     }
 
-    public async Task<DocumentDetailsDto> UpdateDocumentDetailsAsync(UpdateDocumentRequest updateDocumentRequest)
+    public async Task<DocumentDetailsDto> UpdateDocumentDetailsAsync(UpdateDocumentRequest updateDocumentRequest, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Updating document with Id: {DocumentId}", updateDocumentRequest.Id);
 
@@ -63,7 +65,7 @@ public class DocumentService : IDocumentService
         documentToUpdate.UpdatedAt = DateTimeOffset.Now;
         documentToUpdate.UpdatedBy = "Harshil";
 
-        var result = await _documentReppository.UpdateAsync(documentToUpdate);
+        var result = await _documentReppository.UpdateAsync(documentToUpdate, cancellationToken);
 
         _logger.LogInformation("Document with Id: {DocumentId} updated successfully", result.Id);
 

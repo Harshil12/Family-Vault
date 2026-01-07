@@ -14,28 +14,29 @@ public class UserRepository : IUserRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task<IReadOnlyList<User>> GetAllAsync()
+    public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _appDbContext.Users.AsNoTracking().ToListAsync();
+        return await _appDbContext.Users.AsNoTracking().ToListAsync(cancellationToken);
     }
 
-    public async Task<User?> GetByIdAsync(Guid userId)
+    public async Task<User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         return await _appDbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == userId);
+            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
-    public async Task<User> AddAsync(User user)
+    public async Task<User> AddAsync(User user, CancellationToken cancellationToken)
     {
-        _appDbContext.Add(user);
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.AddAsync(user, cancellationToken);
+        await _appDbContext.SaveChangesAsync(cancellationToken);
+
         return user;
     }
 
-    public async Task<User> UpdateAsync(User user)
+    public async Task<User> UpdateAsync(User user, CancellationToken cancellationToken)
     {
-        var existingUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id)
+        var existingUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id, cancellationToken)
      ?? throw new KeyNotFoundException("User not found");
 
         existingUser.FirstName = user.FirstName;
@@ -45,19 +46,20 @@ public class UserRepository : IUserRepository
         existingUser.Mobile = user.Mobile;
         existingUser.Username = user.Username;
         existingUser.Password = user.Password;
-   
-        await _appDbContext.SaveChangesAsync();
+
+        await _appDbContext.SaveChangesAsync(cancellationToken);
+
         return existingUser;
     }
-    public async Task DeleteByIdAsync(Guid userId, string user)
+    public async Task DeleteByIdAsync(Guid userId, string user, CancellationToken cancellationToken)
     {
         var existingUser = await _appDbContext.Users
-           .FirstOrDefaultAsync(u => u.Id == userId) ?? throw new KeyNotFoundException("User not found");
+           .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken) ?? throw new KeyNotFoundException("User not found");
 
         existingUser.IsDeleted = true;
         existingUser.UpdatedAt = DateTimeOffset.UtcNow;
         existingUser.UpdatedBy = user;
 
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.SaveChangesAsync(cancellationToken);
     }
 }

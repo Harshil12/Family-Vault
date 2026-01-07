@@ -17,7 +17,7 @@ public interface IUserService
     /// A <see cref="Task{UserDto}"/> that completes with the <see cref="UserDto"/> representing the requested user.
     /// If the user is not found, the returned task may complete with <c>null</c> or an implementation-specific behavior.
     /// </returns>
-    public Task<UserDto> GetUserByIdAsync(Guid userId);
+    public Task<UserDto> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Retrieves all users.
@@ -25,7 +25,7 @@ public interface IUserService
     /// <returns>
     /// A <see cref="Task{TResult}"/> that completes with a read-only list of <see cref="UserDto"/> containing all users.
     /// </returns>
-    public Task<IReadOnlyList<UserDto>> GetUserAsync();
+    public Task<IReadOnlyList<UserDto>> GetUserAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates an existing user using the provided create-style request.
@@ -35,7 +35,7 @@ public interface IUserService
     /// <returns>
     /// A <see cref="Task{UserDto}"/> that completes with the updated <see cref="UserDto"/>.
     /// </returns>
-    public Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest);
+    public Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new user using the provided update-style request.
@@ -45,12 +45,12 @@ public interface IUserService
     /// <returns>
     /// A <see cref="Task{UserDto}"/> that completes with the newly created <see cref="UserDto"/>.
     /// </returns>
-    public Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest);
+    public Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes the user with the specified unique identifier.
     /// </summary>
     /// <param name="userId">The unique identifier of the user to delete.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous delete operation.</returns>
-    public Task DeleteUserByIdAsync(Guid userId);
+    public Task DeleteUserByIdAsync(Guid userId, CancellationToken cancellationToken);
 }
