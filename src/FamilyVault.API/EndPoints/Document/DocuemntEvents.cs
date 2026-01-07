@@ -64,7 +64,7 @@ public static class DocumentEvents
 
             return Results.Created($"/documents/{createdDocument.Id}",
                 ApiResponse<DocumentDetailsDto>.Success(createdDocument, "Document has been successfully createdDocument.", traceId));
-        });
+        }).AddEndpointFilter<ValidationFilter<CreateDocumentRequest>>(); 
 
         documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest, IDocumentService _documentService, HttpContext httpContext) =>
         {
@@ -73,6 +73,6 @@ public static class DocumentEvents
             var updatedDocument = await _documentService.UpdateDocumentDetailsAsync(updateDocumentRequest);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updatedDocument, "Document has been successfully updatedDocument.", traceId));
-        });
+        }).AddEndpointFilter<ValidationFilter<UpdateDocumentRequest>>(); ;
     }
 }

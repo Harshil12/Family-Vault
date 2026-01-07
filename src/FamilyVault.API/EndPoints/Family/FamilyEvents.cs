@@ -63,7 +63,7 @@ public static class FamilymemberEvents
 
             return Results.Created($"/family/{createdFamily.Id}",
                     ApiResponse<FamilyDto>.Success(createdFamily, "Family has been successfully createdFamily.", traceId));
-        });
+        }).AddEndpointFilter<ValidationFilter<CreateFamilyRequest>>();
 
         familyGroup.MapPut("/family/{id:guid}", async (UpdateFamlyRequest updateFamlyRequest, IFamilyService familyService, HttpContext httpContext) =>
         {
@@ -72,6 +72,6 @@ public static class FamilymemberEvents
             var updatedFamily = await familyService.UpdateFamilyAsync(updateFamlyRequest);
 
             return Results.Ok(ApiResponse<FamilyDto>.Success(updatedFamily, "Family has been successfully updatedFamily.", traceId));
-        });
+        }).AddEndpointFilter<ValidationFilter<UpdateFamlyRequest>>();
     }
 }

@@ -63,7 +63,7 @@ public static class MapAllEndpoints
 
             return Results.Created($"/user/{createdUser.Id}",
                     ApiResponse<UserDto>.Success(createdUser, "User has been successfully createdUser.", traceId));
-        });
+        }).AddEndpointFilter<ValidationFilter<CreateUserRequest>>();
 
         familyGroup.MapPut("/user/{id:guid}", async (UpdateUserRequest updateUserRequest, IUserService userService, HttpContext httpContext) =>
         {
@@ -72,6 +72,6 @@ public static class MapAllEndpoints
             var updatedUser = await userService.UpdateuUerAsync(updateUserRequest);
 
             return Results.Ok(ApiResponse<UserDto>.Success(updatedUser, "Update has been successfully updatedUser.", traceId));
-        });
+        }).AddEndpointFilter<ValidationFilter<UpdateUserRequest>>() ;
     }
 }

@@ -34,7 +34,7 @@ public class Program
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddFluentValidationClientsideAdapters();
 
-        builder.Services.AddValidatorsFromAssemblyContaining<CreateDocumentValidators>();
+        builder.Services.AddValidatorsFromAssemblyContaining<ApplicationAssemblyMarker>();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         //builder.Services.AddOpenApi();
