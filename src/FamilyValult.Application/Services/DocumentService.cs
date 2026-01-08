@@ -9,12 +9,14 @@ namespace FamilyVault.Application.Services;
 
 public class DocumentService : IDocumentService
 {
+    private readonly ICryptoService _cryptoService;
     private readonly IDocumentRepository _documentReppository;
     private readonly IMapper _mapper;
     private readonly ILogger<DocumentService> _logger;
 
-    public DocumentService(IDocumentRepository documentRepository, IMapper mapper, ILogger<DocumentService> logger)
+    public DocumentService(IDocumentRepository documentRepository, ICryptoService cryptoService, IMapper mapper, ILogger<DocumentService> logger)
     {
+        _cryptoService = cryptoService;
         _documentReppository = documentRepository;
         _mapper = mapper;
         _logger = logger;
@@ -24,13 +26,20 @@ public class DocumentService : IDocumentService
     {
         var result = await _documentReppository.GetAllAsync(cancellationToken);
 
+        foreach (var doc in result)
+        {
+            doc.DocumentNumber = _cryptoService.DecryptData(doc.DocumentNumber);
+        }
+
         return _mapper.Map<List<DocumentDetailsDto>>(result);
     }
 
     public async Task<DocumentDetailsDto> GetDocumentDetailsByIdAsync(Guid documentId, CancellationToken cancellationToken)
     {
         var result = await _documentReppository.GetAsyncbyId(documentId, cancellationToken);
-
+        
+        result.DocumentNumber = _cryptoService.DecryptData(result.DocumentNumber);
+      
         return _mapper.Map<DocumentDetailsDto>(result);
     }
 
@@ -41,6 +50,7 @@ public class DocumentService : IDocumentService
         var documentToCreate = _mapper.Map<DocumentDetails>(createDocumentRequest);
         documentToCreate.CreatedAt = DateTimeOffset.Now;
         documentToCreate.CreatedBy = userId.ToString();
+        documentToCreate.DocumentNumber = _cryptoService.EncryptData(documentToCreate.DocumentNumber);
 
         var result = await _documentReppository.AddAsync(documentToCreate, cancellationToken);
 
@@ -66,6 +76,7 @@ public class DocumentService : IDocumentService
         var documentToUpdate = _mapper.Map<DocumentDetails>(updateDocumentRequest);
         documentToUpdate.UpdatedAt = DateTimeOffset.Now;
         documentToUpdate.UpdatedBy = userId.ToString();
+        documentToUpdate.DocumentNumber = _cryptoService.EncryptData(documentToUpdate.DocumentNumber);
 
         var result = await _documentReppository.UpdateAsync(documentToUpdate, cancellationToken);
 

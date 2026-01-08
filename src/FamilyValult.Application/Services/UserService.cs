@@ -9,12 +9,14 @@ namespace FamilyVault.Application.Services;
 
 public class Userservice : IUserService
 {
+    private readonly ICryptoService _cryptoService;
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly ILogger _logger;
 
-    public Userservice(IUserRepository userRepository, IMapper mapper, ILogger<Userservice> logger)
+    public Userservice(IUserRepository userRepository, ICryptoService cryptoService, IMapper mapper, ILogger<Userservice> logger)
     {
+        _cryptoService = cryptoService;
         _userRepository = userRepository;
         _mapper = mapper;
         _logger = logger;
@@ -39,6 +41,8 @@ public class Userservice : IUserService
         _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
 
         var userToCreate = _mapper.Map<User>(createUserRequest);
+
+        userToCreate.Password = _cryptoService.HashPassword(createUserRequest.Password);
         userToCreate.CreatedAt = DateTimeOffset.Now;
         userToCreate.CreatedBy = createdByUserId.ToString();
 
@@ -53,7 +57,7 @@ public class Userservice : IUserService
     {
         _logger.LogInformation("Deleting user with ID: {UserId}", userId);
 
-        await _userRepository.DeleteByIdAsync(userId, "Harshil", cancellationToken);
+        await _userRepository.DeleteByIdAsync(userId, createdByUserId.ToString(), cancellationToken);
 
         _logger.LogInformation("User with ID: {UserId} deleted successfully", userId);
     }
@@ -63,8 +67,10 @@ public class Userservice : IUserService
         _logger.LogInformation("Updating user with ID: {UserId}", updateUserRequest.Id);
 
         var userToUpdate = _mapper.Map<User>(updateUserRequest);
+
+        userToUpdate.Password = _cryptoService.HashPassword(userToUpdate.Password);
         userToUpdate.UpdatedAt = DateTimeOffset.Now;
-        userToUpdate.UpdatedBy = "Harshil";
+        userToUpdate.UpdatedBy = createdByUserId.ToString();
 
         var user = await _userRepository.UpdateAsync(userToUpdate, cancellationToken);
 

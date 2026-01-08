@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.Services;
+﻿using FamilyVault.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Identity.Data;
 
 namespace FamilyVault.API.EndPoints.Login;
@@ -7,18 +7,17 @@ public static class LoginEndpoints
 {
     public static void MapLoginPoints(this WebApplication app)
     {
-        app.MapPost("/login", (
+        app.MapPost("/login", async (
         LoginRequest request,
-        JwtTokenService tokenService) =>
+        IAuthService authService, 
+        CancellationToken cancellationToken) =>
             {
-                // Validate user credentials (mocked)
-                if (request.Email != "admin@fv.com" || request.Password != "password")
+                var token = await authService.GetTokenAsync(request.Email, request.Password, cancellationToken);
+
+                if (token == null)
                     return Results.Unauthorized();
-
-                // Generate token
-                var token = tokenService.GenerateToken(Guid.NewGuid(), request.Email);
-
-                return Results.Ok(new { token });
+                else
+                    return Results.Ok(new { token });
             });
     }
 }
