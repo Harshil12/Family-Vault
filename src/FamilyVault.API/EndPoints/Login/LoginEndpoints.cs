@@ -11,11 +11,11 @@ public static class LoginEndpoints
         LoginRequest request,
         JwtTokenService tokenService) =>
             {
-                // 1️⃣ Validate user credentials (mocked)
+                // Validate user credentials (mocked)
                 if (request.Email != "admin@fv.com" || request.Password != "password")
                     return Results.Unauthorized();
 
-                // 2️⃣ Generate token
+                // Generate token
                 var token = tokenService.GenerateToken(Guid.NewGuid(), request.Email);
 
                 return Results.Ok(new { token });

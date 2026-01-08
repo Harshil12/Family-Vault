@@ -35,7 +35,7 @@ public interface IUserService
     /// <returns>
     /// A <see cref="Task{UserDto}"/> that completes with the updated <see cref="UserDto"/>.
     /// </returns>
-    public Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, CancellationToken cancellationToken);
+    public Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new user using the provided update-style request.
@@ -45,12 +45,13 @@ public interface IUserService
     /// <returns>
     /// A <see cref="Task{UserDto}"/> that completes with the newly created <see cref="UserDto"/>.
     /// </returns>
-    public Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, CancellationToken cancellationToken);
+    public Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, Guid createdByUserId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes the user with the specified unique identifier.
     /// </summary>
     /// <param name="userId">The unique identifier of the user to delete.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous delete operation.</returns>
-    public Task DeleteUserByIdAsync(Guid userId, CancellationToken cancellationToken);
+    public Task DeleteUserByIdAsync(Guid userId, Guid createdByUserId, CancellationToken cancellationToken);
+           
 }

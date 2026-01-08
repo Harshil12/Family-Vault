@@ -19,30 +19,7 @@ public class Userservice : IUserService
         _mapper = mapper;
         _logger = logger;
     }
-    public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
-
-        var userToCreate = _mapper.Map<User>(createUserRequest);
-        userToCreate.CreatedAt = DateTimeOffset.Now;
-        userToCreate.CreatedBy = "Harshil";
-
-        var result = await _userRepository.AddAsync(userToCreate, cancellationToken);
-
-        _logger.LogInformation("User created successfully with ID: {UserId}", result.Id);
-
-        return _mapper.Map<UserDto>(result);
-    }
-
-    public async Task DeleteUserByIdAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("Deleting user with ID: {UserId}", userId);
-
-        await _userRepository.DeleteByIdAsync(userId, "Harshil", cancellationToken);
-
-        _logger.LogInformation("User with ID: {UserId} deleted successfully", userId);
-    }
-
+    
     public async Task<IReadOnlyList<UserDto>> GetUserAsync(CancellationToken cancellationToken)
     {
         var users = await _userRepository.GetAllAsync(cancellationToken);
@@ -57,7 +34,31 @@ public class Userservice : IUserService
         return _mapper.Map<UserDto>(user);
     }
 
-    public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, CancellationToken cancellationToken)
+    public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
+
+        var userToCreate = _mapper.Map<User>(createUserRequest);
+        userToCreate.CreatedAt = DateTimeOffset.Now;
+        userToCreate.CreatedBy = createdByUserId.ToString();
+
+        var result = await _userRepository.AddAsync(userToCreate, cancellationToken);
+
+        _logger.LogInformation("User created successfully with ID: {UserId}", result.Id);
+
+        return _mapper.Map<UserDto>(result);
+    }
+
+    public async Task DeleteUserByIdAsync(Guid userId, Guid createdByUserId, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Deleting user with ID: {UserId}", userId);
+
+        await _userRepository.DeleteByIdAsync(userId, "Harshil", cancellationToken);
+
+        _logger.LogInformation("User with ID: {UserId} deleted successfully", userId);
+    }
+
+    public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Updating user with ID: {UserId}", updateUserRequest.Id);
 

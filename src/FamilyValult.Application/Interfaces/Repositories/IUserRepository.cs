@@ -55,4 +55,14 @@ public interface IUserRepository
     /// A task representing the asynchronous operation.
     /// </returns>
     public Task DeleteByIdAsync(Guid userId, string user, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Retrieves a user by their email.
+    /// </summary>
+    /// <param name="userId">The email id of the user.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. 
+    /// The task result contains the <see cref="User"/> entity if found.
+    /// </returns>
+    public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
 }

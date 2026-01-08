@@ -33,7 +33,7 @@ public interface IFamilymemeberService
     /// <param name="updateFamilyMememberRequest">The request containing the updated information for the family member. Must not be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyMemberDto"/> with
     /// the updated family member details.</returns>
-    public Task<FamilyMemberDto> UpdateFamilyMemberAsync(UpdateFamilyMememberRequest updateFamilyMememberRequest, CancellationToken cancellationToken);
+    public Task<FamilyMemberDto> UpdateFamilyMemberAsync(UpdateFamilyMememberRequest updateFamilyMememberRequest, Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new family member using the specified update request.
@@ -41,12 +41,12 @@ public interface IFamilymemeberService
     /// <param name="createFamilyMememberRequest">An object containing the details of the family member to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyMemberDto"/>
     /// representing the created family member.</returns>
-    public Task<FamilyMemberDto> CreateFamilyMemberAsync(CreateFamilyMememberRequest createFamilyMememberRequest, CancellationToken cancellationToken);
+    public Task<FamilyMemberDto> CreateFamilyMemberAsync(CreateFamilyMememberRequest createFamilyMememberRequest, Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously deletes the family member with the specified unique identifier.
     /// </summary>
     /// <param name="familyMemberId">The unique identifier of the family member to delete.</param>
     /// <returns>A task that represents the asynchronous delete operation.</returns>
-    public Task DeleteFamilyMemberByIdAsync(Guid familyMemberId, CancellationToken cancellationToken);
+    public Task DeleteFamilyMemberByIdAsync(Guid familyMemberId, Guid userId, CancellationToken cancellationToken);
 }

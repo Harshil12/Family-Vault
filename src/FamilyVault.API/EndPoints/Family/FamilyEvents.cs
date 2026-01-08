@@ -1,5 +1,6 @@
 ﻿using FamilyVault.Application.DTOs.Family;
 using FamilyVault.Application.Interfaces.Services;
+using System.Security.Claims;
 
 namespace FamilyVault.API.EndPoints.Family;
 
@@ -48,32 +49,46 @@ public static class FamilymemberEvents
 
         });
 
-        familyGroup.MapDelete("/{id:guid}", async (Guid id, IFamilyService familyService, HttpContext httpContext, CancellationToken cancellationToken) =>
+        familyGroup.MapDelete("/{id:guid}", async (Guid id, IFamilyService familyService, 
+            HttpContext httpContext,
+            ClaimsPrincipal claimsPrincipal,
+            CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            await familyService.DeleteFamilyByIdAsync(id, cancellationToken);
+            await familyService.DeleteFamilyByIdAsync(id, userId, cancellationToken);
 
             return Results.Ok(ApiResponse<FamilyDto>.Success(null, "Family has been successfully deleted.", traceId));
 
         });
 
-        familyGroup.MapPost("/family", async (CreateFamilyRequest createFamilyRequest, IFamilyService familyService, HttpContext httpContext, CancellationToken cancellationToken) =>
+        familyGroup.MapPost("/family", async (CreateFamilyRequest createFamilyRequest, 
+            IFamilyService familyService, 
+            HttpContext httpContext, 
+            ClaimsPrincipal claimsPrincipal,
+            CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            var createdFamily = await familyService.CreateFamilyAsync(createFamilyRequest, cancellationToken);
+            var createdFamily = await familyService.CreateFamilyAsync(createFamilyRequest, userId, cancellationToken);
 
             return Results.Created($"/family/{createdFamily.Id}",
                     ApiResponse<FamilyDto>.Success(createdFamily, "Family has been successfully createdFamily.", traceId));
 
         }).AddEndpointFilter<ValidationFilter<CreateFamilyRequest>>();
 
-        familyGroup.MapPut("/family/{id:guid}", async (UpdateFamlyRequest updateFamlyRequest, IFamilyService familyService, HttpContext httpContext, CancellationToken cancellationToken) =>
+        familyGroup.MapPut("/family/{id:guid}", async (UpdateFamlyRequest updateFamlyRequest, 
+            IFamilyService familyService, 
+            HttpContext httpContext, 
+            ClaimsPrincipal claimsPrincipal,
+            CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            var updatedFamily = await familyService.UpdateFamilyAsync(updateFamlyRequest, cancellationToken);
+            var updatedFamily = await familyService.UpdateFamilyAsync(updateFamlyRequest, userId, cancellationToken);
 
             return Results.Ok(ApiResponse<FamilyDto>.Success(updatedFamily, "Family has been successfully updatedFamily.", traceId));
         }).AddEndpointFilter<ValidationFilter<UpdateFamlyRequest>>();

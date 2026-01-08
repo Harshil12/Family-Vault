@@ -1,6 +1,7 @@
 ﻿using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace FamilyVault.API.EndPoints.User;
 
@@ -49,32 +50,39 @@ public static class MapAllEndpoints
 
         });
 
-        familyGroup.MapDelete("/{id:guid}", async (Guid id, IUserService userService, HttpContext httpContext, CancellationToken cancellationToken) =>
+        familyGroup.MapDelete("/{id:guid}", async (Guid id, IUserService userService, HttpContext httpContext, ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            await userService.DeleteUserByIdAsync(id, cancellationToken);
+            await userService.DeleteUserByIdAsync(id, userId, cancellationToken);
 
             return Results.Ok(ApiResponse<UserDto>.Success(null, "User has been successfully deleted.", traceId));
 
         });
 
-        familyGroup.MapPost("/user", async (CreateUserRequest createUserRequest, IUserService userService, HttpContext httpContext, CancellationToken cancellationToken) =>
+        familyGroup.MapPost("/user", async (CreateUserRequest createUserRequest, IUserService userService, HttpContext httpContext, ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            var createdUser = await userService.CreateUserAsync(createUserRequest, cancellationToken);
+            var createdUser = await userService.CreateUserAsync(createUserRequest, userId, cancellationToken);
 
             return Results.Created($"/user/{createdUser.Id}",
                     ApiResponse<UserDto>.Success(createdUser, "User has been successfully createdUser.", traceId));
 
         }).AddEndpointFilter<ValidationFilter<CreateUserRequest>>();
 
-        familyGroup.MapPut("/user/{id:guid}", async (UpdateUserRequest updateUserRequest, IUserService userService, HttpContext httpContext, CancellationToken cancellationToken) =>
+        familyGroup.MapPut("/user/{id:guid}", async (UpdateUserRequest updateUserRequest, 
+            IUserService userService,
+            HttpContext httpContext,
+            ClaimsPrincipal claimsPrincipal,
+            CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            var updatedUser = await userService.UpdateuUerAsync(updateUserRequest, cancellationToken);
+            var updatedUser = await userService.UpdateuUerAsync(updateUserRequest, userId, cancellationToken);
 
             return Results.Ok(ApiResponse<UserDto>.Success(updatedUser, "Update has been successfully updatedUser.", traceId));
 

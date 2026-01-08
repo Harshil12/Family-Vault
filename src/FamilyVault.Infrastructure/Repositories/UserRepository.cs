@@ -62,4 +62,11 @@ public class UserRepository : IUserRepository
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        return await _appDbContext.Users
+           .AsNoTracking()
+           .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+    }
 }

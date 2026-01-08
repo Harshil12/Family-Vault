@@ -1,5 +1,6 @@
 ﻿using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Services;
+using System.Security.Claims;
 using System.Threading;
 
 namespace FamilyVault.API.EndPoints.Document;
@@ -11,9 +12,9 @@ public static class DocumentEvents
     {
         var documentGroup = app.MapGroup("/documents").RequireAuthorization();
 
-        documentGroup.MapGet("/", async (IDocumentService _documentService, 
-            HttpContext httpContext, 
-            ILoggerFactory loggerFactory, 
+        documentGroup.MapGet("/", async (IDocumentService _documentService,
+            HttpContext httpContext,
+            ILoggerFactory loggerFactory,
             CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
@@ -24,10 +25,10 @@ public static class DocumentEvents
             if (documentDetails is null || !documentDetails.Any())
             {
                 logger.LogWarning($"No documents found. TraceId: {traceId}");
-          
+
                 return Results.Ok(ApiResponse<IReadOnlyList<DocumentDetailsDto>>.Success(Array.Empty<DocumentDetailsDto>(), string.Empty, traceId));
             }
-            
+
             return Results.Ok(ApiResponse<IReadOnlyList<DocumentDetailsDto>>.Success(documentDetails, string.Empty, traceId));
 
         });
@@ -45,7 +46,7 @@ public static class DocumentEvents
             if (documentDetail is null)
             {
                 logger.LogWarning($"No documents found for id - {id}. TraceId: {traceId}");
-             
+
                 return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
                         message: "No documents found for given id",
                         errorCode: "DOC_NOT_FOUND",
@@ -58,35 +59,44 @@ public static class DocumentEvents
 
         documentGroup.MapDelete("/{id:guid}", async (Guid id, IDocumentService _documentService,
             HttpContext httpContext,
+            ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
-        
-            await _documentService.DeleteDocumentDetailsByIdAsync(id, cancellationToken);
+
+            await _documentService.DeleteDocumentDetailsByIdAsync(id, userId, cancellationToken);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(null, "Document has been successfully deleted.", traceId));
 
         });
 
-        documentGroup.MapPost("/documents", async (CreateDocumentRequest createDocumentRequest, 
-            IDocumentService _documentService, 
-            HttpContext httpContext, 
+        documentGroup.MapPost("/documents", async (CreateDocumentRequest createDocumentRequest,
+            IDocumentService _documentService,
+            HttpContext httpContext,
+            ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
-     
-            var createdDocument = await _documentService.CreateDocumentDetailsAsync(createDocumentRequest, cancellationToken);
+
+            var createdDocument = await _documentService.CreateDocumentDetailsAsync(createDocumentRequest, userId, cancellationToken);
 
             return Results.Created($"/documents/{createdDocument.Id}",
                 ApiResponse<DocumentDetailsDto>.Success(createdDocument, "Document has been successfully createdDocument.", traceId));
 
-        }).AddEndpointFilter<ValidationFilter<CreateDocumentRequest>>(); 
+        }).AddEndpointFilter<ValidationFilter<CreateDocumentRequest>>();
 
-        documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest, IDocumentService _documentService, HttpContext httpContext, CancellationToken cancellationToken) =>
+        documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest,
+            IDocumentService _documentService,
+            HttpContext httpContext,
+            ClaimsPrincipal claimsPrincipal,
+            CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
-     
-            var updatedDocument = await _documentService.UpdateDocumentDetailsAsync(updateDocumentRequest, cancellationToken);
+
+            var updatedDocument = await _documentService.UpdateDocumentDetailsAsync(updateDocumentRequest, userId, cancellationToken);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updatedDocument, "Document has been successfully updatedDocument.", traceId));
 

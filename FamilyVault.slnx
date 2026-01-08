@@ -6,7 +6,6 @@
     <Project Path="src/FamilyValult.Application/FamilyVault.Application.csproj" />
   </Folder>
   <Folder Name="/FamilyValult.Infrastructure/">
-    <File Path="src/FamilyValult.Application/Services/UserService.cs" />
     <Project Path="src/FamilyVault.Infrastructure/FamilyVault.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/FamilyVault,Test/" />

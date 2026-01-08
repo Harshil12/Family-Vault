@@ -3,9 +3,9 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using FamilyVault.Application.DTOs.User;
 
 namespace FamilyVault.Application.Services;
-
 
 public class JwtTokenService
 {
@@ -16,14 +16,15 @@ public class JwtTokenService
         _config = config;
     }
 
-    public string GenerateToken(Guid userId, string email)
+    public string GenerateToken(UserDto userDto)
     {
         var claims = new[]
         {
-        new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-        new Claim(JwtRegisteredClaimNames.Email, email),
+        new Claim(JwtRegisteredClaimNames.Sub, userDto.Id.ToString()),
+        new Claim(JwtRegisteredClaimNames.Name, $"{userDto.FirstName} {userDto.LastName}" ),
+        new Claim(JwtRegisteredClaimNames.Email, userDto.Email),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+        };
 
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
