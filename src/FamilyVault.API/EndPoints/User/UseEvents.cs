@@ -1,5 +1,6 @@
 ﻿using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FamilyVault.API.EndPoints.User;
 
@@ -7,7 +8,7 @@ public static class MapAllEndpoints
 {
     public static void MapUserEndPoints(this WebApplication app)
     {
-        var familyGroup = app.MapGroup("/User");
+        var familyGroup = app.MapGroup("/User").RequireAuthorization();
 
         familyGroup.MapGet("/", async (IUserService userService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
         {

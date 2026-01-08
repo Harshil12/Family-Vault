@@ -1,6 +1,7 @@
 ﻿using FamilyVault.API.EndPoints.Document;
 using FamilyVault.API.EndPoints.Family;
 using FamilyVault.API.EndPoints.FamilyMeMber;
+using FamilyVault.API.EndPoints.Login;
 using FamilyVault.API.EndPoints.User;
 
 namespace FamilyVault.API.EndPoints;
@@ -13,5 +14,6 @@ public static class MapAllEndpoint
         app.MapFamilyEndPoints();
         app.MapFamilyMemberEndPoints();
         app.MapUserEndPoints();
+        app.MapLoginPoints();
     }
 }

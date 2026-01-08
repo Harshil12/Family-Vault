@@ -9,7 +9,7 @@ public static class DocumentEvents
 
     public static void MapDocumentEndPoints(this WebApplication app)
     {
-        var documentGroup = app.MapGroup("/documents");
+        var documentGroup = app.MapGroup("/documents").RequireAuthorization();
 
         documentGroup.MapGet("/", async (IDocumentService _documentService, 
             HttpContext httpContext, 

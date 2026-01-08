@@ -7,7 +7,7 @@ public static class FamilymemberEvents
 {
     public static void MapFamilyEndPoints(this WebApplication app)
     {
-        var familyGroup = app.MapGroup("/family");
+        var familyGroup = app.MapGroup("/family").RequireAuthorization(); 
 
         familyGroup.MapGet("/", async (IFamilyService familyService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
         {
