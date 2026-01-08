@@ -33,7 +33,7 @@ public class CreateUserValidators : AbstractValidator<CreateUserRequest>
             {
                 context.AddFailure("CountryCode", "Country code is required when mobile number is provided.");
             }
-            if (!string.IsNullOrEmpty(request.CountryCode))
+            if (!string.IsNullOrEmpty(request.CountryCode) && string.IsNullOrEmpty(request.Mobile))
             {
                 context.AddFailure("Mobile", "Mobile number is required when country code is provided.");
             }
