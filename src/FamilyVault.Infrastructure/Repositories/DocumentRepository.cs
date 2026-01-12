@@ -20,13 +20,20 @@ internal class DocumentRepository : IDocumentRepository
 
     public async Task<IReadOnlyList<DocumentDetails>> GetAllAsync(CancellationToken cancellationToken)
     {
+        var cacheOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+            SlidingExpiration = TimeSpan.FromMinutes(2),
+            Priority = CacheItemPriority.High
+        };
+
         if (_memoryCache.TryGetValue("AllDocument", out IReadOnlyList<DocumentDetails>? cachedDocuments) && cachedDocuments is not null)
         {
             return cachedDocuments;
         }
 
         var result = await _appDbContext.Documents.AsNoTracking().ToListAsync(cancellationToken); ;
-        _memoryCache.Set("AllDocument", result);
+        _memoryCache.Set("AllDocument", result, cacheOptions);
         return result;
 
     }

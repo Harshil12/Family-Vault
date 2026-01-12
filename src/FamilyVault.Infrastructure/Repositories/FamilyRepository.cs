@@ -1,6 +1,7 @@
 ﻿using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
+using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -19,26 +20,40 @@ public class FamilyRepository : IFamilyRepository
 
     public async Task<IReadOnlyList<Family>> GetAllWithFamilyMembersAsync(CancellationToken cancellationToken)
     {
-        if(_memoryCache.TryGetValue("AllWithFamilyMembers", out IReadOnlyList<Family>? families) && families is not null)
+        var cacheOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+            SlidingExpiration = TimeSpan.FromMinutes(2),
+            Priority = CacheItemPriority.High
+        };
+        
+        if (_memoryCache.TryGetValue("AllWithFamilyMembers", out IReadOnlyList<Family>? families) && families is not null)
         {
             return families;
         }
         var result = await _appDbContext.Families.AsNoTracking().Include(f=>f.FamilyMembers).ToListAsync(cancellationToken);
         
-        _memoryCache.Set("AllWithFamilyMembers", result, TimeSpan.FromMinutes(10));
+        _memoryCache.Set("AllWithFamilyMembers", result, cacheOptions);
 
         return result;
     }
 
     public async Task<IReadOnlyList<Family>> GetAllAsync(CancellationToken cancellationToken)
     {
+        var cacheOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+            SlidingExpiration = TimeSpan.FromMinutes(2),
+            Priority = CacheItemPriority.High
+        };
+
         if (_memoryCache.TryGetValue("AllFamilyMembers", out IReadOnlyList<Family>? families) && families is not null)
         {
             return families;
         }
         var result = await _appDbContext.Families.AsNoTracking().ToListAsync(cancellationToken);
 
-        _memoryCache.Set("AllFamilyMembers", result, TimeSpan.FromMinutes(10));
+        _memoryCache.Set("AllFamilyMembers", result, cacheOptions);
 
         return result;
     }

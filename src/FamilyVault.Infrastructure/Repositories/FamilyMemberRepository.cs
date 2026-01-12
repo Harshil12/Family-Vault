@@ -26,6 +26,13 @@ public class FamilyMemberRepository : IFamilyMemberRepository
 
     public async Task<IReadOnlyList<FamilyMember>> GetAllWithDocumentsAsync(CancellationToken cancellationToken)
     {
+        var cacheOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+            SlidingExpiration = TimeSpan.FromMinutes(2),
+            Priority = CacheItemPriority.High
+        };
+
         if (_memoryCache.TryGetValue("GetAllFamilliesWithDocuments", out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
         {
             return familyMembers;
@@ -35,7 +42,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             .Include(fm => fm.DocumentDetails)
             .ToListAsync(cancellationToken);
 
-        _memoryCache.Set("GetAllFamilliesWithDocuments", result, TimeSpan.FromMinutes(10));
+        _memoryCache.Set("GetAllFamilliesWithDocuments", result, cacheOptions);
         return result;
     }
 
@@ -48,6 +55,13 @@ public class FamilyMemberRepository : IFamilyMemberRepository
 
     public async Task<IReadOnlyList<FamilyMember>> GetAllAsync(CancellationToken cancellationToken)
     {
+        var cacheOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+            SlidingExpiration = TimeSpan.FromMinutes(2),
+            Priority = CacheItemPriority.High
+        };
+
         if (_memoryCache.TryGetValue("GetAllFamilies", out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
         {
             return familyMembers;
@@ -56,7 +70,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        _memoryCache.Set("GetAllFamilies", result, TimeSpan.FromMinutes(10));
+        _memoryCache.Set("GetAllFamilies", result, cacheOptions);
         return result;
     }
 

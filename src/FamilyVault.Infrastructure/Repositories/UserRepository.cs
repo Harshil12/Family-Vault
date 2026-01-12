@@ -19,24 +19,38 @@ public class UserRepository : IUserRepository
 
     public async Task<IReadOnlyList<User>> GetAllWithFamilyDetailsAsync(CancellationToken cancellationToken)
     {
+        var cacheOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+            SlidingExpiration = TimeSpan.FromMinutes(2),
+            Priority = CacheItemPriority.High
+        };
+
         if (_memoryCache.TryGetValue("UsersWithFamilies", out IReadOnlyList<User>? cachedUsers) && cachedUsers is not null)
         {
             return cachedUsers;
         }
         var result = await _appDbContext.Users.AsNoTracking().Include(f => f.Families).ToListAsync(cancellationToken);
-        _memoryCache.Set("UsersWithFamilies", result, TimeSpan.FromMinutes(10));
+        _memoryCache.Set("UsersWithFamilies", result, cacheOptions);
         return result;
     }
 
     public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken)
     {
+        var cacheOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+            SlidingExpiration = TimeSpan.FromMinutes(2),
+            Priority = CacheItemPriority.High
+        };
+
         if (_memoryCache.TryGetValue("UsersFamilies", out IReadOnlyList<User>? cachedUsers) && cachedUsers is not null)
         {
             return cachedUsers;
         }
         var result = await _appDbContext.Users.AsNoTracking().ToListAsync(cancellationToken);
 
-        _memoryCache.Set("UsersFamilies", result, TimeSpan.FromMinutes(10));
+        _memoryCache.Set("UsersFamilies", result, cacheOptions);
         
         return result;
     }
