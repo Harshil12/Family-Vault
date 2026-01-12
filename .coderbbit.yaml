@@ -1,0 +1,11 @@
+language: en
+reviews:
+  profile: through
+  auto_reviw: true
+
+ignore:
+  - "README.md"
+  - ".github/**"
+  - "docs/**"
+  - "bin/**"
+  - "obj/**"
