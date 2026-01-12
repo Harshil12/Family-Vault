@@ -1,8 +1,8 @@
 language: en
-reviews:
-  profile: through
-  auto_reviw: true
-
+ language: en
+ reviews:
+  profile: thorough
+  auto_review: true
 ignore:
   - "README.md"
   - ".github/**"
