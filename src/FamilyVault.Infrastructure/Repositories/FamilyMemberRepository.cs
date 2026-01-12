@@ -2,14 +2,20 @@
 using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
-public class FamilyMemberRepository(AppDbContext appContext) : IFamilyMemberRepository
+public class FamilyMemberRepository : IFamilyMemberRepository
 {
-    private readonly AppDbContext _appDbContext = appContext;
+    private readonly AppDbContext _appDbContext;
+    private readonly IMemoryCache _memoryCache;
 
-
+    public FamilyMemberRepository(AppDbContext appContext, IMemoryCache memoryCache)
+    {
+        _appDbContext = appContext;
+        _memoryCache = memoryCache;
+    }
     public async Task<FamilyMember> AddAsync(FamilyMember familyMember, CancellationToken cancellationToken)
     {
         await _appDbContext.FamilyMembers.AddAsync(familyMember, cancellationToken);
@@ -20,10 +26,17 @@ public class FamilyMemberRepository(AppDbContext appContext) : IFamilyMemberRepo
 
     public async Task<IReadOnlyList<FamilyMember>> GetAllWithDocumentsAsync(CancellationToken cancellationToken)
     {
-        return await _appDbContext.FamilyMembers
+        if (_memoryCache.TryGetValue("GetAllFamilliesWithDocuments", out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
+        {
+            return familyMembers;
+        }
+        var result = await _appDbContext.FamilyMembers
             .AsNoTracking()
             .Include(fm => fm.DocumentDetails)
             .ToListAsync(cancellationToken);
+
+        _memoryCache.Set("GetAllFamilliesWithDocuments", result, TimeSpan.FromMinutes(10));
+        return result;
     }
 
     public async Task<FamilyMember?> GetByIdAsync(Guid familyMemberId, CancellationToken cancellationToken)
@@ -35,7 +48,16 @@ public class FamilyMemberRepository(AppDbContext appContext) : IFamilyMemberRepo
 
     public async Task<IReadOnlyList<FamilyMember>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _appDbContext.FamilyMembers.AsNoTracking().ToListAsync(cancellationToken);
+        if (_memoryCache.TryGetValue("GetAllFamilies", out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
+        {
+            return familyMembers;
+        }
+        var result = await _appDbContext.FamilyMembers
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        _memoryCache.Set("GetAllFamilies", result, TimeSpan.FromMinutes(10));
+        return result;
     }
 
     public async Task<FamilyMember> UpdateAsync(FamilyMember familyMember, CancellationToken cancellationToken)

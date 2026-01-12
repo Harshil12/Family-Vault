@@ -2,16 +2,33 @@
 using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
-internal class DocumentRepository(AppDbContext appDbContext) : IDocumentRepository
+internal class DocumentRepository : IDocumentRepository
 {
-    private readonly AppDbContext _appDbContext = appDbContext;
+    private readonly AppDbContext _appDbContext;
+    private readonly IMemoryCache _memoryCache;
+
+    public DocumentRepository(AppDbContext appDbContext, IMemoryCache memoryCache)
+    {
+        _appDbContext = appDbContext;
+        _memoryCache = memoryCache; 
+    }
 
     public async Task<IReadOnlyList<DocumentDetails>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _appDbContext.Documents.AsNoTracking().ToListAsync(cancellationToken);
+        if (_memoryCache.TryGetValue("AllDocument", out IReadOnlyList<DocumentDetails>? cachedDocuments) && cachedDocuments is not null)
+        {
+            return cachedDocuments;
+        }
+
+        var result = await _appDbContext.Documents.AsNoTracking().ToListAsync(cancellationToken); ;
+        _memoryCache.Set("AllDocument", result);
+        return result;
+
     }
 
     public async Task<DocumentDetails?> GetAsyncbyId(Guid documentId, CancellationToken cancellationToken)

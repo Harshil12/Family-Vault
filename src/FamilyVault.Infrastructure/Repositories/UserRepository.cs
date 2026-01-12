@@ -2,26 +2,43 @@
 using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
     private readonly AppDbContext _appDbContext;
+    private readonly IMemoryCache _memoryCache;
 
-    public UserRepository(AppDbContext appDbContext)
+    public UserRepository(AppDbContext appDbContext, IMemoryCache memoryCache)
     {
         _appDbContext = appDbContext;
+        _memoryCache = memoryCache;
     }
 
     public async Task<IReadOnlyList<User>> GetAllWithFamilyDetailsAsync(CancellationToken cancellationToken)
     {
-        return await _appDbContext.Users.AsNoTracking().Include(f=>f.Families).ToListAsync(cancellationToken);
+        if (_memoryCache.TryGetValue("UsersWithFamilies", out IReadOnlyList<User>? cachedUsers) && cachedUsers is not null)
+        {
+            return cachedUsers;
+        }
+        var result = await _appDbContext.Users.AsNoTracking().Include(f => f.Families).ToListAsync(cancellationToken);
+        _memoryCache.Set("UsersWithFamilies", result, TimeSpan.FromMinutes(10));
+        return result;
     }
 
     public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _appDbContext.Users.AsNoTracking().ToListAsync(cancellationToken);
+        if (_memoryCache.TryGetValue("UsersFamilies", out IReadOnlyList<User>? cachedUsers) && cachedUsers is not null)
+        {
+            return cachedUsers;
+        }
+        var result = await _appDbContext.Users.AsNoTracking().ToListAsync(cancellationToken);
+
+        _memoryCache.Set("UsersFamilies", result, TimeSpan.FromMinutes(10));
+        
+        return result;
     }
 
     public async Task<User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
