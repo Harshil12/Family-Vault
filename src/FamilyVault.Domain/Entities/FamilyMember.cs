@@ -78,4 +78,9 @@ public class FamilyMember : BaseEntity
     /// </summary>
     public Family Family { get; set; } = null!;
 
+    /// <summary>
+    /// List of related <see cref="DocumentDetails"/> entities that belong to this member.
+    /// </summary>
+    public ICollection<DocumentDetails>? DocumentDetails { get; set; }
+
 }

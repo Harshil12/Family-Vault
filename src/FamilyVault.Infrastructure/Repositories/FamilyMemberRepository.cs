@@ -18,6 +18,14 @@ public class FamilyMemberRepository(AppDbContext appContext) : IFamilyMemberRepo
         return familyMember;
     }
 
+    public async Task<IReadOnlyList<FamilyMember>> GetAllWithDocumentsAsync(CancellationToken cancellationToken)
+    {
+        return await _appDbContext.FamilyMembers
+            .AsNoTracking()
+            .Include(fm => fm.DocumentDetails)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<FamilyMember?> GetByIdAsync(Guid familyMemberId, CancellationToken cancellationToken)
     {
         return await _appDbContext.FamilyMembers

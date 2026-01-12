@@ -25,6 +25,15 @@ public interface IFamilyMemberRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains a read-only list of <see cref="FamilyMember"/> entities.
     /// </returns>
+    public Task<IReadOnlyList<FamilyMember>> GetAllWithDocumentsAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Retrieves all family members from the repository.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation. 
+    /// The task result contains a read-only list of <see cref="FamilyMember"/> entities.
+    /// </returns>
     public Task<IReadOnlyList<FamilyMember>> GetAllAsync(CancellationToken cancellationToken);
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using FamilyVault.Domain.Enums;
+﻿using FamilyVault.Application.DTOs.Documents;
+using FamilyVault.Domain.Enums;
 
 namespace FamilyVault.Application.DTOs.FamilyMembers;
 
@@ -26,5 +27,7 @@ public class FamilyMemberDto: BaseDto
     public long? PAN { get; set; }
 
     public long? Aadhar { get; set; }
+
+    public ICollection<DocumentDetailsDto>? DocumentDetails { get; set; }
 
 }

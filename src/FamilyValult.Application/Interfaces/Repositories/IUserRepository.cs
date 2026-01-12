@@ -25,6 +25,15 @@ public interface IUserRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains a read-only list of <see cref="User"/> entities.
     /// </returns>
+    public Task<IReadOnlyList<User>> GetAllWithFamilyDetailsAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Retrieves all users from the repository.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation. 
+    /// The task result contains a read-only list of <see cref="User"/> entities.
+    /// </returns>
     public Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken);
 
     /// <summary>

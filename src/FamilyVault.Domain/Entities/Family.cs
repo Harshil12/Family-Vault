@@ -26,4 +26,9 @@ public class Family : BaseEntity
     /// Should be populated when the owner information is required.
     /// </summary>
     public User User { get; set; } = null!;
+
+    /// <summary>
+    /// List of related <see cref="FamilyMember"/> entities that belong to this family.
+    /// </summary>
+    public ICollection<FamilyMember>? FamilyMembers { get; set; }
 }

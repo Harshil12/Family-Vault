@@ -48,5 +48,10 @@ public class User : BaseEntity
     /// </summary>
     [MaxLength(10)]
     public string? Mobile { get; set; }
+
+    /// <summary>
+    /// List of related <see cref="Family"/> entities that belong to this user.
+    /// </summary>
+    public ICollection<Family>? Families { get; set; }
 }
 

@@ -14,6 +14,11 @@ public class FamilyRepository : IFamilyRepository
         _appDbContext = appDbContext;
     }
 
+    public async Task<IReadOnlyList<Family>> GetAllWithFamilyMembersAsync(CancellationToken cancellationToken)
+    {
+        return await _appDbContext.Families.AsNoTracking().Include(f=>f.FamilyMembers).ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Family>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _appDbContext.Families.AsNoTracking().ToListAsync(cancellationToken);
