@@ -19,7 +19,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
     public async Task<FamilyMember> AddAsync(FamilyMember familyMember, CancellationToken cancellationToken)
     {
         await _appDbContext.FamilyMembers.AddAsync(familyMember, cancellationToken);
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.SaveChangesAsync(cancellationToken);
 
         _memoryCache.Remove("AllFamiliesWithDocuments");
         _memoryCache.Remove("AllFamilies");
