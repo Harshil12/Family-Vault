@@ -21,8 +21,8 @@ public class FamilyMemberRepository : IFamilyMemberRepository
         await _appDbContext.FamilyMembers.AddAsync(familyMember, cancellationToken);
         await _appDbContext.SaveChangesAsync();
 
-        _memoryCache.Remove("GetAllFamiliesWithDocuments");
-        _memoryCache.Remove("GetAllFamilies");
+        _memoryCache.Remove("AllFamiliesWithDocuments");
+        _memoryCache.Remove("AllFamilies");
 
         return familyMember;
     }
@@ -36,7 +36,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             Priority = CacheItemPriority.High
         };
 
-        if (_memoryCache.TryGetValue("GetAllFamiliesWithDocuments", out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
+        if (_memoryCache.TryGetValue("AllFamiliesWithDocuments", out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
         {
             return familyMembers;
         }
@@ -45,7 +45,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             .Include(fm => fm.DocumentDetails)
             .ToListAsync(cancellationToken);
 
-        _memoryCache.Set("GetAllFamiliesWithDocuments", result, cacheOptions);
+        _memoryCache.Set("AllFamiliesWithDocuments", result, cacheOptions);
         return result;
     }
 
@@ -65,7 +65,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             Priority = CacheItemPriority.High
         };
 
-        if (_memoryCache.TryGetValue("GetAllFamilies", out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
+        if (_memoryCache.TryGetValue("AllFamilies", out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
         {
             return familyMembers;
         }
@@ -73,7 +73,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        _memoryCache.Set("GetAllFamilies", result, cacheOptions);
+        _memoryCache.Set("AllFamilies", result, cacheOptions);
         return result;
     }
 
@@ -96,8 +96,8 @@ public class FamilyMemberRepository : IFamilyMemberRepository
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
-        _memoryCache.Remove("GetAllFamiliesWithDocuments");
-        _memoryCache.Remove("GetAllFamilies");
+        _memoryCache.Remove("AllFamiliesWithDocuments");
+        _memoryCache.Remove("AllFamilies");
 
         return familyMember;
     }
@@ -111,8 +111,8 @@ public class FamilyMemberRepository : IFamilyMemberRepository
         existingFamilyMember.UpdatedAt = DateTimeOffset.UtcNow;
         existingFamilyMember.UpdatedBy = user;
 
-        _memoryCache.Remove("GetAllFamiliesWithDocuments");
-        _memoryCache.Remove("GetAllFamilies");
+        _memoryCache.Remove("AllFamiliesWithDocuments");
+        _memoryCache.Remove("AllFamilies");
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
     }
