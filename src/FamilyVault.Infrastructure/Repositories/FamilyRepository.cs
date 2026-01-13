@@ -1,7 +1,6 @@
 ﻿using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -68,6 +67,9 @@ public class FamilyRepository : IFamilyRepository
         await _appDbContext.Families.AddAsync(family, cancellationToken);
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
+        _memoryCache.Remove("AllWithFamilyMembers");
+        _memoryCache.Remove("AllFamilyMembers");
+
         return family;
     }
 
@@ -81,6 +83,9 @@ public class FamilyRepository : IFamilyRepository
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
+        _memoryCache.Remove("AllWithFamilyMembers");
+        _memoryCache.Remove("AllFamilyMembers");
+
         return family;
     }
 
@@ -92,6 +97,9 @@ public class FamilyRepository : IFamilyRepository
         existingFamily.IsDeleted = true;
         existingFamily.UpdatedAt = DateTimeOffset.UtcNow;
         existingFamily.UpdatedBy = user;
+
+        _memoryCache.Remove("AllWithFamilyMembers");
+        _memoryCache.Remove("AllFamilyMembers");
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
     }

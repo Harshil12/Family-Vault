@@ -1,6 +1,5 @@
 ﻿using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Services;
-using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
 namespace FamilyVault.API.EndPoints.User;

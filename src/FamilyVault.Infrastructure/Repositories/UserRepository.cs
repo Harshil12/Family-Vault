@@ -67,6 +67,9 @@ public class UserRepository : IUserRepository
         await _appDbContext.AddAsync(user, cancellationToken);
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
+        _memoryCache.Remove("UsersWithFamilies");
+        _memoryCache.Remove("UsersFamilies");
+
         return user;
     }
 
@@ -85,6 +88,9 @@ public class UserRepository : IUserRepository
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
+        _memoryCache.Remove("UsersWithFamilies");
+        _memoryCache.Remove("UsersFamilies");
+
         return existingUser;
     }
     public async Task DeleteByIdAsync(Guid userId, string user, CancellationToken cancellationToken)
@@ -95,6 +101,9 @@ public class UserRepository : IUserRepository
         existingUser.IsDeleted = true;
         existingUser.UpdatedAt = DateTimeOffset.UtcNow;
         existingUser.UpdatedBy = user;
+
+        _memoryCache.Remove("UsersWithFamilies");
+        _memoryCache.Remove("UsersFamilies");
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
     }

@@ -1,7 +1,6 @@
 ﻿using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Services;
 using System.Security.Claims;
-using System.Threading;
 
 namespace FamilyVault.API.EndPoints.Document;
 

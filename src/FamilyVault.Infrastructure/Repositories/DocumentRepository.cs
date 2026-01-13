@@ -3,7 +3,6 @@ using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
@@ -32,7 +31,7 @@ internal class DocumentRepository : IDocumentRepository
             return cachedDocuments;
         }
 
-        var result = await _appDbContext.Documents.AsNoTracking().ToListAsync(cancellationToken); ;
+        var result = await _appDbContext.Documents.AsNoTracking().ToListAsync(cancellationToken);
         _memoryCache.Set("AllDocument", result, cacheOptions);
         return result;
 
@@ -50,6 +49,8 @@ internal class DocumentRepository : IDocumentRepository
         await _appDbContext.Documents.AddAsync(documentDetails, cancellationToken);
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
+        _memoryCache.Remove("AllDocument");
+  
         return documentDetails;
     }
 
@@ -66,6 +67,8 @@ internal class DocumentRepository : IDocumentRepository
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
+        _memoryCache.Remove("AllDocument");
+
         return documentDetails;
     }
 
@@ -77,6 +80,8 @@ internal class DocumentRepository : IDocumentRepository
         existingDocument.IsDeleted = true;
         existingDocument.UpdatedAt = DateTimeOffset.UtcNow;
         existingDocument.UpdatedBy = user;
+
+        _memoryCache.Remove("AllDocument");
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
     }

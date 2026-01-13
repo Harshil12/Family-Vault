@@ -1,5 +1,4 @@
 ﻿using FamilyVault.Application.DTOs.Family;
-using FamilyVault.Application.DTOs.FamilyMembers;
 
 namespace FamilyVault.Application.DTOs.User;
 

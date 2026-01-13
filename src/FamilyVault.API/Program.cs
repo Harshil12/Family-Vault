@@ -8,6 +8,10 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using System.Diagnostics;
 
 namespace FamilyVault.API;
 
@@ -104,7 +108,48 @@ public class Program
             });
         });
 
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+        builder.Logging.AddSimpleConsole(options =>
+        {
+            options.TimestampFormat = "HH:mm:ss ";
+            options.SingleLine = true;
+            options.IncludeScopes = true; // shows scope values like TraceId/RequestId
+        });
+
+        builder.Services.AddMemoryCache();
+
+
+        builder.Services.AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddService("FamilyVaultAPI"))
+            .WithTracing(tracing => tracing
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddSource("FamilyVaultAPI"))
+            .WithMetrics(metrics => metrics
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddConsoleExporter()) ;
+
         var app = builder.Build();
+        
+        app.Use(async(context, next) =>
+        {
+            var traceId = Activity.Current?.TraceId.ToString() ?? "no-trace";
+            using (context.RequestServices.GetRequiredService<ILoggerFactory>()
+                   .CreateLogger("Scope")
+                   .BeginScope(new Dictionary<string, object>
+                   {
+                       ["RequestId"] = context.TraceIdentifier,
+                       ["TraceId"] = traceId
+                   }))
+            {
+                await next();
+            }
+
+        });
+        var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+        logger.LogInformation("App starting");
 
         // ============================================================
         // Middleware Pipeline (ORDER MATTERS)
