@@ -81,9 +81,9 @@ internal class DocumentRepository : IDocumentRepository
         existingDocument.UpdatedAt = DateTimeOffset.UtcNow;
         existingDocument.UpdatedBy = user;
 
-        _memoryCache.Remove("AllDocument");
-
         await _appDbContext.SaveChangesAsync(cancellationToken);
+
+        _memoryCache.Remove("AllDocument");
     }
 
 }

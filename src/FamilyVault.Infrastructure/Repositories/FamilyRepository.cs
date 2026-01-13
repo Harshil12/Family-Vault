@@ -98,9 +98,9 @@ public class FamilyRepository : IFamilyRepository
         existingFamily.UpdatedAt = DateTimeOffset.UtcNow;
         existingFamily.UpdatedBy = user;
 
+        await _appDbContext.SaveChangesAsync(cancellationToken);
+
         _memoryCache.Remove("AllWithFamilyMembers");
         _memoryCache.Remove("AllFamilyMembers");
-
-        await _appDbContext.SaveChangesAsync(cancellationToken);
     }
 }

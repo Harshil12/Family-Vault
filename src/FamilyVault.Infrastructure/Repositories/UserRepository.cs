@@ -30,6 +30,7 @@ public class UserRepository : IUserRepository
         {
             return cachedUsers;
         }
+
         var result = await _appDbContext.Users.AsNoTracking().Include(f => f.Families).ToListAsync(cancellationToken);
         _memoryCache.Set("UsersWithFamilies", result, cacheOptions);
         return result;
@@ -102,10 +103,10 @@ public class UserRepository : IUserRepository
         existingUser.UpdatedAt = DateTimeOffset.UtcNow;
         existingUser.UpdatedBy = user;
 
+        await _appDbContext.SaveChangesAsync(cancellationToken);
+
         _memoryCache.Remove("UsersWithFamilies");
         _memoryCache.Remove("UsersFamilies");
-
-        await _appDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
