@@ -56,7 +56,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             .FirstOrDefaultAsync(fm => fm.Id == familyMemberId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<FamilyMember>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<FamilyMember>> GetAllByFamilyIdAsync(Guid FamilyId, CancellationToken cancellationToken)
     {
         var cacheOptions = new MemoryCacheEntryOptions
         {
@@ -70,6 +70,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             return familyMembers;
         }
         var result = await _appDbContext.FamilyMembers
+            .Where(fm => fm.FamilyId == FamilyId)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
@@ -104,14 +105,21 @@ public class FamilyMemberRepository : IFamilyMemberRepository
 
     public async Task DeleteByIdAsync(Guid familyMemberId, string user, CancellationToken cancellationToken)
     {
-        var existingFamilyMember = await _appDbContext.FamilyMembers
-            .FirstOrDefaultAsync(fm => fm.Id == familyMemberId, cancellationToken) ?? throw new KeyNotFoundException("Family member not found");
+        using var tx = await _appDbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        existingFamilyMember.IsDeleted = true;
-        existingFamilyMember.UpdatedAt = DateTimeOffset.UtcNow;
-        existingFamilyMember.UpdatedBy = user;
+        await _appDbContext.FamilyMembers
+                .Where(fm => fm.Id == familyMemberId)
+                .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
+                .SetProperty(fm => fm.UpdatedBy, user)
+                .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
 
-        await _appDbContext.SaveChangesAsync(cancellationToken);
+        await _appDbContext.Documents
+               .Where(fm => fm.FamilyMemberId == familyMemberId)
+               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
+               .SetProperty(fm => fm.UpdatedBy, user)
+               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
+
+        await tx.CommitAsync(cancellationToken);
 
         _memoryCache.Remove("AllFamiliesWithDocuments");
         _memoryCache.Remove("AllFamilies");

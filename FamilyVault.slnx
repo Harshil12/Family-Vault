@@ -8,7 +8,9 @@
   <Folder Name="/FamilyValult.Infrastructure/">
     <Project Path="src/FamilyVault.Infrastructure/FamilyVault.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/FamilyVault,Test/" />
+  <Folder Name="/FamilyVault,Test/">
+    <Project Path="FamilyVault.Test.Repository/FamilyVault.Test.Repository.csproj" Id="b96a6397-297e-4c98-81bd-e823e51bd101" />
+  </Folder>
   <Folder Name="/FamilyVault.API/">
     <Project Path="src/FamilyVault.API/FamilyVault.API.csproj" />
   </Folder>

@@ -22,9 +22,9 @@ public class DocumentService : IDocumentService
         _logger = logger;
     }
 
-    public async Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsByFamilyMemberIdAsync(Guid familyMemberId, CancellationToken cancellationToken)
     {
-        var result = await _documentReppository.GetAllAsync(cancellationToken);
+        var result = await _documentReppository.GetAllByFamilymemberIdAsync( familyMemberId, cancellationToken);
 
         foreach (var doc in result)
         {

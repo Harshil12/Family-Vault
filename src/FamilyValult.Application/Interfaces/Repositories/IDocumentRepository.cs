@@ -25,7 +25,7 @@ public interface IDocumentRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains a read-only list of <see cref="DocumentDetails"/>.
     /// </returns>
-    public Task<IReadOnlyList<DocumentDetails>> GetAllAsync(CancellationToken cancellationToken);
+    public Task<IReadOnlyList<DocumentDetails>> GetAllByFamilymemberIdAsync(Guid FamilyMemberId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new document record in the repository.

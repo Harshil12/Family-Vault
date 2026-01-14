@@ -9,9 +9,10 @@ public static class DocumentEvents
 
     public static void MapDocumentEndPoints(this WebApplication app)
     {
-        var documentGroup = app.MapGroup("/documents").RequireAuthorization();
+        var documentGroup = app.MapGroup("/documents/{familyMemberId:guid}").RequireAuthorization();
 
-        documentGroup.MapGet("/", async (IDocumentService _documentService,
+        documentGroup.MapGet("/", async (Guid familyMemberId,
+            IDocumentService _documentService,
             HttpContext httpContext,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken) =>
@@ -19,7 +20,7 @@ public static class DocumentEvents
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("DocumentEvents");
 
-            var documentDetails = await _documentService.GetDocumentsDetailsAsync(cancellationToken);
+            var documentDetails = await _documentService.GetDocumentsDetailsByFamilyMemberIdAsync(familyMemberId,cancellationToken);
 
             if (documentDetails is null || !documentDetails.Any())
             {

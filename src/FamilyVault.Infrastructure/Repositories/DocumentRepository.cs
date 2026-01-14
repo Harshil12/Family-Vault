@@ -17,7 +17,7 @@ internal class DocumentRepository : IDocumentRepository
         _memoryCache = memoryCache; 
     }
 
-    public async Task<IReadOnlyList<DocumentDetails>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<DocumentDetails>> GetAllByFamilymemberIdAsync(Guid FamilyMemberId, CancellationToken cancellationToken)
     {
         var cacheOptions = new MemoryCacheEntryOptions
         {
@@ -31,10 +31,9 @@ internal class DocumentRepository : IDocumentRepository
             return cachedDocuments;
         }
 
-        var result = await _appDbContext.Documents.AsNoTracking().ToListAsync(cancellationToken);
+        var result = await _appDbContext.Documents.Where(d => d.FamilyMemberId == FamilyMemberId). AsNoTracking().ToListAsync(cancellationToken);
         _memoryCache.Set("AllDocument", result, cacheOptions);
         return result;
-
     }
 
     public async Task<DocumentDetails?> GetAsyncbyId(Guid documentId, CancellationToken cancellationToken)

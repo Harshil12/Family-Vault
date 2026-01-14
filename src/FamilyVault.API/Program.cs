@@ -131,6 +131,7 @@ public class Program
                 .AddHttpClientInstrumentation()
                 .AddConsoleExporter()) ;
 
+     
         var app = builder.Build();
         
         app.Use(async(context, next) =>
@@ -170,10 +171,12 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
-        // Authentication and Authorization 
-        app.UseAuthentication();
-        app.UseAuthorization();
+        else
+        {
+            // Authentication and Authorization 
+            app.UseAuthentication();
+            app.UseAuthorization();
+        }
 
         // Map Minimal API endpoints (LAST)
         app.MapAllEndpoints();

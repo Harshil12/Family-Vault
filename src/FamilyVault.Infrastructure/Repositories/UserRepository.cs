@@ -52,7 +52,7 @@ public class UserRepository : IUserRepository
         var result = await _appDbContext.Users.AsNoTracking().ToListAsync(cancellationToken);
 
         _memoryCache.Set("UsersFamilies", result, cacheOptions);
-        
+
         return result;
     }
 
@@ -96,14 +96,44 @@ public class UserRepository : IUserRepository
     }
     public async Task DeleteByIdAsync(Guid userId, string user, CancellationToken cancellationToken)
     {
-        var existingUser = await _appDbContext.Users
-           .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken) ?? throw new KeyNotFoundException("User not found");
+        // Soft delete the user and related families and family members and documents
+        await _appDbContext.Users
+               .Where(fm => fm.Id == userId)
+               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
+               .SetProperty(fm => fm.UpdatedBy, user)
+               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
 
-        existingUser.IsDeleted = true;
-        existingUser.UpdatedAt = DateTimeOffset.UtcNow;
-        existingUser.UpdatedBy = user;
+        await _appDbContext.Families
+               .Where(fm => fm.UserId == userId)
+               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
+               .SetProperty(fm => fm.UpdatedBy, user)
+               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
 
-        await _appDbContext.SaveChangesAsync(cancellationToken);
+        await _appDbContext.FamilyMembers
+               .Where(fm => _appDbContext.Families
+                   .Where(f => f.UserId == userId && !f.IsDeleted)
+                   .Select(f => f.Id)
+                   .Contains(fm.FamilyId)
+               && !fm.IsDeleted)
+               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
+               .SetProperty(fm => fm.UpdatedBy, user)
+               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
+
+        await (
+                from d in _appDbContext.Documents
+                join m in _appDbContext.FamilyMembers on d.FamilyMemberId equals m.Id
+                join f in _appDbContext.Families on m.FamilyId equals f.Id
+                where f.UserId == userId
+                      && !f.IsDeleted
+                      && !m.IsDeleted
+                      && !d.IsDeleted
+                select d
+              )
+              .ExecuteUpdateAsync(setter =>
+                setter.SetProperty(d => d.IsDeleted, true)
+                      .SetProperty(d => d.UpdatedBy, user)
+                      .SetProperty(d => d.UpdatedAt, DateTimeOffset.UtcNow),
+                cancellationToken);
 
         _memoryCache.Remove("UsersWithFamilies");
         _memoryCache.Remove("UsersFamilies");
