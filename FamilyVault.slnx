@@ -2,14 +2,16 @@
   <Folder Name="/Family.Vault.Domain/">
     <Project Path="src/FamilyVault.Domain/FamilyVault.Domain.csproj" />
   </Folder>
-  <Folder Name="/FamilyValult.Application/">
-    <Project Path="src/FamilyValult.Application/FamilyVault.Application.csproj" />
+  <Folder Name="/FamilyVault,Test/">
+    <Project Path="src/FamilyVault.Test.Repository/FamilyVault.Test.Repository.csproj" />
   </Folder>
-  <Folder Name="/FamilyValult.Infrastructure/">
-    <Project Path="src/FamilyVault.Infrastructure/FamilyVault.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/FamilyVault,Test/" />
   <Folder Name="/FamilyVault.API/">
     <Project Path="src/FamilyVault.API/FamilyVault.API.csproj" />
+  </Folder>
+  <Folder Name="/FamilyVault.Application/">
+    <Project Path="src/FamilyVault.Application/FamilyVault.Application.csproj" />
+  </Folder>
+  <Folder Name="/FamilyVault.Infrastructure/">
+    <Project Path="src/FamilyVault.Infrastructure/FamilyVault.Infrastructure.csproj" />
   </Folder>
 </Solution>

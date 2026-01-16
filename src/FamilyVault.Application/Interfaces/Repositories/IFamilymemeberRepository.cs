@@ -34,7 +34,7 @@ public interface IFamilyMemberRepository
     /// A task representing the asynchronous operation. 
     /// The task result contains a read-only list of <see cref="FamilyMember"/> entities.
     /// </returns>
-    public Task<IReadOnlyList<FamilyMember>> GetAllAsync(CancellationToken cancellationToken);
+    public Task<IReadOnlyList<FamilyMember>> GetAllByFamilyIdAsync(Guid FamilyId,CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new family member record in the repository.

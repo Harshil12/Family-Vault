@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
+	<!-- Keep ONLY if Application uses ASP.NET Core types -->
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
@@ -15,9 +16,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AutoMapper" Version="12.0.1" />
-		<PackageReference Include="FluentValidation" Version="12.1.1" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
+		<PackageReference Include="AutoMapper" />
+		<PackageReference Include="FluentValidation" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" />
 	</ItemGroup>
 
 </Project>

@@ -22,9 +22,9 @@ public class DocumentService : IDocumentService
         _logger = logger;
     }
 
-    public async Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsByFamilyMemberIdAsync(Guid familyMemberId, CancellationToken cancellationToken)
     {
-        var result = await _documentReppository.GetAllAsync(cancellationToken);
+        var result = await _documentReppository.GetAllByFamilymemberIdAsync(familyMemberId, cancellationToken);
 
         foreach (var doc in result)
         {
@@ -37,9 +37,10 @@ public class DocumentService : IDocumentService
     public async Task<DocumentDetailsDto> GetDocumentDetailsByIdAsync(Guid documentId, CancellationToken cancellationToken)
     {
         var result = await _documentReppository.GetAsyncbyId(documentId, cancellationToken);
-        
-        result.DocumentNumber = _cryptoService.DecryptData(result.DocumentNumber);
-      
+
+        if (result != null)
+            result.DocumentNumber = _cryptoService.DecryptData(result.DocumentNumber);
+
         return _mapper.Map<DocumentDetailsDto>(result);
     }
 

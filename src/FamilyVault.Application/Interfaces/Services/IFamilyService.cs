@@ -22,7 +22,7 @@ public interface IFamilyService
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains a read-only list of <see
     /// cref="FamilyDto"/> objects representing the families. The list is empty if no families are found.</returns>
-    public Task<IReadOnlyList<FamilyDto>> GetFamilyAsync(CancellationToken cancellationToken);
+    public Task<IReadOnlyList<FamilyDto>> GetFamilyByUserIdAsync(Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates the details of an existing family asynchronously using the specified request data.

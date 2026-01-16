@@ -8,14 +8,14 @@ public static class FamilymemberEvents
 {
     public static void MapFamilyEndPoints(this WebApplication app)
     {
-        var familyGroup = app.MapGroup("/family").RequireAuthorization(); 
+        var familyGroup = app.MapGroup("/family/{userId:Guid}").RequireAuthorization();
 
-        familyGroup.MapGet("/", async (IFamilyService familyService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
+        familyGroup.MapGet("/", async (Guid userId, IFamilyService familyService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("FamilyEndpoints");
 
-            var familyDetails = await familyService.GetFamilyAsync(cancellationToken);
+            var familyDetails = await familyService.GetFamilyByUserIdAsync(userId, cancellationToken);
 
             if (familyDetails is null || !familyDetails.Any())
             {
@@ -49,7 +49,7 @@ public static class FamilymemberEvents
 
         });
 
-        familyGroup.MapDelete("/{id:guid}", async (Guid id, IFamilyService familyService, 
+        familyGroup.MapDelete("/{id:guid}", async (Guid id, IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
@@ -63,9 +63,9 @@ public static class FamilymemberEvents
 
         });
 
-        familyGroup.MapPost("/family", async (CreateFamilyRequest createFamilyRequest, 
-            IFamilyService familyService, 
-            HttpContext httpContext, 
+        familyGroup.MapPost("/family", async (CreateFamilyRequest createFamilyRequest,
+            IFamilyService familyService,
+            HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
@@ -79,9 +79,9 @@ public static class FamilymemberEvents
 
         }).AddEndpointFilter<ValidationFilter<CreateFamilyRequest>>();
 
-        familyGroup.MapPut("/family/{id:guid}", async (UpdateFamlyRequest updateFamlyRequest, 
-            IFamilyService familyService, 
-            HttpContext httpContext, 
+        familyGroup.MapPut("/family/{id:guid}", async (UpdateFamlyRequest updateFamlyRequest,
+            IFamilyService familyService,
+            HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {

@@ -18,11 +18,11 @@ public class FamilyService : IFamilyService
         _familyrepository = familyRepository;
         _mapper = mapper;
         _logger = logger;
-    }    
+    }
 
-    public async Task<IReadOnlyList<FamilyDto>> GetFamilyAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<FamilyDto>> GetFamilyByUserIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var result = await _familyrepository.GetAllAsync(cancellationToken);
+        var result = await _familyrepository.GetAllByUserIdAsync(userId, cancellationToken);
 
         return _mapper.Map<IReadOnlyList<FamilyDto>>(result);
     }

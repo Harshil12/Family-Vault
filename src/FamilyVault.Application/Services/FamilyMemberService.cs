@@ -27,9 +27,9 @@ public class FamilyMemberService : IFamilymemeberService
         return _mapper.Map<FamilyMemberDto>(result);
     }
 
-    public async Task<IReadOnlyList<FamilyMemberDto>> GetFamilyMembersAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<FamilyMemberDto>> GetFamilyMembersByFamilyIdAsync(Guid familyId, CancellationToken cancellationToken)
     {
-        var result = await _familyMemberRepository.GetAllAsync(cancellationToken);
+        var result = await _familyMemberRepository.GetAllByFamilyIdAsync(familyId, cancellationToken);
 
         return _mapper.Map<IReadOnlyList<FamilyMemberDto>>(result);
     }

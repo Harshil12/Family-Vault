@@ -26,7 +26,7 @@ public interface IDocumentService
     /// <returns>A task that represents the asynchronous operation. The task result contains a read-only list of <see
     /// cref="DocumentDetailsDto"/> objects, each representing the details of a document. The list is empty if no
     /// documents are available.</returns>
-    public Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsAsync(CancellationToken cancellationToken);
+    public Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsByFamilyMemberIdAsync(Guid familyMemberId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously updates the details of a document based on the specified update request.

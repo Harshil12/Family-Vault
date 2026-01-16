@@ -25,7 +25,7 @@ public interface IFamilymemeberService
     /// <returns>A task that represents the asynchronous operation. The task result contains a read-only list of <see
     /// cref="FamilyMemberDto"/> objects representing the family members. The list is empty if no family members are
     /// found.</returns>
-    public Task<IReadOnlyList<FamilyMemberDto>> GetFamilyMembersAsync(CancellationToken cancellationToken);
+    public Task<IReadOnlyList<FamilyMemberDto>> GetFamilyMembersByFamilyIdAsync(Guid familyId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates the details of an existing family member asynchronously using the specified request data.
