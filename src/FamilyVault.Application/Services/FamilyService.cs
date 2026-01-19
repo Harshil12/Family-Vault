@@ -36,7 +36,7 @@ public class FamilyService : IFamilyService
 
     public async Task<FamilyDto> CreateFamilyAsync(CreateFamilyRequest createFamilyRequest, Guid userId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Creating a new family with name: {FamilyName}", createFamilyRequest.FamilyName);
+        _logger.LogInformation("Creating a new family with name: {Name}", createFamilyRequest.FamilyName);
 
         var familyToCreate = _mapper.Map<Family>(createFamilyRequest);
         familyToCreate.CreatedAt = DateTimeOffset.Now;

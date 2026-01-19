@@ -32,7 +32,7 @@ public class AuthService : IAuthService
         if (user == null)
             return null;
 
-        if (_cryptoService.VerifyPassword(user.Password, password)) // In real scenarios, use hashed password comparison
+        if (!_cryptoService.VerifyPassword(user.Password, password)) // In real scenarios, use hashed password comparison
             return null;
 
         var useDto = _mapper.Map<UserDto>(user);

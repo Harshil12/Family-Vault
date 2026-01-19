@@ -6,7 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
-internal class DocumentRepository : IDocumentRepository
+public class DocumentRepository : IDocumentRepository
 {
     private readonly AppDbContext _appDbContext;
     private readonly IMemoryCache _memoryCache;
