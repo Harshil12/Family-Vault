@@ -10,6 +10,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="API\**" />
+	  <Compile Remove="Infrastructure\**" />
+	  <EmbeddedResource Remove="API\**" />
+	  <EmbeddedResource Remove="Infrastructure\**" />
+	  <None Remove="API\**" />
+	  <None Remove="Infrastructure\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="coverlet.collector" Version="6.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.2" />
@@ -26,10 +35,6 @@
 
 	<ItemGroup>
 		<Using Include="Xunit" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="API\MiddleWare\" />
 	</ItemGroup>
 
 	<ItemGroup>
