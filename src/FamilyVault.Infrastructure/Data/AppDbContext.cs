@@ -42,8 +42,6 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<FamilyMember>().HasIndex(f => f.Aadhar).IsUnique();
         modelBuilder.Entity<FamilyMember>().HasIndex(f => new { f.FirstName, f.LastName }).IsUnique();
 
-
-
         modelBuilder.Entity<User>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<Family>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<FamilyMember>().HasQueryFilter(d => !d.IsDeleted);

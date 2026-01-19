@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+		<DisableParallelization>true</DisableParallelization>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="API\**" />
+	  <Compile Remove="Infrastructure\**" />
+	  <EmbeddedResource Remove="API\**" />
+	  <EmbeddedResource Remove="Infrastructure\**" />
+	  <None Remove="API\**" />
+	  <None Remove="Infrastructure\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="coverlet.collector" Version="6.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+		<PackageReference Include="Moq" Version="4.20.72" />
+		<PackageReference Include="xunit" Version="2.9.3" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="Xunit" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\FamilyVault.API\FamilyVault.API.csproj" />
+	  <ProjectReference Include="..\..\FamilyVault.Application\FamilyVault.Application.csproj" />
+	  <ProjectReference Include="..\..\FamilyVault.Domain\FamilyVault.Domain.csproj" />
+	  <ProjectReference Include="..\..\FamilyVault.Infrastructure\FamilyVault.Infrastructure.csproj" />
+	</ItemGroup>
+
+</Project>

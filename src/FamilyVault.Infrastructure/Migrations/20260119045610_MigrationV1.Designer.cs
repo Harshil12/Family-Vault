@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FamilyVault.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260105062836_Migration-v1")]
-    partial class Migrationv1
+    [Migration("20260119045610_MigrationV1")]
+    partial class MigrationV1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,11 +38,11 @@ namespace FamilyVault.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Number")
+                    b.Property<string>("DocumentNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte>("Type")
+                    b.Property<byte>("DocumentType")
                         .HasColumnType("TINYINT");
 
                     b.Property<DateTimeOffset?>("ExpiryDate")
@@ -58,7 +58,6 @@ namespace FamilyVault.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("SavedLocation")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -254,7 +253,7 @@ namespace FamilyVault.Infrastructure.Migrations
             modelBuilder.Entity("FamilyVault.Domain.Entities.DocumentDetails", b =>
                 {
                     b.HasOne("FamilyVault.Domain.Entities.FamilyMember", "FamilyMember")
-                        .WithMany()
+                        .WithMany("DocumentDetails")
                         .HasForeignKey("FamilyMemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -265,7 +264,7 @@ namespace FamilyVault.Infrastructure.Migrations
             modelBuilder.Entity("FamilyVault.Domain.Entities.Family", b =>
                 {
                     b.HasOne("FamilyVault.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Families")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -276,12 +275,27 @@ namespace FamilyVault.Infrastructure.Migrations
             modelBuilder.Entity("FamilyVault.Domain.Entities.FamilyMember", b =>
                 {
                     b.HasOne("FamilyVault.Domain.Entities.Family", "Family")
-                        .WithMany()
+                        .WithMany("FamilyMembers")
                         .HasForeignKey("FamilyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Family");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.Family", b =>
+                {
+                    b.Navigation("FamilyMembers");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.FamilyMember", b =>
+                {
+                    b.Navigation("DocumentDetails");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Families");
                 });
 #pragma warning restore 612, 618
         }

@@ -40,6 +40,16 @@ public class CryptoService : ICryptoService
 
     public bool VerifyPassword(string hashPassword, string password)
     {
-        return _passwordHasher.VerifyHashedPassword(null, hashPassword, password) == PasswordVerificationResult.Success;
+        try
+        {
+            return _passwordHasher.VerifyHashedPassword(
+                null,
+                hashPassword,
+                password) == PasswordVerificationResult.Success;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
     }
 }
