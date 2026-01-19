@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace FamilyVault.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Migrationv1 : Migration
+    public partial class MigrationV1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -97,7 +98,7 @@ namespace FamilyVault.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DocumentType = table.Column<byte>(type: "TINYINT", nullable: false),
                     DocumentNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SavedLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SavedLocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IssueDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     ExpiryDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     FamilyMemberId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),

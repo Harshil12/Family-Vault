@@ -91,7 +91,10 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
         var request = new CreateUserRequest
         {
             Username = "testuser",
-            Password = "Password@123"
+            Password = "Password@123",
+            Email   = "Iz9Ou@example.com",
+            FirstName = "Test",
+            LastName = "User"
         };
 
         var createdUser = new UserDto
@@ -129,7 +132,9 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
         var request = new UpdateUserRequest
         {
             Id = userId,
-            FirstName = "updatedUser"
+            FirstName = "updatedUser",
+            Email = "Iz9Ou@example.com",
+            Password = "NewPassword@123"
         };
 
         var updatedUser = new UserDto

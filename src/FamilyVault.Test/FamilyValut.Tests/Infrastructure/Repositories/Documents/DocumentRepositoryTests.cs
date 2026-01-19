@@ -1,4 +1,5 @@
 ﻿using FamilyVault.Domain.Entities;
+using FamilyVault.Domain.Enums;
 using FamilyVault.Infrastructure.Data;
 using FamilyVault.Infrastructure.Repositories;
 using FluentAssertions;
@@ -35,8 +36,18 @@ public class DocumentRepositoryTests : IDisposable
 
         var documents = new List<DocumentDetails>
         {
-            new() { Id = Guid.NewGuid(), FamilyMemberId = familyMemberId },
-            new() { Id = Guid.NewGuid(), FamilyMemberId = familyMemberId }
+            new() {
+                Id = Guid.NewGuid(), FamilyMemberId = familyMemberId,
+                CreatedAt = DateTime.UtcNow , CreatedBy="test-user",
+                DocumentType = DocumentTypes.Passport,
+                DocumentNumber = "123"
+            },
+             new() {
+                Id = Guid.NewGuid(), FamilyMemberId = familyMemberId,
+                CreatedAt = DateTime.UtcNow , CreatedBy="test-user",
+                DocumentType = DocumentTypes.Passport,
+                DocumentNumber = "123"
+            }
         };
 
         _dbContext.Documents.AddRange(documents);
@@ -65,7 +76,10 @@ public class DocumentRepositoryTests : IDisposable
         var document = new DocumentDetails
         {
             Id = Guid.NewGuid(),
-            DocumentNumber = "123"
+            DocumentNumber = "123",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user",
+            DocumentType = DocumentTypes.Passport
         };
 
         _dbContext.Documents.Add(document);
@@ -105,7 +119,9 @@ public class DocumentRepositoryTests : IDisposable
         {
             Id = Guid.NewGuid(),
             FamilyMemberId = familyMemberId,
-            DocumentNumber = "DOC123"
+            DocumentNumber = "DOC123",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user-create"
         };
 
         // Act
@@ -131,7 +147,9 @@ public class DocumentRepositoryTests : IDisposable
         var document = new DocumentDetails
         {
             Id = Guid.NewGuid(),
-            DocumentNumber = "OLD"
+            DocumentNumber = "OLD",
+            CreatedBy = "test-user-create",
+            CreatedAt = DateTime.UtcNow
         };
 
         _dbContext.Documents.Add(document);
@@ -140,6 +158,8 @@ public class DocumentRepositoryTests : IDisposable
         _memoryCache.Set("AllDocument", new List<DocumentDetails>());
 
         document.DocumentNumber = "NEW";
+        document.UpdatedAt = DateTime.UtcNow;
+        document.UpdatedBy = "test-user-Update";
 
         // Act
         var result = await _sut.UpdateAsync(document, CancellationToken.None);
@@ -181,7 +201,9 @@ public class DocumentRepositoryTests : IDisposable
         {
             Id = Guid.NewGuid(),
             DocumentNumber = "DELETE_ME",
-            IsDeleted = false
+            IsDeleted = false,
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user-add"
         };
 
         _dbContext.Documents.Add(document);
@@ -190,13 +212,13 @@ public class DocumentRepositoryTests : IDisposable
         _memoryCache.Set("AllDocument", new List<DocumentDetails>());
 
         // Act
-        await _sut.DeleteByIdAsync(document.Id, "test-user", CancellationToken.None);
+        await _sut.DeleteByIdAsync(document.Id, "test-user-delete", CancellationToken.None);
 
         // Assert
         var deleted = await _dbContext.Documents.FindAsync(document.Id);
 
         deleted!.IsDeleted.Should().BeTrue();
-        deleted.UpdatedBy.Should().Be("test-user");
+        deleted.UpdatedBy.Should().Be("test-user-delete");
         deleted.UpdatedAt.Should().NotBeNull();
 
         _memoryCache.TryGetValue("AllDocument", out _).Should().BeFalse();

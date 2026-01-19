@@ -17,6 +17,7 @@ public class FamilyRepositoryTests : IDisposable
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
         _dbContext = new AppDbContext(options);
@@ -35,14 +36,20 @@ public class FamilyRepositoryTests : IDisposable
         {
             Id = Guid.NewGuid(),
             Name = "Test Family",
-            FamilyMembers =
-            {
-                new FamilyMember { Id = Guid.NewGuid(), FirstName = "John" },
-                new FamilyMember { Id = Guid.NewGuid(), FirstName = "Jane" }
-            }
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user"
+        };
+        var familyMember = new FamilyMember 
+        { 
+            Id = Guid.NewGuid(), 
+            FirstName = "John", 
+            FamilyId = family.Id, 
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow 
         };
 
         _dbContext.Families.Add(family);
+        _dbContext.FamilyMembers.Add(familyMember);
         await _dbContext.SaveChangesAsync();
 
         // Act
@@ -51,7 +58,7 @@ public class FamilyRepositoryTests : IDisposable
 
         // Assert
         first.Should().HaveCount(1);
-        first.First().FamilyMembers.Should().HaveCount(2);
+        first.First().FamilyMembers.Should().HaveCount(1);
 
         // Cached instance reused
         first.Should().BeSameAs(second);
@@ -69,8 +76,8 @@ public class FamilyRepositoryTests : IDisposable
 
         var families = new[]
         {
-            new Family { Id = Guid.NewGuid(), UserId = userId, Name = "F1" },
-            new Family { Id = Guid.NewGuid(), UserId = userId, Name = "F2" }
+            new Family { Id = Guid.NewGuid(), UserId = userId, Name = "F1", CreatedBy="test-user" , CreatedAt = DateTime.UtcNow },
+            new Family { Id = Guid.NewGuid(), UserId = userId, Name = "F2", CreatedBy="test-user" , CreatedAt = DateTime.UtcNow }
         };
 
         _dbContext.Families.AddRange(families);
@@ -96,7 +103,9 @@ public class FamilyRepositoryTests : IDisposable
         var family = new Family
         {
             Id = Guid.NewGuid(),
-            Name = "Lookup Family"
+            Name = "Lookup Family",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow
         };
 
         _dbContext.Families.Add(family);
@@ -134,7 +143,9 @@ public class FamilyRepositoryTests : IDisposable
         var family = new Family
         {
             Id = Guid.NewGuid(),
-            Name = "New Family"
+            Name = "New Family",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user-add"
         };
 
         // Act
@@ -160,7 +171,9 @@ public class FamilyRepositoryTests : IDisposable
         {
             Id = Guid.NewGuid(),
             Name = "Old Name",
-            UserId = Guid.NewGuid()
+            UserId = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user-add"
         };
 
         _dbContext.Families.Add(family);
@@ -170,6 +183,8 @@ public class FamilyRepositoryTests : IDisposable
         _memoryCache.Set("AllFamilyMembers", new List<Family>());
 
         family.Name = "Updated Name";
+        family.UpdatedAt = DateTime.UtcNow;
+        family.UpdatedBy = "test-user-update";
 
         // Act
         var result = await _sut.UpdateAsync(family, CancellationToken.None);
@@ -207,9 +222,9 @@ public class FamilyRepositoryTests : IDisposable
         var familyId = Guid.NewGuid();
         var user = "test-user";
 
-        var family = new Family { Id = familyId };
-        var member = new FamilyMember { Id = Guid.NewGuid(), FamilyId = familyId };
-        var document = new DocumentDetails { Id = Guid.NewGuid(), FamilyMemberId = member.Id };
+        var family = new Family { Id = familyId, Name = "Test Family",  CreatedAt= DateTime.UtcNow, CreatedBy = user };
+        var member = new FamilyMember { Id = Guid.NewGuid(), FamilyId = familyId, CreatedAt = DateTime.UtcNow, CreatedBy = user };
+        var document = new DocumentDetails { Id = Guid.NewGuid(), FamilyMemberId = member.Id, CreatedAt = DateTime.UtcNow, CreatedBy = user };
 
         _dbContext.Families.Add(family);
         _dbContext.FamilyMembers.Add(member);

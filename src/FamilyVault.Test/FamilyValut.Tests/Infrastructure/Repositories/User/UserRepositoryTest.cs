@@ -16,6 +16,7 @@ public class UserRepositoryTests : IDisposable
     public UserRepositoryTests()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
+            .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
@@ -33,16 +34,36 @@ public class UserRepositoryTests : IDisposable
         // Arrange
         var user = new User
         {
+            Username = "u1",
             Id = Guid.NewGuid(),
             FirstName = "John",
-            Families =
-            {
-                new Family { Id = Guid.NewGuid(), Name = "Family1" },
-                new Family { Id = Guid.NewGuid(), Name = "Family2" }
-            }
+            Email = "john@doe",
+            Password = "password",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow,
         };
 
+        var family = new Family
+        {
+            Id = Guid.NewGuid(),
+            Name = "Family",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user",
+            UserId = user.Id
+        };
+        var family1 = new Family
+        {
+            Id = Guid.NewGuid(),
+            Name = "Family1",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user",
+            UserId = user.Id
+        };
+
+
         _dbContext.Users.Add(user);
+        _dbContext.Families.Add(family);
+        _dbContext.Families.Add(family1);
         await _dbContext.SaveChangesAsync();
 
         // Act
@@ -66,8 +87,8 @@ public class UserRepositoryTests : IDisposable
     {
         // Arrange
         _dbContext.Users.AddRange(
-            new User { Id = Guid.NewGuid(), Username = "u1" },
-            new User { Id = Guid.NewGuid(), Username = "u2" }
+            new User { Id = Guid.NewGuid(), Username = "u1", FirstName = "John", Email = "john@doe", Password = "password",CreatedBy = "test-user", CreatedAt = DateTime.UtcNow },
+            new User { Id = Guid.NewGuid(), Username = "u2", FirstName = "John", Email = "john@doe", Password = "password",CreatedBy = "test-user", CreatedAt = DateTime.UtcNow }
         );
         await _dbContext.SaveChangesAsync();
 
@@ -88,7 +109,7 @@ public class UserRepositoryTests : IDisposable
     public async Task GetByIdAsync_ShouldReturnUser_WhenExists()
     {
         // Arrange
-        var user = new User { Id = Guid.NewGuid(), Email = "test@test.com" };
+        var user = new User { Username = "u1", Id = Guid.NewGuid(), Email = "test@test.com", FirstName = "John" ,Password = "password",CreatedBy = "test-user", CreatedAt = DateTime.UtcNow };
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
 
@@ -119,7 +140,7 @@ public class UserRepositoryTests : IDisposable
     {
         // Arrange
         var email = "john@doe.com";
-        var user = new User { Id = Guid.NewGuid(), Email = email };
+        var user = new User { Id = Guid.NewGuid(), Email = email, Username = "u1", FirstName = "John", Password = "password", CreatedBy = "test-user", CreatedAt = DateTime.UtcNow };
 
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
@@ -147,7 +168,11 @@ public class UserRepositoryTests : IDisposable
         {
             Id = Guid.NewGuid(),
             Username = "newuser",
-            Email = "new@user.com"
+            FirstName = "New",
+            Password = "password",
+            Email = "new@user.com",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user-add"
         };
 
         // Act
@@ -172,8 +197,12 @@ public class UserRepositoryTests : IDisposable
         var user = new User
         {
             Id = Guid.NewGuid(),
+            Username = "newuser",
+            Password = "password",
             FirstName = "Old",
-            Email = "old@test.com"
+            Email = "old@test.com",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow
         };
 
         _dbContext.Users.Add(user);
@@ -184,6 +213,8 @@ public class UserRepositoryTests : IDisposable
 
         user.FirstName = "Updated";
         user.Email = "updated@test.com";
+        user.UpdatedAt = DateTime.UtcNow;
+        user.UpdatedBy = "test-user-update";
 
         // Act
         var result = await _sut.UpdateAsync(user, CancellationToken.None);
@@ -222,10 +253,10 @@ public class UserRepositoryTests : IDisposable
         var userId = Guid.NewGuid();
         var username = "admin";
 
-        var user = new User { Id = userId };
-        var family = new Family { Id = Guid.NewGuid(), UserId = userId };
-        var member = new FamilyMember { Id = Guid.NewGuid(), FamilyId = family.Id };
-        var document = new DocumentDetails { Id = Guid.NewGuid(), FamilyMemberId = member.Id };
+        var user = new User { Id = userId, Username = "u1", CreatedAt = DateTime.UtcNow, CreatedBy = username, FirstName = "John", Email = "john@doe", Password = "password" };
+        var family = new Family { Id = Guid.NewGuid(), Name = "Family", UserId = userId, CreatedAt = DateTime.UtcNow, CreatedBy = username };
+        var member = new FamilyMember { Id = Guid.NewGuid(), FirstName = "John", FamilyId = family.Id, CreatedAt = DateTime.UtcNow, CreatedBy = username };
+        var document = new DocumentDetails { Id = Guid.NewGuid(), FamilyMemberId = member.Id, CreatedAt = DateTime.UtcNow, CreatedBy = username, DocumentType= Domain.Enums.DocumentTypes.PAN , DocumentNumber = "1234567890" };
 
         _dbContext.Users.Add(user);
         _dbContext.Families.Add(family);

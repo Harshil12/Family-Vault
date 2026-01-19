@@ -19,7 +19,7 @@ public class DocumentDetails : BaseEntity
     /// <summary>
     /// The physical or digital location where the document is stored.
     /// </summary>
-    public string SavedLocation { get; set; } = null!;
+    public string? SavedLocation { get; set; } = null!;
 
     /// <summary>
     /// The date when the document was issued.

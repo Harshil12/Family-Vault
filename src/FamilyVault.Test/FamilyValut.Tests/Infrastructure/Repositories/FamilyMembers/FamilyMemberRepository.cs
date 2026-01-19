@@ -17,6 +17,7 @@ public class FamilyMemberRepositoryTests : IDisposable
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
         _dbContext = new AppDbContext(options);
@@ -38,7 +39,9 @@ public class FamilyMemberRepositoryTests : IDisposable
         {
             Id = Guid.NewGuid(),
             FirstName = "John",
-            FamilyId = Guid.NewGuid()
+            FamilyId = Guid.NewGuid(),
+            CreatedBy = "test-user-add",
+            CreatedAt = DateTime.UtcNow
         };
 
         // Act
@@ -66,14 +69,35 @@ public class FamilyMemberRepositoryTests : IDisposable
         {
             Id = Guid.NewGuid(),
             FirstName = "Jane",
-            DocumentDetails =
-            {
-                new DocumentDetails { Id = Guid.NewGuid(), DocumentNumber = "DOC1" },
-                new DocumentDetails { Id = Guid.NewGuid(), DocumentNumber = "DOC2" }
-            }
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user-add",
+            FamilyId = Guid.NewGuid(),
         };
 
+        var document = new DocumentDetails
+        {
+            Id = Guid.NewGuid(),
+            DocumentType = Domain.Enums.DocumentTypes.Passport,
+            DocumentNumber = "P123456",
+            FamilyMemberId = member.Id,
+            CreatedBy = "test-user-add",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var document1 = new DocumentDetails
+        {
+            Id = Guid.NewGuid(),
+            DocumentType = Domain.Enums.DocumentTypes.Passport,
+            DocumentNumber = "P123456",
+            FamilyMemberId = member.Id,
+            CreatedBy = "test-user-add",
+            CreatedAt = DateTime.UtcNow
+        };
+
+
         _dbContext.FamilyMembers.Add(member);
+        _dbContext.Documents.Add(document);
+        _dbContext.Documents.Add(document1);
         await _dbContext.SaveChangesAsync();
 
         // Act
@@ -99,7 +123,10 @@ public class FamilyMemberRepositoryTests : IDisposable
         var member = new FamilyMember
         {
             Id = Guid.NewGuid(),
-            FirstName = "Lookup"
+            FirstName = "Lookup",
+            FamilyId = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user-add"
         };
 
         _dbContext.FamilyMembers.Add(member);
@@ -135,8 +162,8 @@ public class FamilyMemberRepositoryTests : IDisposable
 
         var members = new[]
         {
-            new FamilyMember { Id = Guid.NewGuid(), FamilyId = familyId },
-            new FamilyMember { Id = Guid.NewGuid(), FamilyId = familyId }
+            new FamilyMember { Id = Guid.NewGuid(), FirstName = "John",  FamilyId = familyId, CreatedAt=DateTime.UtcNow ,CreatedBy="test-user-add"},
+            new FamilyMember { Id = Guid.NewGuid(), FirstName = "Jane",  FamilyId = familyId, CreatedAt=DateTime.UtcNow ,CreatedBy="test-user-add"},
         };
 
         _dbContext.FamilyMembers.AddRange(members);
@@ -163,7 +190,9 @@ public class FamilyMemberRepositoryTests : IDisposable
         {
             Id = Guid.NewGuid(),
             FirstName = "Old",
-            FamilyId = Guid.NewGuid()
+            FamilyId = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user-add"
         };
 
         _dbContext.FamilyMembers.Add(member);
@@ -173,6 +202,8 @@ public class FamilyMemberRepositoryTests : IDisposable
         _memoryCache.Set("AllFamilies", new List<FamilyMember>());
 
         member.FirstName = "Updated";
+        member.UpdatedAt = DateTime.UtcNow;
+        member.UpdatedBy = "test-user-update";
 
         // Act
         var result = await _sut.UpdateAsync(member, CancellationToken.None);
@@ -208,13 +239,16 @@ public class FamilyMemberRepositoryTests : IDisposable
     {
         // Arrange
         var memberId = Guid.NewGuid();
-        var user = "test-user";
 
-        var member = new FamilyMember { Id = memberId };
+        var member = new FamilyMember { Id = memberId, FirstName = "John", CreatedAt = DateTime.UtcNow, CreatedBy = "test-user-add" };
         var document = new DocumentDetails
         {
             Id = Guid.NewGuid(),
-            FamilyMemberId = memberId
+            DocumentType = Domain.Enums.DocumentTypes.Passport,
+            DocumentNumber = "P123456",
+            FamilyMemberId = memberId,
+            CreatedBy = "test-user-add",
+            CreatedAt = DateTime.UtcNow
         };
 
         _dbContext.FamilyMembers.Add(member);
@@ -222,7 +256,7 @@ public class FamilyMemberRepositoryTests : IDisposable
         await _dbContext.SaveChangesAsync();
 
         // Act
-        await _sut.DeleteByIdAsync(memberId, user, CancellationToken.None);
+        await _sut.DeleteByIdAsync(memberId, "test-user-add-delete", CancellationToken.None);
 
         // Assert
         (await _dbContext.FamilyMembers.FindAsync(memberId))!.IsDeleted.Should().BeTrue();

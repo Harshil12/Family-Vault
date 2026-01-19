@@ -8,6 +8,12 @@
 		<DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
@@ -23,6 +29,8 @@
 		<PackageReference Include="OpenTelemetry.Instrumentation.Http" />
 
 		<PackageReference Include="Swashbuckle.AspNetCore" />
+
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
 
 		<!-- VS / Docker tooling -->
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" PrivateAssets="all" />
