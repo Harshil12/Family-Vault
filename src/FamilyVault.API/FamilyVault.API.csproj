@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>749d2c8a-035e-4ecd-9d25-b077bf20ecf3</UserSecretsId>
@@ -16,12 +16,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" />
-		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
 
 		<PackageReference Include="FluentValidation" />
 		<PackageReference Include="FluentValidation.AspNetCore" />
 
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+
+		<PackageReference Include="Microsoft.OpenApi" />
 
 		<PackageReference Include="OpenTelemetry.Exporter.Console" />
 		<PackageReference Include="OpenTelemetry.Extensions.Hosting" />

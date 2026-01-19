@@ -7,7 +7,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -75,7 +75,11 @@ public class Program
         builder.Services.AddScoped<IAuthService, AuthService>();
 
         // -------------------- AutoMapper --------------------
-        builder.Services.AddAutoMapper(typeof(ApplicationAssemblyMarker));
+        builder.Services.AddAutoMapper(cfg =>
+        {
+            // optional custom configuration
+        }, typeof(ApplicationAssemblyMarker).Assembly);
+
 
         // -------------------- Swagger (Minimal API) --------------------
         builder.Services.AddEndpointsApiExplorer();
@@ -92,20 +96,23 @@ public class Program
                 Description = "Enter 'Bearer' [space] and then your token\n\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
             });
 
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    Array.Empty<string>()
-                }
-            });
+//            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+//            {
+//                {
+//                    new OpenApiSecurityScheme
+//                    {
+//                      Name = "Bearer",
+//                      Scheme = "oauth2",
+//Reference = new OpenApiReference
+//                      {
+//                          Type = ReferenceType.SecurityScheme,
+//                          Id = "Bearer"
+//                      },
+//                      In = ParameterLocation.Header
+//                    },
+//                    Array.Empty<string>()
+//                }
+//            });
         });
 
         builder.Logging.ClearProviders();
@@ -129,12 +136,12 @@ public class Program
             .WithMetrics(metrics => metrics
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
-                .AddConsoleExporter()) ;
+                .AddConsoleExporter());
 
-     
+
         var app = builder.Build();
-        
-        app.Use(async(context, next) =>
+
+        app.Use(async (context, next) =>
         {
             var traceId = Activity.Current?.TraceId.ToString() ?? "no-trace";
             using (context.RequestServices.GetRequiredService<ILoggerFactory>()

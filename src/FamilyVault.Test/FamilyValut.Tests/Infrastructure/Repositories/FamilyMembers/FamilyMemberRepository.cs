@@ -2,6 +2,7 @@
 using FamilyVault.Infrastructure.Data;
 using FamilyVault.Infrastructure.Repositories;
 using FluentAssertions;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -15,12 +16,17 @@ public class FamilyMemberRepositoryTests : IDisposable
 
     public FamilyMemberRepositoryTests()
     {
+        var connection = new SqliteConnection("Data Source=:memory:");
+        connection.Open(); // 🔴 MUST stay open
+
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
+            .UseSqlite(connection)
             .Options;
 
-        _dbContext = new AppDbContext(options);
+        // 🔴 Schema creation step (THIS is what you're missing)
+        using var context = new AppDbContext(options);
+        context.Database.EnsureCreatedAsync();
+
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
 
         _sut = new FamilyMemberRepository(_dbContext, _memoryCache);
