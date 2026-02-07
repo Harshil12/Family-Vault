@@ -1,8 +1,6 @@
-﻿using FamilyVault.Application.Interfaces.Repositories;
-using FamilyVault.Application.Services;
+﻿using FamilyVault.Application.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Logging;
 using Moq;
 using System.Text;
 

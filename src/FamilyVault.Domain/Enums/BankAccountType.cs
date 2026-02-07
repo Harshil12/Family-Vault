@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FamilyVault.Domain.Enums
+﻿namespace FamilyVault.Domain.Enums
 {
 
     public enum BankAccountType
