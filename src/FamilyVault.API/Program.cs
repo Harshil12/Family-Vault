@@ -97,24 +97,6 @@ public class Program
                 In = ParameterLocation.Header,
                 Description = "Enter 'Bearer' [space] and then your token\n\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
             });
-
-//            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-//            {
-//                {
-//                    new OpenApiSecurityScheme
-//                    {
-//                      Name = "Bearer",
-//                      Scheme = "oauth2",
-//Reference = new OpenApiReference
-//                      {
-//                          Type = ReferenceType.SecurityScheme,
-//                          Id = "Bearer"
-//                      },
-//                      In = ParameterLocation.Header
-//                    },
-//                    Array.Empty<string>()
-//                }
-//            });
         });
                
         builder.Services.AddMemoryCache();
