@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FamilyVault.Application.Services;
 
-public class FamilyMemberService : GenericService<FamilyMemberDto, FamilyMember>, IFamilyMemberService
+public class FamilyMemberService : GenericService<FamilyMemberDto, FamilyMember>, IFamilymemeberService
 {
     private readonly IFamilyMemberRepository _familyMemberRepository;
     private readonly ILogger<FamilyMemberService> _typedLogger;
@@ -48,4 +48,3 @@ public class FamilyMemberService : GenericService<FamilyMemberDto, FamilyMember>
         return UpdateAsync(familMemberToUpdate, userId, cancellationToken);
     }
 }
-
