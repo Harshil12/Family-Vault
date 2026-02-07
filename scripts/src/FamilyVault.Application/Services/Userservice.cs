@@ -2,7 +2,6 @@ using AutoMapper;
 using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
-using FamilyVault.Application.Services;
 using FamilyVault.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +29,7 @@ public class Userservice : GenericService<UserDto, User>, IUserService
 
     public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(\"Creating a new user with username: {Username}\", createUserRequest.Username);
+        _typedLogger.LogInformation(""Creating a new user with username: {Username}"", createUserRequest.Username);
 
         var userToCreate = _mapper.Map<User>(createUserRequest);
         userToCreate.Password = _cryptoService.HashPassword(createUserRequest.Password);
@@ -40,13 +39,13 @@ public class Userservice : GenericService<UserDto, User>, IUserService
 
     public Task DeleteUserByIdAsync(Guid userId, Guid createdByUserId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(\"Deleting user with ID: {UserId}\", userId);
+        _typedLogger.LogInformation(""Deleting user with ID: {UserId}"", userId);
         return DeleteAsync(userId, createdByUserId, cancellationToken);
     }
 
     public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(\"Updating user with ID: {UserId}\", updateUserRequest.Id);
+        _typedLogger.LogInformation(""Updating user with ID: {UserId}"", updateUserRequest.Id);
 
         var userToUpdate = _mapper.Map<User>(updateUserRequest);
         userToUpdate.Password = _cryptoService.HashPassword(userToUpdate.Password);

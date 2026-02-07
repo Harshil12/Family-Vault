@@ -15,56 +15,31 @@ public class FamilyRepository : GenericRepository<Family>, IFamilyRepository
 
     public async Task<IReadOnlyList<Family>> GetAllWithFamilyMembersAsync(CancellationToken cancellationToken)
     {
-        var cacheKey = ""AllWithFamilyMembers"";
-        var cacheOptions = new MemoryCacheEntryOptions
+        return await GetOrCreateCachedAsync(""WithMembers"", async () =>
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
-            SlidingExpiration = TimeSpan.FromMinutes(2),
-            Priority = CacheItemPriority.High
-        };
-
-        if (_memoryCache.TryGetValue(cacheKey, out IReadOnlyList<Family>? families) && families is not null)
-        {
-            return families;
-        }
-
-        var result = await _appDbContext.Families.AsNoTracking().Include(f => f.FamilyMembers).ToListAsync(cancellationToken);
-        _memoryCache.Set(cacheKey, result, cacheOptions);
-        return result;
+            return await _appDbContext.Families.AsNoTracking().Include(f => f.FamilyMembers).ToListAsync(cancellationToken);
+        }, cancellationToken);
     }
 
     public async Task<IReadOnlyList<Family>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var cacheKey = ""AllFamilyMembers"";
-        var cacheOptions = new MemoryCacheEntryOptions
+        var suffix = $""ByUser:{userId}"";
+        return await GetOrCreateCachedAsync(suffix, async () =>
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
-            SlidingExpiration = TimeSpan.FromMinutes(2),
-            Priority = CacheItemPriority.High
-        };
-
-        if (_memoryCache.TryGetValue(cacheKey, out IReadOnlyList<Family>? families) && families is not null)
-        {
-            return families;
-        }
-
-        var result = await _appDbContext.Families.Where(f => f.UserId == userId).AsNoTracking().ToListAsync(cancellationToken);
-        _memoryCache.Set(cacheKey, result, cacheOptions);
-        return result;
+            return await _appDbContext.Families.Where(f => f.UserId == userId).AsNoTracking().ToListAsync(cancellationToken);
+        }, cancellationToken);
     }
 
     public override async Task DeleteByIdAsync(Guid id, string user, CancellationToken cancellationToken)
     {
         using var tx = await _appDbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        // Soft delete the family
         await _appDbContext.Families
                 .Where(fm => fm.Id == id)
                 .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
                 .SetProperty(fm => fm.UpdatedBy, user)
                 .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
 
-        // soft delete the family members
         await _appDbContext.FamilyMembers
                .Where(fm => fm.FamilyId == id && !fm.IsDeleted)
                .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
@@ -86,7 +61,7 @@ public class FamilyRepository : GenericRepository<Family>, IFamilyRepository
 
         await tx.CommitAsync(cancellationToken);
 
-        _memoryCache.Remove(""AllWithFamilyMembers"");
-        _memoryCache.Remove(""AllFamilyMembers"");
+        // Invalidate cache for Family entity (GenericRepository.DeleteByIdAsync would do this for other entities).
+        InvalidateCache();
     }
 }

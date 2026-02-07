@@ -5,10 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace FamilyVault.Application.Services;
 
-/// <summary>
-/// Generic service with common CRUD helpers used by concrete service implementations.
-/// Concrete services can inherit and call the protected helpers to reduce duplication.
-/// </summary>
 public abstract class GenericService<TDto, TEntity>
     where TEntity : BaseEntity
 {

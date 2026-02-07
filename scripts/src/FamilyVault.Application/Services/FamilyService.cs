@@ -30,20 +30,20 @@ public class FamilyService : GenericService<FamilyDto, Family>, IFamilyService
 
     public Task<FamilyDto> CreateFamilyAsync(CreateFamilyRequest createFamilyRequest, Guid userId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(\"Creating a new family with name: {Name}\", createFamilyRequest.FamilyName);
+        _typedLogger.LogInformation(""Creating a new family with name: {Name}"", createFamilyRequest.FamilyName);
         var familyToCreate = _mapper.Map<Family>(createFamilyRequest);
         return CreateAsync(familyToCreate, userId, cancellationToken);
     }
 
     public Task DeleteFamilyByIdAsync(Guid familyId, Guid userId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(\"Deleting family with ID: {FamilyId}\", familyId);
+        _typedLogger.LogInformation(""Deleting family with ID: {FamilyId}"", familyId);
         return DeleteAsync(familyId, userId, cancellationToken);
     }
 
     public Task<FamilyDto> UpdateFamilyAsync(UpdateFamlyRequest updateFamlyRequest, Guid userId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(\"Updating family with ID: {FamilyId}\", updateFamlyRequest.Id);
+        _typedLogger.LogInformation(""Updating family with ID: {FamilyId}"", updateFamlyRequest.Id);
         var familyToUpdate = _mapper.Map<Family>(updateFamlyRequest);
         return UpdateAsync(familyToUpdate, userId, cancellationToken);
     }

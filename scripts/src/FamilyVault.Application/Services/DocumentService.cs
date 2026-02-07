@@ -1,8 +1,8 @@
+using AutoMapper;
 using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Domain.Entities;
-using AutoMapper;
 using Microsoft.Extensions.Logging;
 
 namespace FamilyVault.Application.Services;
@@ -27,7 +27,7 @@ public class DocumentService : GenericService<DocumentDetailsDto, DocumentDetail
 
         foreach (var doc in result)
         {
-            doc.DocumentNumber = _crypto_service.DecryptData(doc.DocumentNumber);
+            doc.DocumentNumber = _cryptoService.DecryptData(doc.DocumentNumber);
         }
 
         return _mapper.Map<List<DocumentDetailsDto>>(result);
@@ -38,33 +38,33 @@ public class DocumentService : GenericService<DocumentDetailsDto, DocumentDetail
         var result = await _documentReppository.GetByIdAsync(documentId, cancellationToken);
 
         if (result != null)
-            result.DocumentNumber = _crypto_service.DecryptData(result.DocumentNumber);
+            result.DocumentNumber = _cryptoService.DecryptData(result.DocumentNumber);
 
         return _mapper.Map<DocumentDetailsDto>(result);
     }
 
     public async Task<DocumentDetailsDto> CreateDocumentDetailsAsync(CreateDocumentRequest createDocumentRequest, Guid userId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(\"Creating a new document for FamilyMemberId: {FamilyMemberId}\", createDocumentRequest.FamilyMemberId);
+        _typedLogger.LogInformation(""Creating a new document for FamilyMemberId: {FamilyMemberId}"", createDocumentRequest.FamilyMemberId);
 
         var documentToCreate = _mapper.Map<DocumentDetails>(createDocumentRequest);
-        documentToCreate.DocumentNumber = _crypto_service.EncryptData(documentToCreate.DocumentNumber);
+        documentToCreate.DocumentNumber = _cryptoService.EncryptData(documentToCreate.DocumentNumber);
 
         return await CreateAsync(documentToCreate, userId, cancellationToken);
     }
 
     public Task DeleteDocumentDetailsByIdAsync(Guid documentId, Guid userId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(\"Deleting document with Id: {DocumentId}\", documentId);
+        _typedLogger.LogInformation(""Deleting document with Id: {DocumentId}"", documentId);
         return DeleteAsync(documentId, userId, cancellationToken);
     }
 
     public async Task<DocumentDetailsDto> UpdateDocumentDetailsAsync(UpdateDocumentRequest updateDocumentRequest, Guid userId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(\"Updating document with Id: {DocumentId}\", updateDocumentRequest.Id);
+        _typedLogger.LogInformation(""Updating document with Id: {DocumentId}"", updateDocumentRequest.Id);
 
         var documentToUpdate = _mapper.Map<DocumentDetails>(updateDocumentRequest);
-        documentToUpdate.DocumentNumber = _crypto_service.EncryptData(documentToUpdate.DocumentNumber);
+        documentToUpdate.DocumentNumber = _cryptoService.EncryptData(documentToUpdate.DocumentNumber);
 
         return await UpdateAsync(documentToUpdate, userId, cancellationToken);
     }

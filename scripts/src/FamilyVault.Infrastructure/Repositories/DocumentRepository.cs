@@ -15,25 +15,49 @@ public class DocumentRepository : GenericRepository<DocumentDetails>, IDocumentR
 
     public async Task<IReadOnlyList<DocumentDetails>> GetAllByFamilyMemberIdAsync(Guid familyMemberId, CancellationToken cancellationToken)
     {
-        var cacheKey = $""Documents_FamilyMember_{familyMemberId}"";
-        var cacheOptions = new MemoryCacheEntryOptions
+        var suffix = $""ByFamilyMember:{familyMemberId}"";
+        return await GetOrCreateCachedAsync(suffix, async () =>
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
-            SlidingExpiration = TimeSpan.FromMinutes(2),
-            Priority = CacheItemPriority.High
-        };
+            return await _appDbContext.Documents
+                .Where(d => d.FamilyMemberId == familyMemberId)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }, cancellationToken);
+    }
 
-        if (_memoryCache.TryGetValue(cacheKey, out IReadOnlyList<DocumentDetails>? cachedDocuments) && cachedDocuments is not null)
-        {
-            return cachedDocuments;
-        }
+    public override async Task<DocumentDetails> UpdateAsync(DocumentDetails documentDetails, CancellationToken cancellationToken)
+    {
+        var existingDocument = await _appDbContext.Documents
+            .FirstOrDefaultAsync(d => d.Id == documentDetails.Id, cancellationToken) ?? throw new KeyNotFoundException(""Document not found"");
 
-        var result = await _appDbContext.Documents
-            .Where(d => d.FamilyMemberId == familyMemberId)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+        _appDbContext.Entry(existingDocument).CurrentValues.SetValues(documentDetails);
 
-        _memoryCache.Set(cacheKey, result, cacheOptions);
-        return result;
+        await _appDbContext.SaveChangesAsync(cancellationToken);
+
+        InvalidateCache();
+        return documentDetails;
+    }
+
+    public override async Task<DocumentDetails> AddAsync(DocumentDetails documentDetails, CancellationToken cancellationToken)
+    {
+        await _appDbContext.Documents.AddAsync(documentDetails, cancellationToken);
+        await _appDbContext.SaveChangesAsync(cancellationToken);
+
+        InvalidateCache();
+        return documentDetails;
+    }
+
+    public override async Task DeleteByIdAsync(Guid id, string user, CancellationToken cancellationToken)
+    {
+        var existingDocument = await _appDbContext.Documents
+            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken) ?? throw new KeyNotFoundException(""Document not found"");
+
+        existingDocument.IsDeleted = true;
+        existingDocument.UpdatedAt = DateTimeOffset.UtcNow;
+        existingDocument.UpdatedBy = user;
+
+        await _appDbContext.SaveChangesAsync(cancellationToken);
+
+        InvalidateCache();
     }
 }

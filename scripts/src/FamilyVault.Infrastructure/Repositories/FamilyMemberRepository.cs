@@ -18,58 +18,31 @@ public class FamilyMemberRepository : GenericRepository<FamilyMember>, IFamilyMe
         await _appDbContext.FamilyMembers.AddAsync(familyMember, cancellationToken);
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
-        _memoryCache.Remove(""AllFamiliesWithDocuments"");
-        _memoryCache.Remove(""AllFamilies"");
-
+        InvalidateCache();
         return familyMember;
     }
 
     public async Task<IReadOnlyList<FamilyMember>> GetAllWithDocumentsAsync(CancellationToken cancellationToken)
     {
-        var cacheKey = ""AllFamiliesWithDocuments"";
-        var cacheOptions = new MemoryCacheEntryOptions
+        return await GetOrCreateCachedAsync(""WithDocuments"", async () =>
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
-            SlidingExpiration = TimeSpan.FromMinutes(2),
-            Priority = CacheItemPriority.High
-        };
-
-        if (_memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
-        {
-            return familyMembers;
-        }
-
-        var result = await _appDbContext.FamilyMembers
-            .AsNoTracking()
-            .Include(fm => fm.DocumentDetails)
-            .ToListAsync(cancellationToken);
-
-        _memoryCache.Set(cacheKey, result, cacheOptions);
-        return result;
+            return await _appDbContext.FamilyMembers
+                .AsNoTracking()
+                .Include(fm => fm.DocumentDetails)
+                .ToListAsync(cancellationToken);
+        }, cancellationToken);
     }
 
     public async Task<IReadOnlyList<FamilyMember>> GetAllByFamilyIdAsync(Guid familyId, CancellationToken cancellationToken)
     {
-        var cacheKey = ""AllFamilies"";
-        var cacheOptions = new MemoryCacheEntryOptions
+        var suffix = $""ByFamily:{familyId}"";
+        return await GetOrCreateCachedAsync(suffix, async () =>
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
-            SlidingExpiration = TimeSpan.FromMinutes(2),
-            Priority = CacheItemPriority.High
-        };
-
-        if (_memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
-        {
-            return familyMembers;
-        }
-
-        var result = await _appDbContext.FamilyMembers
-            .Where(fm => fm.FamilyId == familyId)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
-        _memoryCache.Set(cacheKey, result, cacheOptions);
-        return result;
+            return await _appDbContext.FamilyMembers
+                .Where(fm => fm.FamilyId == familyId)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }, cancellationToken);
     }
 
     public override async Task<FamilyMember> UpdateAsync(FamilyMember familyMember, CancellationToken cancellationToken)
@@ -77,23 +50,11 @@ public class FamilyMemberRepository : GenericRepository<FamilyMember>, IFamilyMe
         var existingFamilyMember = await _appDbContext.FamilyMembers
             .FirstOrDefaultAsync(fm => fm.Id == familyMember.Id, cancellationToken) ?? throw new KeyNotFoundException(""Family member not found"");
 
-        existingFamilyMember.FirstName = familyMember.FirstName;
-        existingFamilyMember.LastName = familyMember.LastName;
-        existingFamilyMember.CountryCode = familyMember.CountryCode;
-        existingFamilyMember.Mobile = familyMember.Mobile;
-        existingFamilyMember.RelationshipType = familyMember.RelationshipType;
-        existingFamilyMember.DateOfBirth = familyMember.DateOfBirth;
-        existingFamilyMember.BloodGroup = familyMember.BloodGroup;
-        existingFamilyMember.Email = familyMember.Email;
-        existingFamilyMember.PAN = familyMember.PAN;
-        existingFamilyMember.Aadhar = familyMember.Aadhar;
-        existingFamilyMember.FamilyId = familyMember.FamilyId;
+        _appDbContext.Entry(existingFamilyMember).CurrentValues.SetValues(familyMember);
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
-        _memoryCache.Remove(""AllFamiliesWithDocuments"");
-        _memoryCache.Remove(""AllFamilies"");
-
+        InvalidateCache();
         return familyMember;
     }
 
@@ -115,7 +76,6 @@ public class FamilyMemberRepository : GenericRepository<FamilyMember>, IFamilyMe
 
         await tx.CommitAsync(cancellationToken);
 
-        _memoryCache.Remove(""AllFamiliesWithDocuments"");
-        _memoryCache.Remove(""AllFamilies"");
+        InvalidateCache();
     }
 }
