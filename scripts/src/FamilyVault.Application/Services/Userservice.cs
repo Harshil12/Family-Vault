@@ -7,13 +7,13 @@ using Microsoft.Extensions.Logging;
 
 namespace FamilyVault.Application.Services;
 
-public class Userservice : GenericService<UserDto, User>, IUserService
+public class UserService : GenericService<UserDto, User>, IUserService
 {
     private readonly ICryptoService _cryptoService;
     private readonly IUserRepository _userRepository;
-    private readonly ILogger<Userservice> _typedLogger;
+    private readonly ILogger<UserService> _typedLogger;
 
-    public Userservice(IUserRepository userRepository, ICryptoService cryptoService, IMapper mapper, ILogger<Userservice> logger)
+    public UserService(IUserRepository userRepository, ICryptoService cryptoService, IMapper mapper, ILogger<UserService> logger)
         : base(userRepository, mapper, logger)
     {
         _cryptoService = cryptoService;
@@ -29,7 +29,7 @@ public class Userservice : GenericService<UserDto, User>, IUserService
 
     public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(""Creating a new user with username: {Username}"", createUserRequest.Username);
+        _typedLogger.LogInformation(\"Creating a new user\");
 
         var userToCreate = _mapper.Map<User>(createUserRequest);
         userToCreate.Password = _cryptoService.HashPassword(createUserRequest.Password);
@@ -39,16 +39,21 @@ public class Userservice : GenericService<UserDto, User>, IUserService
 
     public Task DeleteUserByIdAsync(Guid userId, Guid createdByUserId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(""Deleting user with ID: {UserId}"", userId);
+        _typedLogger.LogInformation(\"Deleting user with ID: {UserId}\", userId);
         return DeleteAsync(userId, createdByUserId, cancellationToken);
     }
 
-    public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
+    public async Task<UserDto> UpdateUserAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
     {
-        _typedLogger.LogInformation(""Updating user with ID: {UserId}"", updateUserRequest.Id);
+        _typedLogger.LogInformation(\"Updating user with ID: {UserId}\", updateUserRequest.Id);
 
         var userToUpdate = _mapper.Map<User>(updateUserRequest);
-        userToUpdate.Password = _cryptoService.HashPassword(userToUpdate.Password);
+
+        // only hash and update password if provided in request
+        if (!string.IsNullOrEmpty(updateUserRequest.Password))
+        {
+            userToUpdate.Password = _cryptoService.HashPassword(updateUserRequest.Password);
+        }
 
         return await UpdateAsync(userToUpdate, createdByUserId, cancellationToken);
     }

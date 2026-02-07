@@ -24,23 +24,22 @@ public class FamilyMemberRepository : GenericRepository<FamilyMember>, IFamilyMe
 
     public async Task<IReadOnlyList<FamilyMember>> GetAllWithDocumentsAsync(CancellationToken cancellationToken)
     {
-        return await GetOrCreateCachedAsync(\"WithDocuments\", async () =>
+        return await GetOrCreateCachedAsync("WithDocuments", async () =>
         {
             return await _appDbContext.FamilyMembers
-                .Where(fm => !fm.IsDeleted)
                 .AsNoTracking()
-                .Include(fm => fm.DocumentDetails.Where(d => !d.IsDeleted))
+                .Include(fm => fm.DocumentDetails) // global filter will exclude deleted documents
                 .ToListAsync(cancellationToken);
         }, cancellationToken);
     }
 
     public async Task<IReadOnlyList<FamilyMember>> GetAllByFamilyIdAsync(Guid familyId, CancellationToken cancellationToken)
     {
-        var suffix = $\"ByFamily:{familyId}\";
+        var suffix = $"ByFamily:{familyId}";
         return await GetOrCreateCachedAsync(suffix, async () =>
         {
             return await _appDbContext.FamilyMembers
-                .Where(fm => fm.FamilyId == familyId && !fm.IsDeleted)
+                .Where(fm => fm.FamilyId == familyId) // global filter will exclude deleted members
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }, cancellationToken);
@@ -49,7 +48,7 @@ public class FamilyMemberRepository : GenericRepository<FamilyMember>, IFamilyMe
     public override async Task<FamilyMember> UpdateAsync(FamilyMember familyMember, CancellationToken cancellationToken)
     {
         var existingFamilyMember = await _appDbContext.FamilyMembers
-            .FirstOrDefaultAsync(fm => fm.Id == familyMember.Id, cancellationToken) ?? throw new KeyNotFoundException(\"Family member not found\");
+            .FirstOrDefaultAsync(fm => fm.Id == familyMember.Id, cancellationToken) ?? throw new KeyNotFoundException("Family member not found");
 
         _appDbContext.Entry(existingFamilyMember).CurrentValues.SetValues(familyMember);
 

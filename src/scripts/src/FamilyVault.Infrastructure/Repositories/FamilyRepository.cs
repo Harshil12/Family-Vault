@@ -15,23 +15,22 @@ public class FamilyRepository : GenericRepository<Family>, IFamilyRepository
 
     public async Task<IReadOnlyList<Family>> GetAllWithFamilyMembersAsync(CancellationToken cancellationToken)
     {
-        return await GetOrCreateCachedAsync(\"WithMembers\", async () =>
+        return await GetOrCreateCachedAsync("WithMembers", async () =>
         {
             return await _appDbContext.Families
-                .Where(f => !f.IsDeleted)
                 .AsNoTracking()
-                .Include(f => f.FamilyMembers.Where(m => !m.IsDeleted))
+                .Include(f => f.FamilyMembers) // global query filter will exclude deleted members
                 .ToListAsync(cancellationToken);
         }, cancellationToken);
     }
 
     public async Task<IReadOnlyList<Family>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var suffix = $\"ByUser:{userId}\";
+        var suffix = $"ByUser:{userId}";
         return await GetOrCreateCachedAsync(suffix, async () =>
         {
             return await _appDbContext.Families
-                .Where(f => f.UserId == userId && !f.IsDeleted)
+                .Where(f => f.UserId == userId) // global filter will exclude deleted families
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }, cancellationToken);

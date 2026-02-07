@@ -15,11 +15,11 @@ public class DocumentRepository : GenericRepository<DocumentDetails>, IDocumentR
 
     public async Task<IReadOnlyList<DocumentDetails>> GetAllByFamilyMemberIdAsync(Guid familyMemberId, CancellationToken cancellationToken)
     {
-        var suffix = $\"ByFamilyMember:{familyMemberId}\";
+        var suffix = $"ByFamilyMember:{familyMemberId}";
         return await GetOrCreateCachedAsync(suffix, async () =>
         {
             return await _appDbContext.Documents
-                .Where(d => d.FamilyMemberId == familyMemberId && !d.IsDeleted)
+                .Where(d => d.FamilyMemberId == familyMemberId) // global filter excludes deleted docs
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }, cancellationToken);
@@ -37,7 +37,7 @@ public class DocumentRepository : GenericRepository<DocumentDetails>, IDocumentR
     public override async Task<DocumentDetails> UpdateAsync(DocumentDetails documentDetails, CancellationToken cancellationToken)
     {
         var existingDocument = await _appDbContext.Documents
-            .FirstOrDefaultAsync(d => d.Id == documentDetails.Id, cancellationToken) ?? throw new KeyNotFoundException(\"Document not found\");
+            .FirstOrDefaultAsync(d => d.Id == documentDetails.Id, cancellationToken) ?? throw new KeyNotFoundException("Document not found");
 
         _appDbContext.Entry(existingDocument).CurrentValues.SetValues(documentDetails);
 
@@ -53,7 +53,7 @@ public class DocumentRepository : GenericRepository<DocumentDetails>, IDocumentR
     public override async Task DeleteByIdAsync(Guid id, string user, CancellationToken cancellationToken)
     {
         var existingDocument = await _appDbContext.Documents
-            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken) ?? throw new KeyNotFoundException(\"Document not found\");
+            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken) ?? throw new KeyNotFoundException("Document not found");
 
         existingDocument.IsDeleted = true;
         existingDocument.UpdatedAt = DateTimeOffset.UtcNow;
