@@ -487,4 +487,3 @@ Write-Host "Running dotnet build (showing output)..."
 dotnet build
 
 Write-Host "Script finished. Review changes in your IDE's Git Changes window."
-x
