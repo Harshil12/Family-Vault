@@ -26,8 +26,11 @@ public sealed class CryptoService : ICryptoService
         => _passwordHasher.HashPassword(null, password);
 
     public bool VerifyPassword(string hashPassword, string password)
-        => _passwordHasher.VerifyHashedPassword(
-            null,
-            hashPassword,
-            password) == PasswordVerificationResult.Success;
+    {
+        var result = _passwordHasher.VerifyHashedPassword(
+             null,
+             hashPassword,
+             password);
+        return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
+    }
 }
