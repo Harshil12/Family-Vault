@@ -67,6 +67,8 @@ public class Program
         // -------------------- Application & Infrastructure --------------------
         builder.Services.AddInfrastructureServices(builder.Configuration);
 
+        builder.Services.AddDataProtection();
+
         builder.Services.AddScoped<IUserService, Userservice>();
         builder.Services.AddScoped<IFamilymemeberService, FamilyMemberService>();
         builder.Services.AddScoped<IFamilyService, FamilyService>();
@@ -114,18 +116,8 @@ public class Program
 //                }
 //            });
         });
-
-        builder.Logging.ClearProviders();
-        builder.Logging.AddConsole();
-        builder.Logging.AddSimpleConsole(options =>
-        {
-            options.TimestampFormat = "HH:mm:ss ";
-            options.SingleLine = true;
-            options.IncludeScopes = true; // shows scope values like TraceId/RequestId
-        });
-
+               
         builder.Services.AddMemoryCache();
-
 
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resource => resource.AddService("FamilyVaultAPI"))

@@ -1,16 +1,22 @@
-﻿using System.Text;
+﻿using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Services;
 using FluentAssertions;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Logging;
+using Moq;
+using System.Text;
 
 namespace FamilyValut.Tests.Application.Services.Others;
 
 public class CryptoServiceTests
 {
     private readonly CryptoService _sut;
+    private readonly Mock<IDataProtectionProvider> _dataProtectorMock;
 
     public CryptoServiceTests()
     {
-        _sut = new CryptoService();
+        _dataProtectorMock = new Mock<IDataProtectionProvider>();
+        _sut = new CryptoService(_dataProtectorMock.Object);
     }
 
     #region Encrypt / Decrypt
