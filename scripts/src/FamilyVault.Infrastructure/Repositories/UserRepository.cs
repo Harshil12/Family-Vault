@@ -19,9 +19,9 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         return await GetOrCreateCachedAsync(\"WithFamilies\", async () =>
         {
             return await _appDbContext.Users
-                .Where(u => !u.IsDeleted)
+                
                 .AsNoTracking()
-                .Include(u => u.Families.Where(f => !f.IsDeleted))
+                .Include(u => u.Families)
                 .ToListAsync(cancellationToken);
         }, cancellationToken);
     }
@@ -30,7 +30,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
         return await _appDbContext.Users
            .AsNoTracking()
-           .Where(u => !u.IsDeleted)
+           
            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 }
+
