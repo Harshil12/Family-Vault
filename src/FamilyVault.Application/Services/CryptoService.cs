@@ -57,10 +57,18 @@ public sealed class CryptoService : ICryptoService
     /// </summary>
     public bool VerifyPassword(string hashPassword, string password)
     {
-        var result = _passwordHasher.VerifyHashedPassword(
-             PasswordHasherUser,
-             hashPassword,
-             password);
+        PasswordVerificationResult result;
+        try
+        {
+            result = _passwordHasher.VerifyHashedPassword(
+                PasswordHasherUser,
+                hashPassword,
+                password);
+        }
+        catch (FormatException ex)
+        {
+            throw new InvalidOperationException("Malformed password hash.", ex);
+        }
         return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
     }
 }
