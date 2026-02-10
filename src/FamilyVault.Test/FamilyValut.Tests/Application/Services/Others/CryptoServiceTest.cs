@@ -1,32 +1,18 @@
 ﻿using FamilyVault.Application.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.DataProtection;
-using Moq;
+using System.Security.Cryptography;
 
 namespace FamilyValut.Tests.Application.Services.Others;
 
 public class CryptoServiceTests
 {
     private readonly CryptoService _sut;
-    private readonly Mock<IDataProtectionProvider> _dataProtectorMock;
-    private readonly Mock<IDataProtector> _protectorMock;
 
     public CryptoServiceTests()
     {
-        _dataProtectorMock = new Mock<IDataProtectionProvider>();
-        _protectorMock = new Mock<IDataProtector>();
-        _dataProtectorMock
-            .Setup(p => p.CreateProtector(It.IsAny<string>()))
-            .Returns(_protectorMock.Object);
-        _protectorMock
-            .Setup(p => p.Protect(It.IsAny<byte[]>()))
-            .Returns((byte[] input) =>
-                System.Text.Encoding.UTF8.GetBytes(Convert.ToBase64String(input)));
-        _protectorMock
-            .Setup(p => p.Unprotect(It.IsAny<byte[]>()))
-            .Returns((byte[] input) =>
-                Convert.FromBase64String(System.Text.Encoding.UTF8.GetString(input)));
-        _sut = new CryptoService(_dataProtectorMock.Object);
+        var provider = new EphemeralDataProtectionProvider();
+        _sut = new CryptoService(provider);
     }
 
     #region Encrypt / Decrypt
@@ -43,8 +29,6 @@ public class CryptoServiceTests
 
         // Assert
         roundTrip.Should().Be(plainText);
-        _protectorMock.Verify(p => p.Protect(It.IsAny<byte[]>()), Times.Once);
-        _protectorMock.Verify(p => p.Unprotect(It.IsAny<byte[]>()), Times.Once);
     }
 
     [Fact]
@@ -59,7 +43,6 @@ public class CryptoServiceTests
 
         // Assert
         result.Should().Be(plainText);
-        _protectorMock.Verify(p => p.Unprotect(It.IsAny<byte[]>()), Times.Once);
     }
 
     [Fact]
@@ -67,16 +50,12 @@ public class CryptoServiceTests
     {
         // Arrange
         var invalidEncryptedData = "not-protected-data";
-        _protectorMock
-            .Setup(p => p.Unprotect(It.IsAny<byte[]>()))
-            .Throws(new InvalidOperationException("Invalid protected payload."));
 
         // Act
         Action act = () => _sut.DecryptData(invalidEncryptedData);
 
         // Assert
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("Invalid protected payload.");
+        act.Should().Throw<CryptographicException>();
     }
 
     #endregion
