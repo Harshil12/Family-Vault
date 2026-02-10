@@ -81,9 +81,9 @@ public class Userservice : IUserService
     }
 
     /// <summary>
-    /// Performs the UpdateuUerAsync operation.
+    /// Performs the UpdateUserAsync operation.
     /// </summary>
-    public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
+    public async Task<UserDto> UpdateUserAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Updating user with ID: {UserId}", updateUserRequest.Id);
 

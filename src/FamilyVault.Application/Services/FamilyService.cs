@@ -79,11 +79,11 @@ public class FamilyService : IFamilyService
     /// <summary>
     /// Performs the UpdateFamilyAsync operation.
     /// </summary>
-    public async Task<FamilyDto> UpdateFamilyAsync(UpdateFamlyRequest updateFamlyRequest, Guid userId, CancellationToken cancellationToken)
+    public async Task<FamilyDto> UpdateFamilyAsync(UpdateFamilyRequest updateFamilyRequest, Guid userId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Updating family with ID: {FamilyId}", updateFamlyRequest.Id);
+        _logger.LogInformation("Updating family with ID: {FamilyId}", updateFamilyRequest.Id);
 
-        var familyToUpdate = _mapper.Map<Family>(updateFamlyRequest);
+        var familyToUpdate = _mapper.Map<Family>(updateFamilyRequest);
         familyToUpdate.UpdatedAt = DateTimeOffset.Now;
         familyToUpdate.UpdatedBy = userId.ToString();
 
@@ -94,3 +94,4 @@ public class FamilyService : IFamilyService
         return _mapper.Map<FamilyDto>(family);
     }
 }
+

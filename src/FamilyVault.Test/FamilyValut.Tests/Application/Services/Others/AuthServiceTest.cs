@@ -53,10 +53,10 @@ public class AuthServiceTests
 
     #region GetTokenAsync Tests
 
-    [Fact]
     /// <summary>
     /// Performs the GetTokenAsync_ShouldReturnNull_WhenUserDoesNotExist operation.
     /// </summary>
+    [Fact]
     public async Task GetTokenAsync_ShouldReturnNull_WhenUserDoesNotExist()
     {
         // Arrange
@@ -72,10 +72,10 @@ public class AuthServiceTests
         _cryptoMock.Verify(c => c.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
-    [Fact]
     /// <summary>
     /// Performs the GetTokenAsync_ShouldReturnNull_WhenPasswordIsInvalid operation.
     /// </summary>
+    [Fact]
     public async Task GetTokenAsync_ShouldReturnNull_WhenPasswordIsInvalid()
     {
         // Arrange
@@ -102,10 +102,10 @@ public class AuthServiceTests
         _mapperMock.Verify(m => m.Map<UserDto>(It.IsAny<User>()), Times.Never);
     }
 
-    [Fact]
     /// <summary>
     /// Performs the GetTokenAsync_ShouldReturnToken_WhenCredentialsAreValid operation.
     /// </summary>
+    [Fact]
     public async Task GetTokenAsync_ShouldReturnToken_WhenCredentialsAreValid()
     {
         // Arrange
@@ -149,10 +149,10 @@ public class AuthServiceTests
 
     #region GenerateToken Tests
 
-    [Fact]
     /// <summary>
     /// Performs the GenerateToken_ShouldCreateValidJwt_WithExpectedClaims operation.
     /// </summary>
+    [Fact]
     public void GenerateToken_ShouldCreateValidJwt_WithExpectedClaims()
     {
         // Arrange

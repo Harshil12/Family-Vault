@@ -35,7 +35,7 @@ public interface IUserService
     /// <returns>
     /// A <see cref="Task{UserDto}"/> that completes with the updated <see cref="UserDto"/>.
     /// </returns>
-    public Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken);
+    public Task<UserDto> UpdateUserAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new user using the provided update-style request.

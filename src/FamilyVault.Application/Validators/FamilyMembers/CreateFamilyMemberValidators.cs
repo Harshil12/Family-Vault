@@ -7,7 +7,7 @@ namespace FamilyVault.Application.Validators.FamilyMembers;
 /// <summary>
 /// Represents CreateFamilyMemberValidators.
 /// </summary>
-public class CreateFamilyMemberValidators : AbstractValidator<CreateFamilyMememberRequest>
+public class CreateFamilyMemberValidators : AbstractValidator<CreateFamilyMemberRequest>
 {
     /// <summary>
     /// Initializes a new instance of CreateFamilyMemberValidators.
@@ -74,3 +74,4 @@ public class CreateFamilyMemberValidators : AbstractValidator<CreateFamilyMememb
         }); 
     }
 }
+

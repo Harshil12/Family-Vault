@@ -192,13 +192,13 @@ public class UserserviceTests
 
     #endregion
 
-    #region UpdateuUerAsync
+    #region UpdateUserAsync
 
     [Fact]
     /// <summary>
-    /// Performs the UpdateuUerAsync_ShouldHashPassword_AndUpdateUser operation.
+    /// Performs the UpdateUserAsync_ShouldHashPassword_AndUpdateUser operation.
     /// </summary>
-    public async Task UpdateuUerAsync_ShouldHashPassword_AndUpdateUser()
+    public async Task UpdateUserAsync_ShouldHashPassword_AndUpdateUser()
     {
         // Arrange
         var updaterId = Guid.NewGuid();
@@ -240,7 +240,7 @@ public class UserserviceTests
             .Returns(userDto);
 
         // Act
-        var result = await _sut.UpdateuUerAsync(request, updaterId, CancellationToken.None);
+        var result = await _sut.UpdateUserAsync(request, updaterId, CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();

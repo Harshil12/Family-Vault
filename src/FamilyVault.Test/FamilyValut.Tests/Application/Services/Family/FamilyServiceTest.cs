@@ -206,7 +206,7 @@ public class FamilyServiceTests
         // Arrange
         var userId = Guid.NewGuid();
 
-        var request = new UpdateFamlyRequest
+        var request = new UpdateFamilyRequest
         {
             Id = Guid.NewGuid(),
             FamilyName = "Updated Family"
@@ -251,3 +251,4 @@ public class FamilyServiceTests
 
     #endregion
 }
+

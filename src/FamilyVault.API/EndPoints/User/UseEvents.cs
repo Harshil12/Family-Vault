@@ -87,7 +87,7 @@ public static class MapAllEndpoints
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            var updatedUser = await userService.UpdateuUerAsync(updateUserRequest, userId, cancellationToken);
+            var updatedUser = await userService.UpdateUserAsync(updateUserRequest, userId, cancellationToken);
 
             return Results.Ok(ApiResponse<UserDto>.Success(updatedUser, "Update has been successfully updatedUser.", traceId));
 

@@ -128,7 +128,7 @@ public class FamilyMemberServiceTests
         // Arrange
         var userId = Guid.NewGuid();
 
-        var request = new CreateFamilyMememberRequest
+        var request = new CreateFamilyMemberRequest
         {
             FirstName = "Jane",
             LastName = "Doe"
@@ -210,7 +210,7 @@ public class FamilyMemberServiceTests
         // Arrange
         var userId = Guid.NewGuid();
 
-        var request = new UpdateFamilyMememberRequest
+        var request = new UpdateFamilyMemberRequest
         {
             Id = Guid.NewGuid(),
             FirstName = "Updated",
@@ -258,3 +258,4 @@ public class FamilyMemberServiceTests
 
     #endregion
 }
+

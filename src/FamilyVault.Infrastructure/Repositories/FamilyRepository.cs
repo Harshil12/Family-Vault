@@ -42,7 +42,7 @@ public class FamilyRepository : IFamilyRepository
         var result = await _appDbContext.Families
             .Where(f => !f.IsDeleted)
             .AsNoTracking()
-            .Include(f => f.FamilyMembers.Where(m => !m.IsDeleted))
+            .Include(f => f.FamilyMembers!.Where(m => !m.IsDeleted))
             .ToListAsync(cancellationToken);
 
         _memoryCache.Set("AllWithFamilyMembers", result, cacheOptions);

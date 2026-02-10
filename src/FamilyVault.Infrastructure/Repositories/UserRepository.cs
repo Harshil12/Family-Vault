@@ -43,7 +43,7 @@ public class UserRepository : IUserRepository
         var result = await _appDbContext.Users
             .Where(u => !u.IsDeleted)
             .AsNoTracking()
-            .Include(u => u.Families.Where(f => !f.IsDeleted))
+            .Include(u => u.Families!.Where(f => !f.IsDeleted))
             .ToListAsync(cancellationToken);
         _memoryCache.Set("UsersWithFamilies", result, cacheOptions);
         return result;

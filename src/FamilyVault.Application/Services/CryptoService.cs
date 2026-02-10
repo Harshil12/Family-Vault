@@ -10,7 +10,8 @@ namespace FamilyVault.Application.Services;
 public sealed class CryptoService : ICryptoService
 {
     private readonly IDataProtector _protector;
-    private readonly PasswordHasher<object?> _passwordHasher = new();
+    private static readonly object PasswordHasherUser = new();
+    private readonly PasswordHasher<object> _passwordHasher = new();
 
     /// <summary>
     /// Initializes a new instance of CryptoService.
@@ -38,7 +39,7 @@ public sealed class CryptoService : ICryptoService
     /// Performs the HashPassword operation.
     /// </summary>
     public string HashPassword(string password)
-        => _passwordHasher.HashPassword(null, password);
+        => _passwordHasher.HashPassword(PasswordHasherUser, password);
 
     /// <summary>
     /// Performs the VerifyPassword operation.
@@ -46,7 +47,7 @@ public sealed class CryptoService : ICryptoService
     public bool VerifyPassword(string hashPassword, string password)
     {
         var result = _passwordHasher.VerifyHashedPassword(
-             null,
+             PasswordHasherUser,
              hashPassword,
              password);
         return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;

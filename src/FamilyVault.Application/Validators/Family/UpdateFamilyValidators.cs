@@ -6,7 +6,7 @@ namespace FamilyVault.Application.Validators.Family;
 /// <summary>
 /// Represents UpdateFamilyValidators.
 /// </summary>
-public class UpdateFamilyValidators : AbstractValidator<UpdateFamlyRequest>
+public class UpdateFamilyValidators : AbstractValidator<UpdateFamilyRequest>
 {
     /// <summary>
     /// Initializes a new instance of UpdateFamilyValidators.
@@ -18,3 +18,4 @@ public class UpdateFamilyValidators : AbstractValidator<UpdateFamlyRequest>
         RuleFor(x => x.FamilyName).MaximumLength(100).WithMessage("Family name cannot exceed 100 characters.");
     }   
 }
+

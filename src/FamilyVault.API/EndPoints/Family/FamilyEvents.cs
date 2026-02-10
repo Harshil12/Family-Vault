@@ -85,7 +85,7 @@ public static class FamilymemberEvents
 
         }).AddEndpointFilter<ValidationFilter<CreateFamilyRequest>>();
 
-        familyGroup.MapPut("/family/{id:guid}", async (UpdateFamlyRequest updateFamlyRequest,
+        familyGroup.MapPut("/family/{id:guid}", async (UpdateFamilyRequest updateFamilyRequest,
             IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
@@ -94,9 +94,10 @@ public static class FamilymemberEvents
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            var updatedFamily = await familyService.UpdateFamilyAsync(updateFamlyRequest, userId, cancellationToken);
+            var updatedFamily = await familyService.UpdateFamilyAsync(updateFamilyRequest, userId, cancellationToken);
 
             return Results.Ok(ApiResponse<FamilyDto>.Success(updatedFamily, "Family has been successfully updatedFamily.", traceId));
-        }).AddEndpointFilter<ValidationFilter<UpdateFamlyRequest>>();
+        }).AddEndpointFilter<ValidationFilter<UpdateFamilyRequest>>();
     }
 }
+

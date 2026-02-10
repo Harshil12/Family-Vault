@@ -10,7 +10,7 @@ namespace FamilyVault.Application.Services;
 /// <summary>
 /// Represents FamilyMemberService.
 /// </summary>
-public class FamilyMemberService : IFamilymemeberService
+public class FamilyMemberService : IFamilyMemberService
 {
     private readonly IFamilyMemberRepository _familyMemberRepository;
     private readonly IMapper _mapper;
@@ -49,11 +49,11 @@ public class FamilyMemberService : IFamilymemeberService
     /// <summary>
     /// Performs the CreateFamilyMemberAsync operation.
     /// </summary>
-    public async Task<FamilyMemberDto> CreateFamilyMemberAsync(CreateFamilyMememberRequest createFamilyMememberRequest, Guid userId, CancellationToken cancellationToken)
+    public async Task<FamilyMemberDto> CreateFamilyMemberAsync(CreateFamilyMemberRequest createFamilyMemberRequest, Guid userId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Creating a new family member: {FirstName} {LastName}", createFamilyMememberRequest.FirstName, createFamilyMememberRequest.LastName);
+        _logger.LogInformation("Creating a new family member: {FirstName} {LastName}", createFamilyMemberRequest.FirstName, createFamilyMemberRequest.LastName);
 
-        var familMemberToCreate = _mapper.Map<FamilyMember>(createFamilyMememberRequest);
+        var familMemberToCreate = _mapper.Map<FamilyMember>(createFamilyMemberRequest);
         familMemberToCreate.CreatedAt = DateTimeOffset.Now;
         familMemberToCreate.CreatedBy = userId.ToString();
 
@@ -79,11 +79,11 @@ public class FamilyMemberService : IFamilymemeberService
     /// <summary>
     /// Performs the UpdateFamilyMemberAsync operation.
     /// </summary>
-    public async Task<FamilyMemberDto> UpdateFamilyMemberAsync(UpdateFamilyMememberRequest updateFamilyMememberRequest, Guid userId, CancellationToken cancellationToken)
+    public async Task<FamilyMemberDto> UpdateFamilyMemberAsync(UpdateFamilyMemberRequest updateFamilyMemberRequest, Guid userId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Updating family member with ID: {FamilyMemberId}", updateFamilyMememberRequest.Id);
+        _logger.LogInformation("Updating family member with ID: {FamilyMemberId}", updateFamilyMemberRequest.Id);
 
-        var familMemberToUpdate = _mapper.Map<FamilyMember>(updateFamilyMememberRequest);
+        var familMemberToUpdate = _mapper.Map<FamilyMember>(updateFamilyMemberRequest);
         familMemberToUpdate.UpdatedAt = DateTimeOffset.Now;
         familMemberToUpdate.UpdatedBy = userId.ToString();
 
@@ -94,3 +94,4 @@ public class FamilyMemberService : IFamilymemeberService
         return _mapper.Map<FamilyMemberDto>(result);
     }
 }
+

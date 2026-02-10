@@ -3,9 +3,9 @@ using FamilyVault.Domain.Enums;
 namespace FamilyVault.Application.DTOs.FamilyMembers;
 
 /// <summary>
-/// Represents UpdateFamilyMememberRequest.
+/// Represents UpdateFamilyMemberRequest.
 /// </summary>
-public class UpdateFamilyMememberRequest
+public class UpdateFamilyMemberRequest
 {
     /// <summary>
     /// Gets or sets Id.

@@ -17,7 +17,7 @@ namespace FamilyVault.Tests.API.EndPoints.FamilyMember;
 public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
-    private readonly Mock<IFamilymemeberService> _familyMemberServiceMock = new();
+    private readonly Mock<IFamilyMemberService> _familyMemberServiceMock = new();
 
     /// <summary>
     /// Initializes a new instance of FamilyMemberApiTest.
@@ -108,7 +108,7 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var familyId = Guid.NewGuid();
 
-        var request = new CreateFamilyMememberRequest
+        var request = new CreateFamilyMemberRequest
         {
             FamilyId = familyId,
             FirstName = "John",
@@ -123,7 +123,7 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
 
         _familyMemberServiceMock
             .Setup(s => s.CreateFamilyMemberAsync(
-                It.IsAny<CreateFamilyMememberRequest>(),
+                It.IsAny<CreateFamilyMemberRequest>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(created);
@@ -152,7 +152,7 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
         var familyId = Guid.NewGuid();
         var memberId = Guid.NewGuid();
 
-        var request = new UpdateFamilyMememberRequest
+        var request = new UpdateFamilyMemberRequest
         {
             Id = memberId,
             FirstName = "Updated"
@@ -166,7 +166,7 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
 
         _familyMemberServiceMock
             .Setup(s => s.UpdateFamilyMemberAsync(
-                It.IsAny<UpdateFamilyMememberRequest>(),
+                It.IsAny<UpdateFamilyMemberRequest>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(updated);
@@ -214,3 +214,4 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
 
     #endregion
 }
+

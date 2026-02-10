@@ -57,7 +57,7 @@ public class FamilyMemberDto: BaseDto
     /// <summary>
     /// Gets or sets PAN.
     /// </summary>
-    public long? PAN { get; set; }
+    public string? PAN { get; set; }
 
     /// <summary>
     /// Gets or sets Aadhar.

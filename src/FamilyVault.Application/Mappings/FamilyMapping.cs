@@ -14,7 +14,8 @@ public class FamilyMapping : Profile
     public FamilyMapping()
     {
         CreateMap<CreateFamilyRequest, Family>();
-        CreateMap<UpdateFamlyRequest, Family>();
+        CreateMap<UpdateFamilyRequest, Family>();
         CreateMap<Family, FamilyDto>().ReverseMap();
     }    
 }
+

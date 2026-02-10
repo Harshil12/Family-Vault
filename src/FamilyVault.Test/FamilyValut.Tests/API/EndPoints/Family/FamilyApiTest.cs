@@ -150,7 +150,7 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
         var userId = Guid.NewGuid();
         var familyId = Guid.NewGuid();
 
-        var request = new UpdateFamlyRequest
+        var request = new UpdateFamilyRequest
         {
             Id = familyId,
             FamilyName = "Updated Family"
@@ -164,7 +164,7 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
 
         _familyServiceMock
             .Setup(s => s.UpdateFamilyAsync(
-                It.IsAny<UpdateFamlyRequest>(),
+                It.IsAny<UpdateFamilyRequest>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(updated);
@@ -212,3 +212,4 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
 
     #endregion
 }
+

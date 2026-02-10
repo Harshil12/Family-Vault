@@ -104,7 +104,7 @@ public class Program
         }
 
         builder.Services.AddScoped<IUserService, Userservice>();
-        builder.Services.AddScoped<IFamilymemeberService, FamilyMemberService>();
+        builder.Services.AddScoped<IFamilyMemberService, FamilyMemberService>();
         builder.Services.AddScoped<IFamilyService, FamilyService>();
         builder.Services.AddScoped<IDocumentService, DocumentService>();
         builder.Services.AddScoped<ICryptoService, CryptoService>();
@@ -199,3 +199,4 @@ public class Program
         app.Run();
     }
 }
+

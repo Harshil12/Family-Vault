@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.DTOs.FamilyMembers;
+using FamilyVault.Application.DTOs.FamilyMembers;
 
 namespace FamilyVault.Application.Interfaces.Services;
 
@@ -9,7 +9,7 @@ namespace FamilyVault.Application.Interfaces.Services;
 /// <remarks>Implementations of this interface should ensure thread safety for concurrent operations and validate
 /// input parameters according to method requirements. All methods are asynchronous and return tasks that complete when
 /// the corresponding operation finishes.</remarks>
-public interface IFamilymemeberService
+public interface IFamilyMemberService
 {
     /// <summary>
     /// Asynchronously retrieves a family member by their unique identifier.
@@ -30,18 +30,18 @@ public interface IFamilymemeberService
     /// <summary>
     /// Updates the details of an existing family member asynchronously using the specified request data.
     /// </summary>
-    /// <param name="updateFamilyMememberRequest">The request containing the updated information for the family member. Must not be null.</param>
+    /// <param name="updateFamilyMemberRequest">The request containing the updated information for the family member. Must not be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyMemberDto"/> with
     /// the updated family member details.</returns>
-    public Task<FamilyMemberDto> UpdateFamilyMemberAsync(UpdateFamilyMememberRequest updateFamilyMememberRequest, Guid userId, CancellationToken cancellationToken);
+    public Task<FamilyMemberDto> UpdateFamilyMemberAsync(UpdateFamilyMemberRequest updateFamilyMemberRequest, Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new family member using the specified update request.
     /// </summary>
-    /// <param name="createFamilyMememberRequest">An object containing the details of the family member to create. Cannot be null.</param>
+    /// <param name="createFamilyMemberRequest">An object containing the details of the family member to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyMemberDto"/>
     /// representing the created family member.</returns>
-    public Task<FamilyMemberDto> CreateFamilyMemberAsync(CreateFamilyMememberRequest createFamilyMememberRequest, Guid userId, CancellationToken cancellationToken);
+    public Task<FamilyMemberDto> CreateFamilyMemberAsync(CreateFamilyMemberRequest createFamilyMemberRequest, Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Asynchronously deletes the family member with the specified unique identifier.
@@ -50,3 +50,4 @@ public interface IFamilymemeberService
     /// <returns>A task that represents the asynchronous delete operation.</returns>
     public Task DeleteFamilyMemberByIdAsync(Guid familyMemberId, Guid userId, CancellationToken cancellationToken);
 }
+

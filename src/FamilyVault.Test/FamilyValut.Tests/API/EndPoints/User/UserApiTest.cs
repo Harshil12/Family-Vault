@@ -46,10 +46,10 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region GET /User
 
-    [Fact]
     /// <summary>
     /// Performs the GetUsers_ShouldReturnEmptyList_WhenNoUsers operation.
     /// </summary>
+    [Fact]
     public async Task GetUsers_ShouldReturnEmptyList_WhenNoUsers()
     {
         // Arrange
@@ -70,10 +70,10 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region GET /User/{id}
 
-    [Fact]
     /// <summary>
     /// Performs the GetUserById_ShouldReturnNotFound_WhenUserDoesNotExist operation.
     /// </summary>
+    [Fact]
     public async Task GetUserById_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
         // Arrange
@@ -96,10 +96,10 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region POST /User/user
 
-    [Fact]
     /// <summary>
     /// Performs the CreateUser_ShouldReturnCreated operation.
     /// </summary>
+    [Fact]
     public async Task CreateUser_ShouldReturnCreated()
     {
         // Arrange
@@ -138,10 +138,10 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region PUT /User/user/{id}
 
-    [Fact]
     /// <summary>
     /// Performs the UpdateUser_ShouldReturnOk operation.
     /// </summary>
+    [Fact]
     public async Task UpdateUser_ShouldReturnOk()
     {
         // Arrange
@@ -162,7 +162,7 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
         };
 
         _userServiceMock
-            .Setup(s => s.UpdateuUerAsync(
+            .Setup(s => s.UpdateUserAsync(
                 It.IsAny<UpdateUserRequest>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
@@ -182,10 +182,10 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region DELETE /User/{id}
 
-    [Fact]
     /// <summary>
     /// Performs the DeleteUser_ShouldReturnOk operation.
     /// </summary>
+    [Fact]
     public async Task DeleteUser_ShouldReturnOk()
     {
         // Arrange
