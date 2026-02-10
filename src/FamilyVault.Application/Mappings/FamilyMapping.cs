@@ -13,8 +13,10 @@ public class FamilyMapping : Profile
     /// </summary>
     public FamilyMapping()
     {
-        CreateMap<CreateFamilyRequest, Family>();
-        CreateMap<UpdateFamilyRequest, Family>();
+        CreateMap<CreateFamilyRequest, Family>()
+            .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FamilyName));
+        CreateMap<UpdateFamilyRequest, Family>()
+            .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FamilyName));
         CreateMap<Family, FamilyDto>().ReverseMap();
     }    
 }

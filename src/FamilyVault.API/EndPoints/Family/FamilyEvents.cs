@@ -81,7 +81,7 @@ public static class FamilymemberEvents
             var createdFamily = await familyService.CreateFamilyAsync(createFamilyRequest, userId, cancellationToken);
 
             return Results.Created($"/family/{createdFamily.Id}",
-                    ApiResponse<FamilyDto>.Success(createdFamily, "Family has been successfully createdFamily.", traceId));
+                    ApiResponse<FamilyDto>.Success(createdFamily, "Family has been successfully created.", traceId));
 
         }).AddEndpointFilter<ValidationFilter<CreateFamilyRequest>>();
 
@@ -96,7 +96,7 @@ public static class FamilymemberEvents
 
             var updatedFamily = await familyService.UpdateFamilyAsync(updateFamilyRequest, userId, cancellationToken);
 
-            return Results.Ok(ApiResponse<FamilyDto>.Success(updatedFamily, "Family has been successfully updatedFamily.", traceId));
+            return Results.Ok(ApiResponse<FamilyDto>.Success(updatedFamily, "Family has been successfully updated.", traceId));
         }).AddEndpointFilter<ValidationFilter<UpdateFamilyRequest>>();
     }
 }

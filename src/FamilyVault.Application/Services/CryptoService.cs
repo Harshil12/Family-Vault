@@ -1,6 +1,7 @@
 using FamilyVault.Application.Interfaces.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Cryptography;
 
 namespace FamilyVault.Application.Services;
 
@@ -31,8 +32,18 @@ public sealed class CryptoService : ICryptoService
     /// <summary>
     /// Performs the DecryptData operation.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the encrypted payload cannot be decrypted.</exception>
     public string DecryptData(string encryptedData)
-        => _protector.Unprotect(encryptedData);
+    {
+        try
+        {
+            return _protector.Unprotect(encryptedData);
+        }
+        catch (CryptographicException ex)
+        {
+            throw new InvalidOperationException("Failed to decrypt the provided data.", ex);
+        }
+    }
 
     // 🔑 For passwords
     /// <summary>

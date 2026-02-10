@@ -54,7 +54,7 @@ public class FamilyMemberService : IFamilyMemberService
         _logger.LogInformation("Creating a new family member: {FirstName} {LastName}", createFamilyMemberRequest.FirstName, createFamilyMemberRequest.LastName);
 
         var familMemberToCreate = _mapper.Map<FamilyMember>(createFamilyMemberRequest);
-        familMemberToCreate.CreatedAt = DateTimeOffset.Now;
+        familMemberToCreate.CreatedAt = DateTimeOffset.UtcNow;
         familMemberToCreate.CreatedBy = userId.ToString();
 
         var result = await _familyMemberRepository.AddAsync(familMemberToCreate, cancellationToken);
@@ -84,7 +84,7 @@ public class FamilyMemberService : IFamilyMemberService
         _logger.LogInformation("Updating family member with ID: {FamilyMemberId}", updateFamilyMemberRequest.Id);
 
         var familMemberToUpdate = _mapper.Map<FamilyMember>(updateFamilyMemberRequest);
-        familMemberToUpdate.UpdatedAt = DateTimeOffset.Now;
+        familMemberToUpdate.UpdatedAt = DateTimeOffset.UtcNow;
         familMemberToUpdate.UpdatedBy = userId.ToString();
 
         var result = await _familyMemberRepository.UpdateAsync(familMemberToUpdate, cancellationToken);
