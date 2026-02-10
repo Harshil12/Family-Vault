@@ -6,6 +6,7 @@ using FamilyVault.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using OpenTelemetry.Metrics;
@@ -82,6 +83,17 @@ public class Program
             if (certs.Count > 0)
             {
                 dataProtectionBuilder.ProtectKeysWithCertificate(certs[0]);
+            }
+            else
+            {
+                var log = LoggerFactory
+                    .Create(logging => logging.AddConsole())
+                    .CreateLogger("DataProtection");
+                log.LogWarning(
+                    "Data Protection certificate not found. Thumbprint='{Thumbprint}', StoreName='{StoreName}', StoreLocation='{StoreLocation}'. Keys will be persisted without encryption.",
+                    certThumbprint,
+                    store.Name,
+                    store.Location);
             }
         }
 

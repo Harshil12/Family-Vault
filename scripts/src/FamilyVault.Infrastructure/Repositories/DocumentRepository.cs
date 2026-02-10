@@ -22,7 +22,7 @@ public class DocumentRepository : GenericRepository<DocumentDetails>, IDocumentR
                 .Where(d => d.FamilyMemberId == familyMemberId && !d.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
-        }, cancellationToken);
+        }, cancellationToken) ?? Array.Empty<DocumentDetails>();
     }
 
     public override async Task<DocumentDetails> AddAsync(DocumentDetails documentDetails, CancellationToken cancellationToken)

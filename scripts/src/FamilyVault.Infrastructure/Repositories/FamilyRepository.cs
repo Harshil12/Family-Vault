@@ -22,7 +22,7 @@ public class FamilyRepository : GenericRepository<Family>, IFamilyRepository
                 .AsNoTracking()
                 .Include(f => f.FamilyMembers.Where(m => !m.IsDeleted))
                 .ToListAsync(cancellationToken);
-        }, cancellationToken);
+        }, cancellationToken) ?? Array.Empty<Family>();
     }
 
     public async Task<IReadOnlyList<Family>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
@@ -34,7 +34,7 @@ public class FamilyRepository : GenericRepository<Family>, IFamilyRepository
                 .Where(f => f.UserId == userId && !f.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
-        }, cancellationToken);
+        }, cancellationToken) ?? Array.Empty<Family>();
     }
 
     public override async Task DeleteByIdAsync(Guid id, string user, CancellationToken cancellationToken)

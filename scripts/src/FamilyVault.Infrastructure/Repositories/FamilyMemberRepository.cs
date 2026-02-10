@@ -31,7 +31,7 @@ public class FamilyMemberRepository : GenericRepository<FamilyMember>, IFamilyMe
                 .AsNoTracking()
                 .Include(fm => fm.DocumentDetails.Where(d => !d.IsDeleted))
                 .ToListAsync(cancellationToken);
-        }, cancellationToken);
+        }, cancellationToken) ?? Array.Empty<FamilyMember>();
     }
 
     public async Task<IReadOnlyList<FamilyMember>> GetAllByFamilyIdAsync(Guid familyId, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ public class FamilyMemberRepository : GenericRepository<FamilyMember>, IFamilyMe
                 .Where(fm => fm.FamilyId == familyId && !fm.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
-        }, cancellationToken);
+        }, cancellationToken) ?? Array.Empty<FamilyMember>();
     }
 
     public override async Task<FamilyMember> UpdateAsync(FamilyMember familyMember, CancellationToken cancellationToken)
@@ -78,6 +78,8 @@ public class FamilyMemberRepository : GenericRepository<FamilyMember>, IFamilyMe
                .ExecuteUpdateAsync(setter => setter.SetProperty(d => d.IsDeleted, true)
                .SetProperty(d => d.UpdatedBy, user)
                .SetProperty(d => d.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
+
+        _memoryCache.Remove($"DocumentDetails:ByFamilyMember:{id}");
 
         await tx.CommitAsync(cancellationToken);
 

@@ -19,18 +19,13 @@ public class CryptoServiceTests
             .Setup(p => p.CreateProtector(It.IsAny<string>()))
             .Returns(_protectorMock.Object);
         _protectorMock
-            .Setup(p => p.Protect(It.IsAny<string>()))
-            .Returns((string input) => $"protected:{input}");
+            .Setup(p => p.Protect(It.IsAny<byte[]>()))
+            .Returns((byte[] input) =>
+                System.Text.Encoding.UTF8.GetBytes(Convert.ToBase64String(input)));
         _protectorMock
-            .Setup(p => p.Unprotect(It.IsAny<string>()))
-            .Returns((string input) =>
-            {
-                if (!input.StartsWith("protected:", StringComparison.Ordinal))
-                {
-                    throw new InvalidOperationException("Invalid protected payload.");
-                }
-                return input["protected:".Length..];
-            });
+            .Setup(p => p.Unprotect(It.IsAny<byte[]>()))
+            .Returns((byte[] input) =>
+                Convert.FromBase64String(System.Text.Encoding.UTF8.GetString(input)));
         _sut = new CryptoService(_dataProtectorMock.Object);
     }
 
@@ -44,24 +39,27 @@ public class CryptoServiceTests
 
         // Act
         var result = _sut.EncryptData(plainText);
+        var roundTrip = _sut.DecryptData(result);
 
         // Assert
-        result.Should().Be("protected:hello world");
-        _protectorMock.Verify(p => p.Protect(plainText), Times.Once);
+        roundTrip.Should().Be(plainText);
+        _protectorMock.Verify(p => p.Protect(It.IsAny<byte[]>()), Times.Once);
+        _protectorMock.Verify(p => p.Unprotect(It.IsAny<byte[]>()), Times.Once);
     }
 
     [Fact]
-    public void DecryptData_ShouldReturnOriginalValue()
+    public void DecryptData_ShouldRoundTrip()
     {
         // Arrange
-        var encryptedText = "protected:hello world";
+        var plainText = "hello world";
+        var encryptedText = _sut.EncryptData(plainText);
 
         // Act
         var result = _sut.DecryptData(encryptedText);
 
         // Assert
-        result.Should().Be("hello world");
-        _protectorMock.Verify(p => p.Unprotect(encryptedText), Times.Once);
+        result.Should().Be(plainText);
+        _protectorMock.Verify(p => p.Unprotect(It.IsAny<byte[]>()), Times.Once);
     }
 
     [Fact]
@@ -70,7 +68,7 @@ public class CryptoServiceTests
         // Arrange
         var invalidEncryptedData = "not-protected-data";
         _protectorMock
-            .Setup(p => p.Unprotect(It.IsAny<string>()))
+            .Setup(p => p.Unprotect(It.IsAny<byte[]>()))
             .Throws(new InvalidOperationException("Invalid protected payload."));
 
         // Act

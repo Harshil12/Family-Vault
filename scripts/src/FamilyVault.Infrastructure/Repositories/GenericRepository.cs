@@ -54,7 +54,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         _memoryCache.Set(CacheEvictionTokenKey, newCts);
     }
 
-    protected async Task<TItem> GetOrCreateCachedAsync<TItem>(string keySuffix, Func<Task<TItem>> factory, CancellationToken cancellationToken)
+    protected async Task<TItem?> GetOrCreateCachedAsync<TItem>(string keySuffix, Func<Task<TItem>> factory, CancellationToken cancellationToken)
     {
         var cacheKey = BuildCacheKey(keySuffix);
         var evictionToken = GetOrCreateEvictionToken();
@@ -81,7 +81,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         return await GetOrCreateCachedAsync("All", async () =>
         {
             return await _appDbContext.Set<T>().Where(e => !e.IsDeleted).AsNoTracking().ToListAsync(cancellationToken);
-        }, cancellationToken);
+        }, cancellationToken) ?? Array.Empty<T>();
     }
 
     public virtual async Task<T> AddAsync(T entity, CancellationToken cancellationToken)

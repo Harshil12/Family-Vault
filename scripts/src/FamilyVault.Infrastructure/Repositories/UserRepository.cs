@@ -23,7 +23,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
                 .AsNoTracking()
                 .Include(u => u.Families.Where(f => !f.IsDeleted))
                 .ToListAsync(cancellationToken);
-        }, cancellationToken);
+        }, cancellationToken) ?? Array.Empty<User>();
     }
 
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
