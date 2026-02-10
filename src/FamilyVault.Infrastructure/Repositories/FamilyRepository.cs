@@ -30,7 +30,11 @@ public class FamilyRepository : IFamilyRepository
         {
             return families;
         }
-        var result = await _appDbContext.Families.AsNoTracking().Include(f => f.FamilyMembers).ToListAsync(cancellationToken);
+        var result = await _appDbContext.Families
+            .Where(f => !f.IsDeleted)
+            .AsNoTracking()
+            .Include(f => f.FamilyMembers.Where(m => !m.IsDeleted))
+            .ToListAsync(cancellationToken);
 
         _memoryCache.Set("AllWithFamilyMembers", result, cacheOptions);
 
@@ -51,7 +55,10 @@ public class FamilyRepository : IFamilyRepository
         {
             return families;
         }
-        var result = await _appDbContext.Families.Where(f => f.UserId == userId).AsNoTracking().ToListAsync(cancellationToken);
+        var result = await _appDbContext.Families
+            .Where(f => f.UserId == userId && !f.IsDeleted)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
 
         _memoryCache.Set(cacheKey, result, cacheOptions);
 
@@ -60,7 +67,10 @@ public class FamilyRepository : IFamilyRepository
 
     public async Task<Family?> GetByIdAsync(Guid familyId, CancellationToken cancellationToken)
     {
-        return await _appDbContext.Families.FirstOrDefaultAsync(x => x.Id == familyId, cancellationToken);
+        return await _appDbContext.Families
+            .Where(f => !f.IsDeleted)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == familyId, cancellationToken);
     }
 
     public async Task<Family> AddAsync(Family family, CancellationToken cancellationToken)

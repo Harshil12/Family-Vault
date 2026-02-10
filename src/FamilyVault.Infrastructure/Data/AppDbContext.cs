@@ -36,11 +36,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
 
-        modelBuilder.Entity<Family>().HasIndex(f => f.Name).IsUnique();
+        modelBuilder.Entity<Family>().HasIndex(f => new { f.Name, f.UserId }).IsUnique();
 
         modelBuilder.Entity<FamilyMember>().HasIndex(f => f.PAN).IsUnique();
         modelBuilder.Entity<FamilyMember>().HasIndex(f => f.Aadhar).IsUnique();
-        modelBuilder.Entity<FamilyMember>().HasIndex(f => new { f.FirstName, f.LastName }).IsUnique();
+        modelBuilder.Entity<FamilyMember>().HasIndex(f => new { f.FirstName, f.LastName, f.FamilyId }).IsUnique();
 
         modelBuilder.Entity<User>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<Family>().HasQueryFilter(d => !d.IsDeleted);

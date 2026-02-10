@@ -41,8 +41,9 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             return familyMembers;
         }
         var result = await _appDbContext.FamilyMembers
+            .Where(fm => !fm.IsDeleted)
             .AsNoTracking()
-            .Include(fm => fm.DocumentDetails)
+            .Include(fm => fm.DocumentDetails.Where(d => !d.IsDeleted))
             .ToListAsync(cancellationToken);
 
         _memoryCache.Set("AllFamiliesWithDocuments", result, cacheOptions);
