@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.DTOs.Family;
+using FamilyVault.Application.DTOs.Family;
 
 namespace FamilyVault.Application.Interfaces.Services;
 
@@ -27,18 +27,18 @@ public interface IFamilyService
     /// <summary>
     /// Updates the details of an existing family asynchronously using the specified request data.
     /// </summary>
-    /// <param name="updateFamlyRequest">The request containing the updated family information. Cannot be null.</param>
+    /// <param name="updateFamilyRequest">The request containing the updated family information. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyDto"/> with the
     /// updated family details.</returns>
-    public Task<FamilyDto> UpdateFamilyAsync(UpdateFamlyRequest updateFamlyRequest, Guid userId, CancellationToken cancellationToken);
+    public Task<FamilyDto> UpdateFamilyAsync(UpdateFamilyRequest updateFamilyRequest, Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new family record asynchronously using the specified update request.
     /// </summary>
-    /// <param name="createFamlyRequest">An object containing the details required to create the family. Cannot be null.</param>
+    /// <param name="createFamilyRequest">An object containing the details required to create the family. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="FamilyDto"/>
     /// representing the newly created family.</returns>
-    public Task<FamilyDto> CreateFamilyAsync(CreateFamilyRequest createFamlyRequest, Guid userId, CancellationToken cancellationToken);
+    public Task<FamilyDto> CreateFamilyAsync(CreateFamilyRequest createFamilyRequest, Guid userId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes the family with the specified unique identifier asynchronously.
@@ -47,4 +47,5 @@ public interface IFamilyService
     /// <returns>A task that represents the asynchronous delete operation.</returns>
     public Task DeleteFamilyByIdAsync(Guid familyId, Guid userId, CancellationToken cancellationToken);
 }
+
 

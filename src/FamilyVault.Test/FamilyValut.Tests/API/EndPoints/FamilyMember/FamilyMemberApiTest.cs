@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.DTOs.FamilyMembers;
+using FamilyVault.Application.DTOs.FamilyMembers;
 using FamilyVault.Application.Interfaces.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
@@ -11,11 +11,17 @@ using System.Net.Http.Json;
 
 namespace FamilyVault.Tests.API.EndPoints.FamilyMember;
 
+/// <summary>
+/// Represents FamilyMemberApiTest.
+/// </summary>
 public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
-    private readonly Mock<IFamilymemeberService> _familyMemberServiceMock = new();
+    private readonly Mock<IFamilyMemberService> _familyMemberServiceMock = new();
 
+    /// <summary>
+    /// Initializes a new instance of FamilyMemberApiTest.
+    /// </summary>
     public FamilyMemberApiTest(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder =>
@@ -41,6 +47,9 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
     #region GET /familymember/{familyId}
 
     [Fact]
+    /// <summary>
+    /// Performs the GetFamilyMembers_ShouldReturnEmptyList_WhenNoneExist operation.
+    /// </summary>
     public async Task GetFamilyMembers_ShouldReturnEmptyList_WhenNoneExist()
     {
         // Arrange
@@ -64,6 +73,9 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
     #region GET /familymember/{familyId}/{id}
 
     [Fact]
+    /// <summary>
+    /// Performs the GetFamilyMemberById_ShouldReturnNotFound_WhenMemberDoesNotExist operation.
+    /// </summary>
     public async Task GetFamilyMemberById_ShouldReturnNotFound_WhenMemberDoesNotExist()
     {
         // Arrange
@@ -88,12 +100,15 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
     #region POST /familymember/{familyId}/familymember
 
     [Fact]
+    /// <summary>
+    /// Performs the CreateFamilyMember_ShouldReturnCreated operation.
+    /// </summary>
     public async Task CreateFamilyMember_ShouldReturnCreated()
     {
         // Arrange
         var familyId = Guid.NewGuid();
 
-        var request = new CreateFamilyMememberRequest
+        var request = new CreateFamilyMemberRequest
         {
             FamilyId = familyId,
             FirstName = "John",
@@ -108,7 +123,7 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
 
         _familyMemberServiceMock
             .Setup(s => s.CreateFamilyMemberAsync(
-                It.IsAny<CreateFamilyMememberRequest>(),
+                It.IsAny<CreateFamilyMemberRequest>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(created);
@@ -128,13 +143,16 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
     #region PUT /familymember/{familyId}/familymember/{id}
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateFamilyMember_ShouldReturnOk operation.
+    /// </summary>
     public async Task UpdateFamilyMember_ShouldReturnOk()
     {
         // Arrange
         var familyId = Guid.NewGuid();
         var memberId = Guid.NewGuid();
 
-        var request = new UpdateFamilyMememberRequest
+        var request = new UpdateFamilyMemberRequest
         {
             Id = memberId,
             FirstName = "Updated"
@@ -148,7 +166,7 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
 
         _familyMemberServiceMock
             .Setup(s => s.UpdateFamilyMemberAsync(
-                It.IsAny<UpdateFamilyMememberRequest>(),
+                It.IsAny<UpdateFamilyMemberRequest>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(updated);
@@ -168,6 +186,9 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
     #region DELETE /familymember/{familyId}/{id}
 
     [Fact]
+    /// <summary>
+    /// Performs the DeleteFamilyMember_ShouldReturnOk operation.
+    /// </summary>
     public async Task DeleteFamilyMember_ShouldReturnOk()
     {
         // Arrange
@@ -193,3 +214,4 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
 
     #endregion
 }
+

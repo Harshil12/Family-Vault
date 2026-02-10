@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.Interfaces.Repositories;
+using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -6,17 +6,26 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
+/// <summary>
+/// Represents UserRepository.
+/// </summary>
 public class UserRepository : IUserRepository
 {
     private readonly AppDbContext _appDbContext;
     private readonly IMemoryCache _memoryCache;
 
+    /// <summary>
+    /// Initializes a new instance of UserRepository.
+    /// </summary>
     public UserRepository(AppDbContext appDbContext, IMemoryCache memoryCache)
     {
         _appDbContext = appDbContext;
         _memoryCache = memoryCache;
     }
 
+    /// <summary>
+    /// Performs the GetAllWithFamilyDetailsAsync operation.
+    /// </summary>
     public async Task<IReadOnlyList<User>> GetAllWithFamilyDetailsAsync(CancellationToken cancellationToken)
     {
         var cacheOptions = new MemoryCacheEntryOptions
@@ -31,11 +40,18 @@ public class UserRepository : IUserRepository
             return cachedUsers;
         }
 
-        var result = await _appDbContext.Users.AsNoTracking().Include(f => f.Families).ToListAsync(cancellationToken);
+        var result = await _appDbContext.Users
+            .Where(u => !u.IsDeleted)
+            .AsNoTracking()
+            .Include(u => u.Families!.Where(f => !f.IsDeleted))
+            .ToListAsync(cancellationToken);
         _memoryCache.Set("UsersWithFamilies", result, cacheOptions);
         return result;
     }
 
+    /// <summary>
+    /// Performs the GetAllAsync operation.
+    /// </summary>
     public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken)
     {
         var cacheOptions = new MemoryCacheEntryOptions
@@ -49,20 +65,30 @@ public class UserRepository : IUserRepository
         {
             return cachedUsers;
         }
-        var result = await _appDbContext.Users.AsNoTracking().ToListAsync(cancellationToken);
+        var result = await _appDbContext.Users
+            .Where(u => !u.IsDeleted)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
 
         _memoryCache.Set("UsersFamilies", result, cacheOptions);
 
         return result;
     }
 
+    /// <summary>
+    /// Performs the GetByIdAsync operation.
+    /// </summary>
     public async Task<User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         return await _appDbContext.Users
+            .Where(u => !u.IsDeleted)
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
+    /// <summary>
+    /// Performs the AddAsync operation.
+    /// </summary>
     public async Task<User> AddAsync(User user, CancellationToken cancellationToken)
     {
         await _appDbContext.AddAsync(user, cancellationToken);
@@ -74,6 +100,9 @@ public class UserRepository : IUserRepository
         return user;
     }
 
+    /// <summary>
+    /// Performs the UpdateAsync operation.
+    /// </summary>
     public async Task<User> UpdateAsync(User user, CancellationToken cancellationToken)
     {
         var existingUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id, cancellationToken)
@@ -94,6 +123,9 @@ public class UserRepository : IUserRepository
 
         return existingUser;
     }
+    /// <summary>
+    /// Performs the DeleteByIdAsync operation.
+    /// </summary>
     public async Task DeleteByIdAsync(Guid userId, string user, CancellationToken cancellationToken)
     {
         // Soft delete the user and related families and family members and documents
@@ -139,9 +171,13 @@ public class UserRepository : IUserRepository
         _memoryCache.Remove("UsersFamilies");
     }
 
+    /// <summary>
+    /// Performs the GetByEmailAsync operation.
+    /// </summary>
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
         return await _appDbContext.Users
+           .Where(u => !u.IsDeleted)
            .AsNoTracking()
            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }

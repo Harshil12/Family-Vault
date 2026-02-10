@@ -1,7 +1,10 @@
-﻿using FamilyVault.Domain.Enums;
+using FamilyVault.Domain.Enums;
 
 namespace FamilyVault.Application.DTOs.Documents;
 
+/// <summary>
+/// Represents CreateDocumentRequest.
+/// </summary>
 public class CreateDocumentRequest
 {
     /// <summary>

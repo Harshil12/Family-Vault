@@ -1,4 +1,4 @@
-﻿using FamilyVault.Domain.Entities;
+using FamilyVault.Domain.Entities;
 using FamilyVault.Domain.Enums;
 using FamilyVault.Infrastructure.Data;
 using FamilyVault.Infrastructure.Repositories;
@@ -8,12 +8,18 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Tests.Infrastructure.Repositories;
 
+/// <summary>
+/// Represents DocumentRepositoryTests.
+/// </summary>
 public class DocumentRepositoryTests : IDisposable
 {
     private readonly AppDbContext _dbContext;
     private readonly IMemoryCache _memoryCache;
     private readonly DocumentRepository _sut;
 
+    /// <summary>
+    /// Initializes a new instance of DocumentRepositoryTests.
+    /// </summary>
     public DocumentRepositoryTests()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -29,6 +35,9 @@ public class DocumentRepositoryTests : IDisposable
     #region GetAllByFamilymemberIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetAllByFamilymemberIdAsync_ShouldReturnDocuments_AndCacheResult operation.
+    /// </summary>
     public async Task GetAllByFamilymemberIdAsync_ShouldReturnDocuments_AndCacheResult()
     {
         // Arrange
@@ -65,11 +74,62 @@ public class DocumentRepositoryTests : IDisposable
         firstCall.Should().BeSameAs(secondCall);
     }
 
+    [Fact]
+    public async Task GetAllByFamilymemberIdAsync_ShouldReturnEmpty_WhenNoDocuments()
+    {
+        // Arrange
+        var familyMemberId = Guid.NewGuid();
+
+        // Act
+        var result = await _sut.GetAllByFamilymemberIdAsync(familyMemberId, CancellationToken.None);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetAllByFamilymemberIdAsync_ShouldExcludeSoftDeletedDocuments()
+    {
+        // Arrange
+        var familyMemberId = Guid.NewGuid();
+
+        var documents = new List<DocumentDetails>
+        {
+            new() {
+                Id = Guid.NewGuid(), FamilyMemberId = familyMemberId,
+                CreatedAt = DateTime.UtcNow , CreatedBy="test-user",
+                DocumentType = DocumentTypes.Passport,
+                DocumentNumber = "123",
+                IsDeleted = false
+            },
+             new() {
+                Id = Guid.NewGuid(), FamilyMemberId = familyMemberId,
+                CreatedAt = DateTime.UtcNow , CreatedBy="test-user",
+                DocumentType = DocumentTypes.Passport,
+                DocumentNumber = "456",
+                IsDeleted = true
+            }
+        };
+
+        _dbContext.Documents.AddRange(documents);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAllByFamilymemberIdAsync(familyMemberId, CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.First().DocumentNumber.Should().Be("123");
+    }
+
     #endregion
 
     #region GetAsyncbyId
 
     [Fact]
+    /// <summary>
+    /// Performs the GetAsyncbyId_ShouldReturnDocument_WhenExists operation.
+    /// </summary>
     public async Task GetAsyncbyId_ShouldReturnDocument_WhenExists()
     {
         // Arrange
@@ -94,6 +154,9 @@ public class DocumentRepositoryTests : IDisposable
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the GetAsyncbyId_ShouldReturnNull_WhenNotFound operation.
+    /// </summary>
     public async Task GetAsyncbyId_ShouldReturnNull_WhenNotFound()
     {
         // Act
@@ -103,11 +166,39 @@ public class DocumentRepositoryTests : IDisposable
         result.Should().BeNull();
     }
 
+    [Fact]
+    public async Task GetAsyncbyId_ShouldReturnSoftDeletedDocument()
+    {
+        // Arrange
+        var document = new DocumentDetails
+        {
+            Id = Guid.NewGuid(),
+            DocumentNumber = "123",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user",
+            DocumentType = DocumentTypes.Passport,
+            IsDeleted = true
+        };
+
+        _dbContext.Documents.Add(document);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAsyncbyId(document.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.IsDeleted.Should().BeTrue();
+    }
+
     #endregion
 
     #region AddAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the AddAsync_ShouldPersistDocument_AndClearCache operation.
+    /// </summary>
     public async Task AddAsync_ShouldPersistDocument_AndClearCache()
     {
         // Arrange
@@ -141,6 +232,9 @@ public class DocumentRepositoryTests : IDisposable
     #region UpdateAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateAsync_ShouldUpdateDocument_AndClearCache operation.
+    /// </summary>
     public async Task UpdateAsync_ShouldUpdateDocument_AndClearCache()
     {
         // Arrange
@@ -172,6 +266,9 @@ public class DocumentRepositoryTests : IDisposable
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateAsync_ShouldThrow_WhenDocumentNotFound operation.
+    /// </summary>
     public async Task UpdateAsync_ShouldThrow_WhenDocumentNotFound()
     {
         // Arrange
@@ -194,6 +291,9 @@ public class DocumentRepositoryTests : IDisposable
     #region DeleteByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the DeleteByIdAsync_ShouldSoftDeleteDocument_AndClearCache operation.
+    /// </summary>
     public async Task DeleteByIdAsync_ShouldSoftDeleteDocument_AndClearCache()
     {
         // Arrange
@@ -225,6 +325,9 @@ public class DocumentRepositoryTests : IDisposable
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the DeleteByIdAsync_ShouldThrow_WhenDocumentNotFound operation.
+    /// </summary>
     public async Task DeleteByIdAsync_ShouldThrow_WhenDocumentNotFound()
     {
         // Act
@@ -237,6 +340,9 @@ public class DocumentRepositoryTests : IDisposable
 
     #endregion
 
+    /// <summary>
+    /// Performs the Dispose operation.
+    /// </summary>
     public void Dispose()
     {
         _dbContext.Dispose();

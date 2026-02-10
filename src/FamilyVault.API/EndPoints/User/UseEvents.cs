@@ -1,11 +1,17 @@
-﻿using FamilyVault.Application.DTOs.User;
+using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Services;
 using System.Security.Claims;
 
 namespace FamilyVault.API.EndPoints.User;
 
+/// <summary>
+/// Represents MapAllEndpoints.
+/// </summary>
 public static class MapAllEndpoints
 {
+    /// <summary>
+    /// Performs the MapUserEndPoints operation.
+    /// </summary>
     public static void MapUserEndPoints(this WebApplication app)
     {
         var familyGroup = app.MapGroup("/User").RequireAuthorization();
@@ -81,7 +87,7 @@ public static class MapAllEndpoints
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            var updatedUser = await userService.UpdateuUerAsync(updateUserRequest, userId, cancellationToken);
+            var updatedUser = await userService.UpdateUserAsync(updateUserRequest, userId, cancellationToken);
 
             return Results.Ok(ApiResponse<UserDto>.Success(updatedUser, "Update has been successfully updatedUser.", traceId));
 

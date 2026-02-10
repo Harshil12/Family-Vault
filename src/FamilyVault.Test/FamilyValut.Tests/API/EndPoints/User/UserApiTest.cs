@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.DTOs.User;
+using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
@@ -11,11 +11,17 @@ using System.Net.Http.Json;
 
 namespace FamilyVault.Tests.API.EndPoints.User;
 
+/// <summary>
+/// Represents UserEventsTests.
+/// </summary>
 public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly Mock<IUserService> _userServiceMock = new();
 
+    /// <summary>
+    /// Initializes a new instance of UserEventsTests.
+    /// </summary>
     public UserEventsTests(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder =>
@@ -40,6 +46,9 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region GET /User
 
+    /// <summary>
+    /// Performs the GetUsers_ShouldReturnEmptyList_WhenNoUsers operation.
+    /// </summary>
     [Fact]
     public async Task GetUsers_ShouldReturnEmptyList_WhenNoUsers()
     {
@@ -61,6 +70,9 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region GET /User/{id}
 
+    /// <summary>
+    /// Performs the GetUserById_ShouldReturnNotFound_WhenUserDoesNotExist operation.
+    /// </summary>
     [Fact]
     public async Task GetUserById_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
@@ -84,6 +96,9 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region POST /User/user
 
+    /// <summary>
+    /// Performs the CreateUser_ShouldReturnCreated operation.
+    /// </summary>
     [Fact]
     public async Task CreateUser_ShouldReturnCreated()
     {
@@ -123,6 +138,9 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region PUT /User/user/{id}
 
+    /// <summary>
+    /// Performs the UpdateUser_ShouldReturnOk operation.
+    /// </summary>
     [Fact]
     public async Task UpdateUser_ShouldReturnOk()
     {
@@ -144,7 +162,7 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
         };
 
         _userServiceMock
-            .Setup(s => s.UpdateuUerAsync(
+            .Setup(s => s.UpdateUserAsync(
                 It.IsAny<UpdateUserRequest>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
@@ -164,6 +182,9 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
 
     #region DELETE /User/{id}
 
+    /// <summary>
+    /// Performs the DeleteUser_ShouldReturnOk operation.
+    /// </summary>
     [Fact]
     public async Task DeleteUser_ShouldReturnOk()
     {

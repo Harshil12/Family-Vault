@@ -1,5 +1,8 @@
-﻿namespace FamilyVault.Application.DTOs.User;
+namespace FamilyVault.Application.DTOs.User;
 
+/// <summary>
+/// Represents CreateUserRequest.
+/// </summary>
 public class CreateUserRequest
 {
     /// <summary>

@@ -1,18 +1,16 @@
-using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Domain.Enums;
 
 namespace FamilyVault.Application.DTOs.FamilyMembers;
 
 /// <summary>
-/// Represents FamilyMemberDto.
+/// Represents UpdateFamilyMemberRequest.
 /// </summary>
-public class FamilyMemberDto: BaseDto 
+public class UpdateFamilyMemberRequest
 {
-
     /// <summary>
-    /// Gets or sets FamilyId.
+    /// Gets or sets Id.
     /// </summary>
-    public Guid FamilyId { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets FirstName.
@@ -32,7 +30,7 @@ public class FamilyMemberDto: BaseDto
     /// <summary>
     /// Gets or sets Mobile.
     /// </summary>
-    public long? Mobile { get; set; }
+    public string? Mobile { get; set; }
 
     /// <summary>
     /// Gets or sets RelationshipType.
@@ -62,11 +60,10 @@ public class FamilyMemberDto: BaseDto
     /// <summary>
     /// Gets or sets Aadhar.
     /// </summary>
-    public long? Aadhar { get; set; }
+    public string ? Aadhar { get; set; }
 
     /// <summary>
-    /// Gets or sets DocumentDetails.
+    /// Gets or sets FamilyId.
     /// </summary>
-    public ICollection<DocumentDetailsDto>? DocumentDetails { get; set; }
-
+    public Guid FamilyId { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using FamilyVault.API.EndPoints;
+using FamilyVault.API.EndPoints;
 using FamilyVault.Application;
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Application.Services;
@@ -6,17 +6,26 @@ using FamilyVault.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Diagnostics;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace FamilyVault.API;
 
+/// <summary>
+/// Represents Program.
+/// </summary>
 public class Program
 {
+    /// <summary>
+    /// Performs the Main operation.
+    /// </summary>
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -67,8 +76,35 @@ public class Program
         // -------------------- Application & Infrastructure --------------------
         builder.Services.AddInfrastructureServices(builder.Configuration);
 
+        var dataProtectionBuilder = builder.Services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(
+                Path.Combine(builder.Environment.ContentRootPath, "data-protection-keys")));
+
+        var certThumbprint = builder.Configuration["DataProtection:CertificateThumbprint"];
+        if (!string.IsNullOrWhiteSpace(certThumbprint))
+        {
+            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly);
+            var certs = store.Certificates.Find(X509FindType.FindByThumbprint, certThumbprint, validOnly: false);
+            if (certs.Count > 0)
+            {
+                dataProtectionBuilder.ProtectKeysWithCertificate(certs[0]);
+            }
+            else
+            {
+                var log = LoggerFactory
+                    .Create(logging => logging.AddConsole())
+                    .CreateLogger("DataProtection");
+                log.LogWarning(
+                    "Data Protection certificate not found. Thumbprint='{Thumbprint}', StoreName='{StoreName}', StoreLocation='{StoreLocation}'. Keys will be persisted without encryption.",
+                    certThumbprint,
+                    store.Name,
+                    store.Location);
+            }
+        }
+
         builder.Services.AddScoped<IUserService, Userservice>();
-        builder.Services.AddScoped<IFamilymemeberService, FamilyMemberService>();
+        builder.Services.AddScoped<IFamilyMemberService, FamilyMemberService>();
         builder.Services.AddScoped<IFamilyService, FamilyService>();
         builder.Services.AddScoped<IDocumentService, DocumentService>();
         builder.Services.AddScoped<ICryptoService, CryptoService>();
@@ -95,37 +131,9 @@ public class Program
                 In = ParameterLocation.Header,
                 Description = "Enter 'Bearer' [space] and then your token\n\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
             });
-
-//            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-//            {
-//                {
-//                    new OpenApiSecurityScheme
-//                    {
-//                      Name = "Bearer",
-//                      Scheme = "oauth2",
-//Reference = new OpenApiReference
-//                      {
-//                          Type = ReferenceType.SecurityScheme,
-//                          Id = "Bearer"
-//                      },
-//                      In = ParameterLocation.Header
-//                    },
-//                    Array.Empty<string>()
-//                }
-//            });
         });
-
-        builder.Logging.ClearProviders();
-        builder.Logging.AddConsole();
-        builder.Logging.AddSimpleConsole(options =>
-        {
-            options.TimestampFormat = "HH:mm:ss ";
-            options.SingleLine = true;
-            options.IncludeScopes = true; // shows scope values like TraceId/RequestId
-        });
-
+               
         builder.Services.AddMemoryCache();
-
 
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resource => resource.AddService("FamilyVaultAPI"))
@@ -191,3 +199,4 @@ public class Program
         app.Run();
     }
 }
+

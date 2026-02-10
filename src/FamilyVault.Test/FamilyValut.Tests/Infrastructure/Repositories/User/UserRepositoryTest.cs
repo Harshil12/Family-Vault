@@ -1,4 +1,4 @@
-﻿using FamilyVault.Domain.Entities;
+using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using FamilyVault.Infrastructure.Repositories;
 using FluentAssertions;
@@ -7,12 +7,18 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Tests.Infrastructure.Repositories;
 
+/// <summary>
+/// Represents UserRepositoryTests.
+/// </summary>
 public class UserRepositoryTests : IDisposable
 {
     private readonly AppDbContext _dbContext;
     private readonly IMemoryCache _memoryCache;
     private readonly UserRepository _sut;
 
+    /// <summary>
+    /// Initializes a new instance of UserRepositoryTests.
+    /// </summary>
     public UserRepositoryTests()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -29,6 +35,9 @@ public class UserRepositoryTests : IDisposable
     #region GetAllWithFamilyDetailsAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetAllWithFamilyDetailsAsync_ShouldReturnUsers_WithFamilies_AndCache operation.
+    /// </summary>
     public async Task GetAllWithFamilyDetailsAsync_ShouldReturnUsers_WithFamilies_AndCache()
     {
         // Arrange
@@ -78,11 +87,100 @@ public class UserRepositoryTests : IDisposable
         first.Should().BeSameAs(second);
     }
 
+    [Fact]
+    public async Task GetAllWithFamilyDetailsAsync_ShouldExcludeSoftDeletedUsers()
+    {
+        // Arrange
+        var activeUser = new User
+        {
+            Username = "active",
+            Id = Guid.NewGuid(),
+            FirstName = "Active",
+            Email = "active@test.com",
+            Password = "password",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
+        };
+
+        var deletedUser = new User
+        {
+            Username = "deleted",
+            Id = Guid.NewGuid(),
+            FirstName = "Deleted",
+            Email = "deleted@test.com",
+            Password = "password",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = true
+        };
+
+        _dbContext.Users.AddRange(activeUser, deletedUser);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAllWithFamilyDetailsAsync(CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.First().Username.Should().Be("active");
+    }
+
+    [Fact]
+    public async Task GetAllWithFamilyDetailsAsync_ShouldExcludeSoftDeletedFamilies()
+    {
+        // Arrange
+        var user = new User
+        {
+            Username = "u1",
+            Id = Guid.NewGuid(),
+            FirstName = "John",
+            Email = "john@doe.com",
+            Password = "password",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        var activeFamily = new Family
+        {
+            Id = Guid.NewGuid(),
+            Name = "ActiveFamily",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user",
+            UserId = user.Id,
+            IsDeleted = false
+        };
+
+        var deletedFamily = new Family
+        {
+            Id = Guid.NewGuid(),
+            Name = "DeletedFamily",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user",
+            UserId = user.Id,
+            IsDeleted = true
+        };
+
+        _dbContext.Users.Add(user);
+        _dbContext.Families.AddRange(activeFamily, deletedFamily);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAllWithFamilyDetailsAsync(CancellationToken.None);
+
+        // Assert
+        result.First().Families.Should().HaveCount(1);
+        result.First().Families.First().Name.Should().Be("ActiveFamily");
+    }
+
     #endregion
 
     #region GetAllAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetAllAsync_ShouldReturnUsers_AndCache operation.
+    /// </summary>
     public async Task GetAllAsync_ShouldReturnUsers_AndCache()
     {
         // Arrange
@@ -106,6 +204,9 @@ public class UserRepositoryTests : IDisposable
     #region GetByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetByIdAsync_ShouldReturnUser_WhenExists operation.
+    /// </summary>
     public async Task GetByIdAsync_ShouldReturnUser_WhenExists()
     {
         // Arrange
@@ -122,6 +223,9 @@ public class UserRepositoryTests : IDisposable
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the GetByIdAsync_ShouldReturnNull_WhenNotFound operation.
+    /// </summary>
     public async Task GetByIdAsync_ShouldReturnNull_WhenNotFound()
     {
         // Act
@@ -136,6 +240,9 @@ public class UserRepositoryTests : IDisposable
     #region GetByEmailAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetByEmailAsync_ShouldReturnUser_WhenEmailExists operation.
+    /// </summary>
     public async Task GetByEmailAsync_ShouldReturnUser_WhenEmailExists()
     {
         // Arrange
@@ -153,11 +260,51 @@ public class UserRepositoryTests : IDisposable
         result!.Email.Should().Be(email);
     }
 
+    [Fact]
+    public async Task GetByEmailAsync_ShouldReturnNull_WhenEmailNotFound()
+    {
+        // Act
+        var result = await _sut.GetByEmailAsync("nonexistent@test.com", CancellationToken.None);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetByEmailAsync_ShouldReturnNull_WhenUserIsDeleted()
+    {
+        // Arrange
+        var email = "deleted@test.com";
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = email,
+            Username = "deleted",
+            FirstName = "Deleted",
+            Password = "password",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = true
+        };
+
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetByEmailAsync(email, CancellationToken.None);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
     #endregion
 
     #region AddAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the AddAsync_ShouldPersistUser_AndClearCaches operation.
+    /// </summary>
     public async Task AddAsync_ShouldPersistUser_AndClearCaches()
     {
         // Arrange
@@ -191,6 +338,9 @@ public class UserRepositoryTests : IDisposable
     #region UpdateAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateAsync_ShouldUpdateUser_AndClearCaches operation.
+    /// </summary>
     public async Task UpdateAsync_ShouldUpdateUser_AndClearCaches()
     {
         // Arrange
@@ -229,6 +379,9 @@ public class UserRepositoryTests : IDisposable
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateAsync_ShouldThrow_WhenUserNotFound operation.
+    /// </summary>
     public async Task UpdateAsync_ShouldThrow_WhenUserNotFound()
     {
         // Arrange
@@ -247,6 +400,9 @@ public class UserRepositoryTests : IDisposable
     #region DeleteByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the DeleteByIdAsync_ShouldSoftDeleteUser_Families_Members_AndDocuments operation.
+    /// </summary>
     public async Task DeleteByIdAsync_ShouldSoftDeleteUser_Families_Members_AndDocuments()
     {
         // Arrange
@@ -276,6 +432,9 @@ public class UserRepositoryTests : IDisposable
 
     #endregion
 
+    /// <summary>
+    /// Performs the Dispose operation.
+    /// </summary>
     public void Dispose()
     {
         _dbContext.Dispose();

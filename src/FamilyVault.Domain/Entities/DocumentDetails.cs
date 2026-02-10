@@ -1,7 +1,10 @@
-﻿using FamilyVault.Domain.Enums;
+using FamilyVault.Domain.Enums;
 
 namespace FamilyVault.Domain.Entities;
 
+/// <summary>
+/// Represents DocumentDetails.
+/// </summary>
 public class DocumentDetails : BaseEntity
 {
   

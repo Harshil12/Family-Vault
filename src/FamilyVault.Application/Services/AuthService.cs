@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
@@ -10,6 +10,9 @@ using System.Text;
 
 namespace FamilyVault.Application.Services;
 
+/// <summary>
+/// Represents AuthService.
+/// </summary>
 public class AuthService : IAuthService
 {
     private readonly IConfiguration _config;
@@ -17,6 +20,9 @@ public class AuthService : IAuthService
     private readonly IUserRepository _userRepository;
     private readonly ICryptoService _cryptoService;
 
+    /// <summary>
+    /// Initializes a new instance of AuthService.
+    /// </summary>
     public AuthService(IConfiguration config, IUserRepository userRepository, IMapper mapper, ICryptoService cryptoService)
     {
         _config = config;
@@ -25,6 +31,9 @@ public class AuthService : IAuthService
         _cryptoService = cryptoService;
     }
 
+    /// <summary>
+    /// Performs the GetTokenAsync operation.
+    /// </summary>
     public async Task<string?> GetTokenAsync(string email, string password, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
@@ -40,6 +49,9 @@ public class AuthService : IAuthService
         return GenerateToken(useDto);
     }
 
+    /// <summary>
+    /// Performs the GenerateToken operation.
+    /// </summary>
     public string GenerateToken(UserDto user)
     {
         var jWTSettingsSection = _config.GetSection("Jwt");

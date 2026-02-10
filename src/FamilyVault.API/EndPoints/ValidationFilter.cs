@@ -1,10 +1,16 @@
-﻿
+
 using FluentValidation;
 
 namespace FamilyVault.API.EndPoints;
 
+/// <summary>
+/// Represents ValidationFilter.
+/// </summary>
 public class ValidationFilter<T> : IEndpointFilter
 {
+    /// <summary>
+    /// Performs the InvokeAsync operation.
+    /// </summary>
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
         var validator = context.HttpContext.RequestServices

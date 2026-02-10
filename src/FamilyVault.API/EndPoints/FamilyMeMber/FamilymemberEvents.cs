@@ -1,16 +1,22 @@
-﻿using FamilyVault.Application.DTOs.FamilyMembers;
+using FamilyVault.Application.DTOs.FamilyMembers;
 using FamilyVault.Application.Interfaces.Services;
 using System.Security.Claims;
 
 namespace FamilyVault.API.EndPoints.FamilyMeMber;
 
+/// <summary>
+/// Represents FamilyMemberEvents.
+/// </summary>
 public static class FamilyMemberEvents
 {
+    /// <summary>
+    /// Performs the MapFamilyMemberEndPoints operation.
+    /// </summary>
     public static void MapFamilyMemberEndPoints(this WebApplication app)
     {
         var familyGroup = app.MapGroup("/familymember/{familyId:guid}").RequireAuthorization();
 
-        familyGroup.MapGet("/", async (Guid familyId, IFamilymemeberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
+        familyGroup.MapGet("/", async (Guid familyId, IFamilyMemberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
 
@@ -29,7 +35,7 @@ public static class FamilyMemberEvents
 
         });
 
-        familyGroup.MapGet("/{id:Guid}", async (Guid id, IFamilymemeberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
+        familyGroup.MapGet("/{id:Guid}", async (Guid id, IFamilyMemberService familyService, HttpContext httpContext, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
         {
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("FamilyMemberEvents");
@@ -50,7 +56,7 @@ public static class FamilyMemberEvents
         });
 
         familyGroup.MapDelete("/{id:guid}", async (Guid id,
-            IFamilymemeberService familyService,
+            IFamilyMemberService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
@@ -64,8 +70,8 @@ public static class FamilyMemberEvents
 
         });
 
-        familyGroup.MapPost("/familymember", async (CreateFamilyMememberRequest createFamilyRequest,
-            IFamilymemeberService familyService,
+        familyGroup.MapPost("/familymember", async (CreateFamilyMemberRequest createFamilyRequest,
+            IFamilyMemberService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
@@ -76,12 +82,12 @@ public static class FamilyMemberEvents
             var createdFamilyMember = await familyService.CreateFamilyMemberAsync(createFamilyRequest, userId, cancellationToken);
 
             return Results.Created($"/familymember/{createdFamilyMember.Id}",
-                    ApiResponse<FamilyMemberDto>.Success(createdFamilyMember, "Family member has been successfully createdFamilyMember.", traceId));
+                    ApiResponse<FamilyMemberDto>.Success(createdFamilyMember, "Family member has been successfully created.", traceId));
 
-        }).AddEndpointFilter<ValidationFilter<CreateFamilyMememberRequest>>();
+        }).AddEndpointFilter<ValidationFilter<CreateFamilyMemberRequest>>();
 
-        familyGroup.MapPut("/familymember/{id:guid}", async (UpdateFamilyMememberRequest updateFamlyRequest,
-            IFamilymemeberService familyService,
+        familyGroup.MapPut("/familymember/{id:guid}", async (UpdateFamilyMemberRequest updateFamilyMemberRequest,
+            IFamilyMemberService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
@@ -89,10 +95,11 @@ public static class FamilyMemberEvents
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            var updatedFamilyMember = await familyService.UpdateFamilyMemberAsync(updateFamlyRequest, userId, cancellationToken);
+            var updatedFamilyMember = await familyService.UpdateFamilyMemberAsync(updateFamilyMemberRequest, userId, cancellationToken);
 
-            return Results.Ok(ApiResponse<FamilyMemberDto>.Success(updatedFamilyMember, "Family member has been successfully updatedFamilyMember.", traceId));
+            return Results.Ok(ApiResponse<FamilyMemberDto>.Success(updatedFamilyMember, "Family member has been successfully updated.", traceId));
 
-        }).AddEndpointFilter<ValidationFilter<UpdateFamilyMememberRequest>>();
+        }).AddEndpointFilter<ValidationFilter<UpdateFamilyMemberRequest>>();
     }
 }
+

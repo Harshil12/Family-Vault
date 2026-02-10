@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.DTOs.Documents;
+using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Domain.Entities;
@@ -7,6 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace FamilyVault.Application.Services;
 
+/// <summary>
+/// Represents DocumentService.
+/// </summary>
 public class DocumentService : IDocumentService
 {
     private readonly ICryptoService _cryptoService;
@@ -14,6 +17,9 @@ public class DocumentService : IDocumentService
     private readonly IMapper _mapper;
     private readonly ILogger<DocumentService> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of DocumentService.
+    /// </summary>
     public DocumentService(IDocumentRepository documentRepository, ICryptoService cryptoService, IMapper mapper, ILogger<DocumentService> logger)
     {
         _cryptoService = cryptoService;
@@ -22,6 +28,9 @@ public class DocumentService : IDocumentService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Performs the GetDocumentsDetailsByFamilyMemberIdAsync operation.
+    /// </summary>
     public async Task<IReadOnlyList<DocumentDetailsDto>> GetDocumentsDetailsByFamilyMemberIdAsync(Guid familyMemberId, CancellationToken cancellationToken)
     {
         var result = await _documentReppository.GetAllByFamilymemberIdAsync(familyMemberId, cancellationToken);
@@ -34,6 +43,9 @@ public class DocumentService : IDocumentService
         return _mapper.Map<List<DocumentDetailsDto>>(result);
     }
 
+    /// <summary>
+    /// Performs the GetDocumentDetailsByIdAsync operation.
+    /// </summary>
     public async Task<DocumentDetailsDto> GetDocumentDetailsByIdAsync(Guid documentId, CancellationToken cancellationToken)
     {
         var result = await _documentReppository.GetAsyncbyId(documentId, cancellationToken);
@@ -44,6 +56,9 @@ public class DocumentService : IDocumentService
         return _mapper.Map<DocumentDetailsDto>(result);
     }
 
+    /// <summary>
+    /// Performs the CreateDocumentDetailsAsync operation.
+    /// </summary>
     public async Task<DocumentDetailsDto> CreateDocumentDetailsAsync(CreateDocumentRequest createDocumentRequest, Guid userId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Creating a new document for FamilyMemberId: {FamilyMemberId}", createDocumentRequest.FamilyMemberId);
@@ -60,6 +75,9 @@ public class DocumentService : IDocumentService
         return _mapper.Map<DocumentDetailsDto>(result);
     }
 
+    /// <summary>
+    /// Performs the DeleteDocumentDetailsByIdAsync operation.
+    /// </summary>
     public async Task DeleteDocumentDetailsByIdAsync(Guid documentId, Guid userId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Deleting document with Id: {DocumentId}", documentId);
@@ -70,6 +88,9 @@ public class DocumentService : IDocumentService
     }
 
 
+    /// <summary>
+    /// Performs the UpdateDocumentDetailsAsync operation.
+    /// </summary>
     public async Task<DocumentDetailsDto> UpdateDocumentDetailsAsync(UpdateDocumentRequest updateDocumentRequest, Guid userId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Updating document with Id: {DocumentId}", updateDocumentRequest.Id);

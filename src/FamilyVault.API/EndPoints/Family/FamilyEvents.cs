@@ -1,11 +1,17 @@
-﻿using FamilyVault.Application.DTOs.Family;
+using FamilyVault.Application.DTOs.Family;
 using FamilyVault.Application.Interfaces.Services;
 using System.Security.Claims;
 
 namespace FamilyVault.API.EndPoints.Family;
 
+/// <summary>
+/// Represents FamilymemberEvents.
+/// </summary>
 public static class FamilymemberEvents
 {
+    /// <summary>
+    /// Performs the MapFamilyEndPoints operation.
+    /// </summary>
     public static void MapFamilyEndPoints(this WebApplication app)
     {
         var familyGroup = app.MapGroup("/family/{userId:Guid}").RequireAuthorization();
@@ -75,11 +81,11 @@ public static class FamilymemberEvents
             var createdFamily = await familyService.CreateFamilyAsync(createFamilyRequest, userId, cancellationToken);
 
             return Results.Created($"/family/{createdFamily.Id}",
-                    ApiResponse<FamilyDto>.Success(createdFamily, "Family has been successfully createdFamily.", traceId));
+                    ApiResponse<FamilyDto>.Success(createdFamily, "Family has been successfully created.", traceId));
 
         }).AddEndpointFilter<ValidationFilter<CreateFamilyRequest>>();
 
-        familyGroup.MapPut("/family/{id:guid}", async (UpdateFamlyRequest updateFamlyRequest,
+        familyGroup.MapPut("/family/{id:guid}", async (UpdateFamilyRequest updateFamilyRequest,
             IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
@@ -88,9 +94,10 @@ public static class FamilymemberEvents
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
 
-            var updatedFamily = await familyService.UpdateFamilyAsync(updateFamlyRequest, userId, cancellationToken);
+            var updatedFamily = await familyService.UpdateFamilyAsync(updateFamilyRequest, userId, cancellationToken);
 
-            return Results.Ok(ApiResponse<FamilyDto>.Success(updatedFamily, "Family has been successfully updatedFamily.", traceId));
-        }).AddEndpointFilter<ValidationFilter<UpdateFamlyRequest>>();
+            return Results.Ok(ApiResponse<FamilyDto>.Success(updatedFamily, "Family has been successfully updated.", traceId));
+        }).AddEndpointFilter<ValidationFilter<UpdateFamilyRequest>>();
     }
 }
+

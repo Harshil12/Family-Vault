@@ -1,55 +1,74 @@
-﻿using FamilyVault.Application.Interfaces.Services;
+using FamilyVault.Application.Interfaces.Services;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
-using System.Text;
+using System.Security.Cryptography;
 
 namespace FamilyVault.Application.Services;
 
-public class CryptoService : ICryptoService
+/// <summary>
+/// Represents CryptoService.
+/// </summary>
+public sealed class CryptoService : ICryptoService
 {
-    private const string key = "VERY_SECRET_32_CHAR_KEY!!";
-    private readonly PasswordHasher<object?> _passwordHasher = new();
-    
-    public string DecryptData(string encryptedData)
+    private readonly IDataProtector _protector;
+    private static readonly object PasswordHasherUser = new();
+    private readonly PasswordHasher<object> _passwordHasher = new();
+
+    /// <summary>
+    /// Initializes a new instance of CryptoService.
+    /// </summary>
+    public CryptoService(IDataProtectionProvider provider)
     {
-        using var aes = System.Security.Cryptography.Aes.Create();
-        aes.Key = Convert.FromBase64String(key);
-        aes.IV = new byte[16];
-
-        var decryptor = aes.CreateDecryptor();
-        var bytes = Convert.FromBase64String(encryptedData);
-
-        return Encoding.UTF8.GetString(decryptor.TransformFinalBlock(bytes, 0, bytes.Length));
+        _protector = provider.CreateProtector("FamilyVault.SensitiveData.v1");
     }
 
+    // 🔐 For application data (email, phone, notes, etc.)
+    /// <summary>
+    /// Performs the EncryptData operation.
+    /// </summary>
     public string EncryptData(string data)
-    {
-        using var aes = System.Security.Cryptography.Aes.Create();
-        aes.Key = Convert.FromBase64String(key);
-        aes.IV = new byte[16];
+        => _protector.Protect(data);
 
-        var encryptor = aes.CreateEncryptor();
-        var bytes = Encoding.UTF8.GetBytes(data);
-
-        return Encoding.UTF8.GetString(encryptor.TransformFinalBlock(bytes, 0, bytes.Length));
-    }
-
-    public string HashPassword(string password)
-    {
-        return _passwordHasher.HashPassword(null, password);
-    }
-
-    public bool VerifyPassword(string hashPassword, string password)
+    /// <summary>
+    /// Performs the DecryptData operation.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the encrypted payload cannot be decrypted.</exception>
+    public string DecryptData(string encryptedData)
     {
         try
         {
-            return _passwordHasher.VerifyHashedPassword(
-                null,
-                hashPassword,
-                password) == PasswordVerificationResult.Success;
+            return _protector.Unprotect(encryptedData);
         }
-        catch (FormatException)
+        catch (CryptographicException ex)
         {
-            return false;
+            throw new InvalidOperationException("Failed to decrypt the provided data.", ex);
         }
+    }
+
+    // 🔑 For passwords
+    /// <summary>
+    /// Performs the HashPassword operation.
+    /// </summary>
+    public string HashPassword(string password)
+        => _passwordHasher.HashPassword(PasswordHasherUser, password);
+
+    /// <summary>
+    /// Performs the VerifyPassword operation.
+    /// </summary>
+    public bool VerifyPassword(string hashPassword, string password)
+    {
+        PasswordVerificationResult result;
+        try
+        {
+            result = _passwordHasher.VerifyHashedPassword(
+                PasswordHasherUser,
+                hashPassword,
+                password);
+        }
+        catch (FormatException ex)
+        {
+            throw new InvalidOperationException("Malformed password hash.", ex);
+        }
+        return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
     }
 }

@@ -1,11 +1,17 @@
-﻿using FamilyVault.Application.DTOs.Documents;
+using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Domain.Enums;
 using FluentValidation;
 
 namespace FamilyVault.Application.Validators.Document;
 
+/// <summary>
+/// Represents CreateDocumentValidators.
+/// </summary>
 public class CreateDocumentValidators : AbstractValidator<CreateDocumentRequest>
 {
+    /// <summary>
+    /// Initializes a new instance of CreateDocumentValidators.
+    /// </summary>
     public CreateDocumentValidators()
     {
         RuleFor(x => x.DocumentNumber).NotEmpty().WithMessage("Document number is required.");

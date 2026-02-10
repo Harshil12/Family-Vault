@@ -1,59 +1,118 @@
-﻿using System.Text;
 using FamilyVault.Application.Services;
 using FluentAssertions;
+using Microsoft.AspNetCore.DataProtection;
+using System.Security.Cryptography;
 
 namespace FamilyValut.Tests.Application.Services.Others;
 
+/// <summary>
+/// Represents CryptoServiceTests.
+/// </summary>
 public class CryptoServiceTests
 {
     private readonly CryptoService _sut;
 
+    /// <summary>
+    /// Initializes a new instance of CryptoServiceTests.
+    /// </summary>
     public CryptoServiceTests()
     {
-        _sut = new CryptoService();
+        var provider = new EphemeralDataProtectionProvider();
+        _sut = new CryptoService(provider);
     }
 
     #region Encrypt / Decrypt
 
     [Fact]
-    public void EncryptData_ShouldThrow_WhenKeyIsNotValidBase64()
+    /// <summary>
+    /// Performs the EncryptData_ShouldReturnProtectedValue operation.
+    /// </summary>
+    public void EncryptData_ShouldReturnProtectedValue()
     {
         // Arrange
         var plainText = "hello world";
 
         // Act
-        Action act = () => _sut.EncryptData(plainText);
+        var result = _sut.EncryptData(plainText);
 
         // Assert
-        act.Should().Throw<FormatException>()
-           .WithMessage("*base-64*");
+        result.Should().NotBeNullOrWhiteSpace();
+        result.Should().NotBe(plainText);
     }
 
     [Fact]
-    public void DecryptData_ShouldThrow_WhenKeyIsNotValidBase64()
+    /// <summary>
+    /// Performs the DecryptData_ShouldRoundTrip operation.
+    /// </summary>
+    public void DecryptData_ShouldRoundTrip()
     {
         // Arrange
-        var encryptedText = Convert.ToBase64String(Encoding.UTF8.GetBytes("dummy"));
+        var plainText = "hello world";
+        var encryptedText = _sut.EncryptData(plainText);
 
         // Act
-        Action act = () => _sut.DecryptData(encryptedText);
+        var result = _sut.DecryptData(encryptedText);
 
         // Assert
-        act.Should().Throw<FormatException>()
-           .WithMessage("*base-64*");
+        result.Should().Be(plainText);
     }
 
     [Fact]
-    public void DecryptData_ShouldThrow_WhenEncryptedDataIsNotBase64()
+    /// <summary>
+    /// Performs the DecryptData_ShouldThrow_WhenProtectorThrows operation.
+    /// </summary>
+    public void DecryptData_ShouldThrow_WhenProtectorThrows()
     {
         // Arrange
-        var invalidEncryptedData = "not-base64-data";
+        var invalidEncryptedData = "not-protected-data";
 
         // Act
         Action act = () => _sut.DecryptData(invalidEncryptedData);
 
         // Assert
-        act.Should().Throw<FormatException>();
+        act.Should().Throw<CryptographicException>();
+    }
+
+    [Fact]
+    public void EncryptData_ShouldHandleEmptyString()
+    {
+        // Arrange
+        var emptyString = string.Empty;
+
+        // Act
+        var encrypted = _sut.EncryptData(emptyString);
+        var decrypted = _sut.DecryptData(encrypted);
+
+        // Assert
+        decrypted.Should().Be(emptyString);
+    }
+
+    [Fact]
+    public void EncryptData_ShouldHandleSpecialCharacters()
+    {
+        // Arrange
+        var specialData = "Test!@#$%^&*()_+{}[]|\\:;\"'<>,.?/~`";
+
+        // Act
+        var encrypted = _sut.EncryptData(specialData);
+        var decrypted = _sut.DecryptData(encrypted);
+
+        // Assert
+        decrypted.Should().Be(specialData);
+    }
+
+    [Fact]
+    public void EncryptData_ShouldHandleUnicodeCharacters()
+    {
+        // Arrange
+        var unicodeData = "Hello 世界 🌍";
+
+        // Act
+        var encrypted = _sut.EncryptData(unicodeData);
+        var decrypted = _sut.DecryptData(encrypted);
+
+        // Assert
+        decrypted.Should().Be(unicodeData);
     }
 
     #endregion
@@ -61,6 +120,9 @@ public class CryptoServiceTests
     #region HashPassword
 
     [Fact]
+    /// <summary>
+    /// Performs the HashPassword_ShouldReturn_NonEmptyHash operation.
+    /// </summary>
     public void HashPassword_ShouldReturn_NonEmptyHash()
     {
         // Arrange
@@ -75,6 +137,9 @@ public class CryptoServiceTests
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the HashPassword_ShouldGenerateDifferentHashes_ForSamePassword operation.
+    /// </summary>
     public void HashPassword_ShouldGenerateDifferentHashes_ForSamePassword()
     {
         // Arrange
@@ -89,6 +154,9 @@ public class CryptoServiceTests
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the HashPassword_ShouldThrow_WhenPasswordIsNull operation.
+    /// </summary>
     public void HashPassword_ShouldThrow_WhenPasswordIsNull()
     {
         // Act
@@ -103,6 +171,9 @@ public class CryptoServiceTests
     #region VerifyPassword
 
     [Fact]
+    /// <summary>
+    /// Performs the VerifyPassword_ShouldReturnTrue_WhenPasswordMatchesHash operation.
+    /// </summary>
     public void VerifyPassword_ShouldReturnTrue_WhenPasswordMatchesHash()
     {
         // Arrange
@@ -117,6 +188,9 @@ public class CryptoServiceTests
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the VerifyPassword_ShouldReturnFalse_WhenPasswordDoesNotMatchHash operation.
+    /// </summary>
     public void VerifyPassword_ShouldReturnFalse_WhenPasswordDoesNotMatchHash()
     {
         // Arrange
@@ -132,6 +206,9 @@ public class CryptoServiceTests
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the VerifyPassword_ShouldReturnFalse_WhenHashIsInvalid operation.
+    /// </summary>
     public void VerifyPassword_ShouldReturnFalse_WhenHashIsInvalid()
     {
         // Arrange
@@ -146,6 +223,9 @@ public class CryptoServiceTests
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the VerifyPassword_ShouldThrow_WhenPasswordIsNull operation.
+    /// </summary>
     public void VerifyPassword_ShouldThrow_WhenPasswordIsNull()
     {
         // Arrange
@@ -156,6 +236,34 @@ public class CryptoServiceTests
 
         // Assert
         act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void VerifyPassword_ShouldReturnTrue_ForEmptyPassword()
+    {
+        // Arrange
+        var emptyPassword = string.Empty;
+        var hash = _sut.HashPassword(emptyPassword);
+
+        // Act
+        var result = _sut.VerifyPassword(hash, emptyPassword);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void VerifyPassword_ShouldReturnFalse_ForEmptyHashWithNonEmptyPassword()
+    {
+        // Arrange
+        var emptyHash = string.Empty;
+        var password = "SomePassword";
+
+        // Act
+        var result = _sut.VerifyPassword(emptyHash, password);
+
+        // Assert
+        result.Should().BeFalse();
     }
 
     #endregion

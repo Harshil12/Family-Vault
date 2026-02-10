@@ -1,11 +1,17 @@
-﻿using FamilyVault.Application.DTOs.Documents;
+using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Domain.Enums;
 using FluentValidation;
 
 namespace FamilyVault.Application.Validators.Document;
 
+/// <summary>
+/// Represents UpdateDocumentrValidators.
+/// </summary>
 public class UpdateDocumentrValidators : AbstractValidator<UpdateDocumentRequest>
 {
+    /// <summary>
+    /// Initializes a new instance of UpdateDocumentrValidators.
+    /// </summary>
     public UpdateDocumentrValidators()
     {
         RuleFor(x => x.Id).NotEmpty().WithMessage("Document ID is required.");

@@ -1,14 +1,20 @@
-﻿using FamilyVault.Application.DTOs.FamilyMembers;
+using FamilyVault.Application.DTOs.FamilyMembers;
 using FamilyVault.Domain.Enums;
 using FluentValidation;
 
 namespace FamilyVault.Application.Validators.FamilyMembers;
 
-public class UpdateFamilyMemberValidators : AbstractValidator<UpdateFamilyMememberRequest>
+/// <summary>
+/// Represents UpdateFamilyMemberValidators.
+/// </summary>
+public class UpdateFamilyMemberValidators : AbstractValidator<UpdateFamilyMemberRequest>
 {
+    /// <summary>
+    /// Initializes a new instance of UpdateFamilyMemberValidators.
+    /// </summary>
     public UpdateFamilyMemberValidators()
     {
-        RuleFor(x => x.Id).NotEmpty().WithMessage("Document ID is required.");
+        RuleFor(x => x.Id).NotEmpty().WithMessage("Family member ID is required.");
 
         RuleFor(x => x.FirstName).NotEmpty().WithMessage("First name is required.")
             .MaximumLength(50).WithMessage("First name cannot exceed 50 characters.");

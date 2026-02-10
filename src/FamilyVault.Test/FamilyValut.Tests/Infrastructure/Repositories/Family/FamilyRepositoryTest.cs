@@ -1,4 +1,4 @@
-﻿using FamilyVault.Domain.Entities;
+using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using FamilyVault.Infrastructure.Repositories;
 using FluentAssertions;
@@ -7,12 +7,18 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Tests.Infrastructure.Repositories;
 
+/// <summary>
+/// Represents FamilyRepositoryTests.
+/// </summary>
 public class FamilyRepositoryTests : IDisposable
 {
     private readonly AppDbContext _dbContext;
     private readonly IMemoryCache _memoryCache;
     private readonly FamilyRepository _sut;
 
+    /// <summary>
+    /// Initializes a new instance of FamilyRepositoryTests.
+    /// </summary>
     public FamilyRepositoryTests()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -29,6 +35,9 @@ public class FamilyRepositoryTests : IDisposable
     #region GetAllWithFamilyMembersAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetAllWithFamilyMembersAsync_ShouldReturnFamilies_WithMembers_AndCache operation.
+    /// </summary>
     public async Task GetAllWithFamilyMembersAsync_ShouldReturnFamilies_WithMembers_AndCache()
     {
         // Arrange
@@ -39,13 +48,13 @@ public class FamilyRepositoryTests : IDisposable
             CreatedAt = DateTime.UtcNow,
             CreatedBy = "test-user"
         };
-        var familyMember = new FamilyMember 
-        { 
-            Id = Guid.NewGuid(), 
-            FirstName = "John", 
-            FamilyId = family.Id, 
+        var familyMember = new FamilyMember
+        {
+            Id = Guid.NewGuid(),
+            FirstName = "John",
+            FamilyId = family.Id,
             CreatedBy = "test-user",
-            CreatedAt = DateTime.UtcNow 
+            CreatedAt = DateTime.UtcNow
         };
 
         _dbContext.Families.Add(family);
@@ -64,11 +73,24 @@ public class FamilyRepositoryTests : IDisposable
         first.Should().BeSameAs(second);
     }
 
+    [Fact]
+    public async Task GetAllWithFamilyMembersAsync_ShouldReturnEmpty_WhenNoFamilies()
+    {
+        // Act
+        var result = await _sut.GetAllWithFamilyMembersAsync(CancellationToken.None);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
     #endregion
 
     #region GetAllByUserIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetAllByUserIdAsync_ShouldReturnFamilies_ForUser_AndCache operation.
+    /// </summary>
     public async Task GetAllByUserIdAsync_ShouldReturnFamilies_ForUser_AndCache()
     {
         // Arrange
@@ -92,11 +114,51 @@ public class FamilyRepositoryTests : IDisposable
         first.Should().BeSameAs(second);
     }
 
+    [Fact]
+    public async Task GetAllByUserIdAsync_ShouldReturnEmpty_WhenUserHasNoFamilies()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+
+        // Act
+        var result = await _sut.GetAllByUserIdAsync(userId, CancellationToken.None);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetAllByUserIdAsync_ShouldReturnOnlySpecificUsersFamilies()
+    {
+        // Arrange
+        var userId1 = Guid.NewGuid();
+        var userId2 = Guid.NewGuid();
+
+        var families = new[]
+        {
+            new Family { Id = Guid.NewGuid(), UserId = userId1, Name = "User1Family", CreatedBy="test-user", CreatedAt = DateTime.UtcNow },
+            new Family { Id = Guid.NewGuid(), UserId = userId2, Name = "User2Family", CreatedBy="test-user", CreatedAt = DateTime.UtcNow }
+        };
+
+        _dbContext.Families.AddRange(families);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAllByUserIdAsync(userId1, CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.First().Name.Should().Be("User1Family");
+    }
+
     #endregion
 
     #region GetByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetByIdAsync_ShouldReturnFamily_WhenExists operation.
+    /// </summary>
     public async Task GetByIdAsync_ShouldReturnFamily_WhenExists()
     {
         // Arrange
@@ -120,6 +182,9 @@ public class FamilyRepositoryTests : IDisposable
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the GetByIdAsync_ShouldReturnNull_WhenNotFound operation.
+    /// </summary>
     public async Task GetByIdAsync_ShouldReturnNull_WhenNotFound()
     {
         // Act
@@ -134,6 +199,9 @@ public class FamilyRepositoryTests : IDisposable
     #region AddAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the AddAsync_ShouldPersistFamily_AndClearCaches operation.
+    /// </summary>
     public async Task AddAsync_ShouldPersistFamily_AndClearCaches()
     {
         // Arrange
@@ -164,6 +232,9 @@ public class FamilyRepositoryTests : IDisposable
     #region UpdateAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateAsync_ShouldUpdateFamily_AndClearCaches operation.
+    /// </summary>
     public async Task UpdateAsync_ShouldUpdateFamily_AndClearCaches()
     {
         // Arrange
@@ -198,6 +269,9 @@ public class FamilyRepositoryTests : IDisposable
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateAsync_ShouldThrow_WhenFamilyNotFound operation.
+    /// </summary>
     public async Task UpdateAsync_ShouldThrow_WhenFamilyNotFound()
     {
         // Arrange
@@ -216,6 +290,9 @@ public class FamilyRepositoryTests : IDisposable
     #region DeleteByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the DeleteByIdAsync_ShouldSoftDeleteFamily_Members_AndDocuments operation.
+    /// </summary>
     public async Task DeleteByIdAsync_ShouldSoftDeleteFamily_Members_AndDocuments()
     {
         // Arrange
@@ -240,8 +317,33 @@ public class FamilyRepositoryTests : IDisposable
         (await _dbContext.Documents.FindAsync(document.Id))!.IsDeleted.Should().BeTrue();
     }
 
+    [Fact]
+    public async Task DeleteByIdAsync_ShouldClearCache()
+    {
+        // Arrange
+        var familyId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var family = new Family { Id = familyId, Name = "Test Family", UserId = userId, CreatedAt = DateTime.UtcNow, CreatedBy = "test-user" };
+
+        _dbContext.Families.Add(family);
+        await _dbContext.SaveChangesAsync();
+
+        _memoryCache.Set("AllWithFamilyMembers", new List<Family>());
+        _memoryCache.Set($"AllFamilyMembers:{userId}", new List<Family>());
+
+        // Act
+        await _sut.DeleteByIdAsync(familyId, "test-user", CancellationToken.None);
+
+        // Assert
+        _memoryCache.TryGetValue("AllWithFamilyMembers", out _).Should().BeFalse();
+        _memoryCache.TryGetValue($"AllFamilyMembers:{userId}", out _).Should().BeFalse();
+    }
+
     #endregion
 
+    /// <summary>
+    /// Performs the Dispose operation.
+    /// </summary>
     public void Dispose()
     {
         _dbContext.Dispose();
