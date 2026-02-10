@@ -58,6 +58,48 @@ public class CryptoServiceTests
         act.Should().Throw<CryptographicException>();
     }
 
+    [Fact]
+    public void EncryptData_ShouldHandleEmptyString()
+    {
+        // Arrange
+        var emptyString = string.Empty;
+
+        // Act
+        var encrypted = _sut.EncryptData(emptyString);
+        var decrypted = _sut.DecryptData(encrypted);
+
+        // Assert
+        decrypted.Should().Be(emptyString);
+    }
+
+    [Fact]
+    public void EncryptData_ShouldHandleSpecialCharacters()
+    {
+        // Arrange
+        var specialData = "Test!@#$%^&*()_+{}[]|\\:;\"'<>,.?/~`";
+
+        // Act
+        var encrypted = _sut.EncryptData(specialData);
+        var decrypted = _sut.DecryptData(encrypted);
+
+        // Assert
+        decrypted.Should().Be(specialData);
+    }
+
+    [Fact]
+    public void EncryptData_ShouldHandleUnicodeCharacters()
+    {
+        // Arrange
+        var unicodeData = "Hello 世界 🌍";
+
+        // Act
+        var encrypted = _sut.EncryptData(unicodeData);
+        var decrypted = _sut.DecryptData(encrypted);
+
+        // Assert
+        decrypted.Should().Be(unicodeData);
+    }
+
     #endregion
 
     #region HashPassword
@@ -158,6 +200,34 @@ public class CryptoServiceTests
 
         // Assert
         act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void VerifyPassword_ShouldReturnTrue_ForEmptyPassword()
+    {
+        // Arrange
+        var emptyPassword = string.Empty;
+        var hash = _sut.HashPassword(emptyPassword);
+
+        // Act
+        var result = _sut.VerifyPassword(hash, emptyPassword);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void VerifyPassword_ShouldReturnFalse_ForEmptyHashWithNonEmptyPassword()
+    {
+        // Arrange
+        var emptyHash = string.Empty;
+        var password = "SomePassword";
+
+        // Act
+        var result = _sut.VerifyPassword(emptyHash, password);
+
+        // Assert
+        result.Should().BeFalse();
     }
 
     #endregion

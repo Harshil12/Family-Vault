@@ -39,13 +39,13 @@ public class FamilyRepositoryTests : IDisposable
             CreatedAt = DateTime.UtcNow,
             CreatedBy = "test-user"
         };
-        var familyMember = new FamilyMember 
-        { 
-            Id = Guid.NewGuid(), 
-            FirstName = "John", 
-            FamilyId = family.Id, 
+        var familyMember = new FamilyMember
+        {
+            Id = Guid.NewGuid(),
+            FirstName = "John",
+            FamilyId = family.Id,
             CreatedBy = "test-user",
-            CreatedAt = DateTime.UtcNow 
+            CreatedAt = DateTime.UtcNow
         };
 
         _dbContext.Families.Add(family);
@@ -62,6 +62,16 @@ public class FamilyRepositoryTests : IDisposable
 
         // Cached instance reused
         first.Should().BeSameAs(second);
+    }
+
+    [Fact]
+    public async Task GetAllWithFamilyMembersAsync_ShouldReturnEmpty_WhenNoFamilies()
+    {
+        // Act
+        var result = await _sut.GetAllWithFamilyMembersAsync(CancellationToken.None);
+
+        // Assert
+        result.Should().BeEmpty();
     }
 
     #endregion
@@ -90,6 +100,43 @@ public class FamilyRepositoryTests : IDisposable
         // Assert
         first.Should().HaveCount(2);
         first.Should().BeSameAs(second);
+    }
+
+    [Fact]
+    public async Task GetAllByUserIdAsync_ShouldReturnEmpty_WhenUserHasNoFamilies()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+
+        // Act
+        var result = await _sut.GetAllByUserIdAsync(userId, CancellationToken.None);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetAllByUserIdAsync_ShouldReturnOnlySpecificUsersFamilies()
+    {
+        // Arrange
+        var userId1 = Guid.NewGuid();
+        var userId2 = Guid.NewGuid();
+
+        var families = new[]
+        {
+            new Family { Id = Guid.NewGuid(), UserId = userId1, Name = "User1Family", CreatedBy="test-user", CreatedAt = DateTime.UtcNow },
+            new Family { Id = Guid.NewGuid(), UserId = userId2, Name = "User2Family", CreatedBy="test-user", CreatedAt = DateTime.UtcNow }
+        };
+
+        _dbContext.Families.AddRange(families);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAllByUserIdAsync(userId1, CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.First().Name.Should().Be("User1Family");
     }
 
     #endregion
@@ -238,6 +285,28 @@ public class FamilyRepositoryTests : IDisposable
         (await _dbContext.Families.FindAsync(familyId))!.IsDeleted.Should().BeTrue();
         (await _dbContext.FamilyMembers.FindAsync(member.Id))!.IsDeleted.Should().BeTrue();
         (await _dbContext.Documents.FindAsync(document.Id))!.IsDeleted.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task DeleteByIdAsync_ShouldClearCache()
+    {
+        // Arrange
+        var familyId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var family = new Family { Id = familyId, Name = "Test Family", UserId = userId, CreatedAt = DateTime.UtcNow, CreatedBy = "test-user" };
+
+        _dbContext.Families.Add(family);
+        await _dbContext.SaveChangesAsync();
+
+        _memoryCache.Set("AllWithFamilyMembers", new List<Family>());
+        _memoryCache.Set($"AllFamilyMembers:{userId}", new List<Family>());
+
+        // Act
+        await _sut.DeleteByIdAsync(familyId, "test-user", CancellationToken.None);
+
+        // Assert
+        _memoryCache.TryGetValue("AllWithFamilyMembers", out _).Should().BeFalse();
+        _memoryCache.TryGetValue($"AllFamilyMembers:{userId}", out _).Should().BeFalse();
     }
 
     #endregion

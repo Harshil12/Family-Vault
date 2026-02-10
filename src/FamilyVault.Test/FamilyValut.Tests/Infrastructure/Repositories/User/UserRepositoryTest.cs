@@ -78,6 +78,92 @@ public class UserRepositoryTests : IDisposable
         first.Should().BeSameAs(second);
     }
 
+    [Fact]
+    public async Task GetAllWithFamilyDetailsAsync_ShouldExcludeSoftDeletedUsers()
+    {
+        // Arrange
+        var activeUser = new User
+        {
+            Username = "active",
+            Id = Guid.NewGuid(),
+            FirstName = "Active",
+            Email = "active@test.com",
+            Password = "password",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
+        };
+
+        var deletedUser = new User
+        {
+            Username = "deleted",
+            Id = Guid.NewGuid(),
+            FirstName = "Deleted",
+            Email = "deleted@test.com",
+            Password = "password",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = true
+        };
+
+        _dbContext.Users.AddRange(activeUser, deletedUser);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAllWithFamilyDetailsAsync(CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.First().Username.Should().Be("active");
+    }
+
+    [Fact]
+    public async Task GetAllWithFamilyDetailsAsync_ShouldExcludeSoftDeletedFamilies()
+    {
+        // Arrange
+        var user = new User
+        {
+            Username = "u1",
+            Id = Guid.NewGuid(),
+            FirstName = "John",
+            Email = "john@doe.com",
+            Password = "password",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        var activeFamily = new Family
+        {
+            Id = Guid.NewGuid(),
+            Name = "ActiveFamily",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user",
+            UserId = user.Id,
+            IsDeleted = false
+        };
+
+        var deletedFamily = new Family
+        {
+            Id = Guid.NewGuid(),
+            Name = "DeletedFamily",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user",
+            UserId = user.Id,
+            IsDeleted = true
+        };
+
+        _dbContext.Users.Add(user);
+        _dbContext.Families.AddRange(activeFamily, deletedFamily);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAllWithFamilyDetailsAsync(CancellationToken.None);
+
+        // Assert
+        result.First().Families.Should().HaveCount(1);
+        result.First().Families.First().Name.Should().Be("ActiveFamily");
+    }
+
     #endregion
 
     #region GetAllAsync
@@ -151,6 +237,43 @@ public class UserRepositoryTests : IDisposable
         // Assert
         result.Should().NotBeNull();
         result!.Email.Should().Be(email);
+    }
+
+    [Fact]
+    public async Task GetByEmailAsync_ShouldReturnNull_WhenEmailNotFound()
+    {
+        // Act
+        var result = await _sut.GetByEmailAsync("nonexistent@test.com", CancellationToken.None);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetByEmailAsync_ShouldReturnNull_WhenUserIsDeleted()
+    {
+        // Arrange
+        var email = "deleted@test.com";
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = email,
+            Username = "deleted",
+            FirstName = "Deleted",
+            Password = "password",
+            CreatedBy = "test-user",
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = true
+        };
+
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetByEmailAsync(email, CancellationToken.None);
+
+        // Assert
+        result.Should().BeNull();
     }
 
     #endregion

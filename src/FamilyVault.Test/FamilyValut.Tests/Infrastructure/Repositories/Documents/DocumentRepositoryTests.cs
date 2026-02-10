@@ -65,6 +65,54 @@ public class DocumentRepositoryTests : IDisposable
         firstCall.Should().BeSameAs(secondCall);
     }
 
+    [Fact]
+    public async Task GetAllByFamilymemberIdAsync_ShouldReturnEmpty_WhenNoDocuments()
+    {
+        // Arrange
+        var familyMemberId = Guid.NewGuid();
+
+        // Act
+        var result = await _sut.GetAllByFamilymemberIdAsync(familyMemberId, CancellationToken.None);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetAllByFamilymemberIdAsync_ShouldExcludeSoftDeletedDocuments()
+    {
+        // Arrange
+        var familyMemberId = Guid.NewGuid();
+
+        var documents = new List<DocumentDetails>
+        {
+            new() {
+                Id = Guid.NewGuid(), FamilyMemberId = familyMemberId,
+                CreatedAt = DateTime.UtcNow , CreatedBy="test-user",
+                DocumentType = DocumentTypes.Passport,
+                DocumentNumber = "123",
+                IsDeleted = false
+            },
+             new() {
+                Id = Guid.NewGuid(), FamilyMemberId = familyMemberId,
+                CreatedAt = DateTime.UtcNow , CreatedBy="test-user",
+                DocumentType = DocumentTypes.Passport,
+                DocumentNumber = "456",
+                IsDeleted = true
+            }
+        };
+
+        _dbContext.Documents.AddRange(documents);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAllByFamilymemberIdAsync(familyMemberId, CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.First().DocumentNumber.Should().Be("123");
+    }
+
     #endregion
 
     #region GetAsyncbyId
@@ -101,6 +149,31 @@ public class DocumentRepositoryTests : IDisposable
 
         // Assert
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetAsyncbyId_ShouldReturnSoftDeletedDocument()
+    {
+        // Arrange
+        var document = new DocumentDetails
+        {
+            Id = Guid.NewGuid(),
+            DocumentNumber = "123",
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test-user",
+            DocumentType = DocumentTypes.Passport,
+            IsDeleted = true
+        };
+
+        _dbContext.Documents.Add(document);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _sut.GetAsyncbyId(document.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.IsDeleted.Should().BeTrue();
     }
 
     #endregion

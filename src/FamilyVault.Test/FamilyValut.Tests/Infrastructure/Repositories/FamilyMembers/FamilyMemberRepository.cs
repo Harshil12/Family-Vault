@@ -16,17 +16,12 @@ public class FamilyMemberRepositoryTests : IDisposable
 
     public FamilyMemberRepositoryTests()
     {
-        var connection = new SqliteConnection("Data Source=:memory:");
-        connection.Open(); // 🔴 MUST stay open
-
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite(connection)
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
-        // 🔴 Schema creation step (THIS is what you're missing)
-        using var context = new AppDbContext(options);
-        context.Database.EnsureCreatedAsync();
-
+        _dbContext = new AppDbContext(options);
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
 
         _sut = new FamilyMemberRepository(_dbContext, _memoryCache);
@@ -118,6 +113,16 @@ public class FamilyMemberRepositoryTests : IDisposable
         first.Should().BeSameAs(second);
     }
 
+    [Fact]
+    public async Task GetAllWithDocumentsAsync_ShouldReturnEmpty_WhenNoMembers()
+    {
+        // Act
+        var result = await _sut.GetAllWithDocumentsAsync(CancellationToken.None);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
     #endregion
 
     #region GetByIdAsync
@@ -182,6 +187,19 @@ public class FamilyMemberRepositoryTests : IDisposable
         // Assert
         first.Should().HaveCount(2);
         first.Should().BeSameAs(second);
+    }
+
+    [Fact]
+    public async Task GetAllByFamilyIdAsync_ShouldReturnEmpty_WhenFamilyHasNoMembers()
+    {
+        // Arrange
+        var familyId = Guid.NewGuid();
+
+        // Act
+        var result = await _sut.GetAllByFamilyIdAsync(familyId, CancellationToken.None);
+
+        // Assert
+        result.Should().BeEmpty();
     }
 
     #endregion
@@ -267,6 +285,28 @@ public class FamilyMemberRepositoryTests : IDisposable
         // Assert
         (await _dbContext.FamilyMembers.FindAsync(memberId))!.IsDeleted.Should().BeTrue();
         (await _dbContext.Documents.FindAsync(document.Id))!.IsDeleted.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task DeleteByIdAsync_ShouldClearCache()
+    {
+        // Arrange
+        var memberId = Guid.NewGuid();
+        var familyId = Guid.NewGuid();
+        var member = new FamilyMember { Id = memberId, FirstName = "John", FamilyId = familyId, CreatedAt = DateTime.UtcNow, CreatedBy = "test-user" };
+
+        _dbContext.FamilyMembers.Add(member);
+        await _dbContext.SaveChangesAsync();
+
+        _memoryCache.Set("AllFamiliesWithDocuments", new List<FamilyMember>());
+        _memoryCache.Set($"FamilyMembers:{familyId}", new List<FamilyMember>());
+
+        // Act
+        await _sut.DeleteByIdAsync(memberId, "test-user", CancellationToken.None);
+
+        // Assert
+        _memoryCache.TryGetValue("AllFamiliesWithDocuments", out _).Should().BeFalse();
+        _memoryCache.TryGetValue($"FamilyMembers:{familyId}", out _).Should().BeFalse();
     }
 
     #endregion
