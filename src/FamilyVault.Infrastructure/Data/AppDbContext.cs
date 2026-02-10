@@ -1,16 +1,34 @@
-﻿using FamilyVault.Domain.Entities;
+using FamilyVault.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace FamilyVault.Infrastructure.Data;
 
+/// <summary>
+/// Represents AppDbContext.
+/// </summary>
 public class AppDbContext : DbContext
 {
+    /// <summary>
+    /// Initializes a new instance of AppDbContext.
+    /// </summary>
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
 
+    /// <summary>
+    /// Gets or sets Users.
+    /// </summary>
     public DbSet<User> Users { get; set; }
+    /// <summary>
+    /// Gets or sets Families.
+    /// </summary>
     public DbSet<Family> Families { get; set; }
+    /// <summary>
+    /// Gets or sets FamilyMembers.
+    /// </summary>
     public DbSet<FamilyMember> FamilyMembers { get; set; }
+    /// <summary>
+    /// Gets or sets Documents.
+    /// </summary>
     public DbSet<DocumentDetails> Documents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

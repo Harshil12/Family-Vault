@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.DTOs.Documents;
+using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
@@ -11,11 +11,17 @@ using System.Net.Http.Json;
 
 namespace FamilyVault.Tests.API.EndPoints.Document;
 
+/// <summary>
+/// Represents DocumentApiTests.
+/// </summary>
 public class DocumentApiTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly Mock<IDocumentService> _documentServiceMock = new();
 
+    /// <summary>
+    /// Initializes a new instance of DocumentApiTests.
+    /// </summary>
     public DocumentApiTests(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder =>
@@ -41,6 +47,9 @@ public class DocumentApiTests : IClassFixture<WebApplicationFactory<Program>>
     #region GET /documents/{familyMemberId}
 
     [Fact]
+    /// <summary>
+    /// Performs the GetDocuments_ShouldReturnEmptyList_WhenNoDocuments operation.
+    /// </summary>
     public async Task GetDocuments_ShouldReturnEmptyList_WhenNoDocuments()
     {
         // Arrange
@@ -65,6 +74,9 @@ public class DocumentApiTests : IClassFixture<WebApplicationFactory<Program>>
     #region GET /documents/{familyMemberId}/{id}
 
     [Fact]
+    /// <summary>
+    /// Performs the GetDocumentById_ShouldReturnNotFound_WhenDocumentDoesNotExist operation.
+    /// </summary>
     public async Task GetDocumentById_ShouldReturnNotFound_WhenDocumentDoesNotExist()
     {
         // Arrange
@@ -89,6 +101,9 @@ public class DocumentApiTests : IClassFixture<WebApplicationFactory<Program>>
     #region POST /documents
 
     [Fact]
+    /// <summary>
+    /// Performs the CreateDocument_ShouldReturnCreated operation.
+    /// </summary>
     public async Task CreateDocument_ShouldReturnCreated()
     {
         // Arrange
@@ -127,6 +142,9 @@ public class DocumentApiTests : IClassFixture<WebApplicationFactory<Program>>
     #region PUT /documents/{id}
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateDocument_ShouldReturnOk operation.
+    /// </summary>
     public async Task UpdateDocument_ShouldReturnOk()
     {
         // Arrange
@@ -163,6 +181,9 @@ public class DocumentApiTests : IClassFixture<WebApplicationFactory<Program>>
     #region DELETE /documents/{id}
 
     [Fact]
+    /// <summary>
+    /// Performs the DeleteDocument_ShouldReturnOk operation.
+    /// </summary>
     public async Task DeleteDocument_ShouldReturnOk()
     {
         // Arrange

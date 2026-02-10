@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
@@ -7,6 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace FamilyVault.Application.Services;
 
+/// <summary>
+/// Represents Userservice.
+/// </summary>
 public class Userservice : IUserService
 {
     private readonly ICryptoService _cryptoService;
@@ -14,6 +17,9 @@ public class Userservice : IUserService
     private readonly IMapper _mapper;
     private readonly ILogger _logger;
 
+    /// <summary>
+    /// Initializes a new instance of Userservice.
+    /// </summary>
     public Userservice(IUserRepository userRepository, ICryptoService cryptoService, IMapper mapper, ILogger<Userservice> logger)
     {
         _cryptoService = cryptoService;
@@ -22,6 +28,9 @@ public class Userservice : IUserService
         _logger = logger;
     }
     
+    /// <summary>
+    /// Performs the GetUserAsync operation.
+    /// </summary>
     public async Task<IReadOnlyList<UserDto>> GetUserAsync(CancellationToken cancellationToken)
     {
         var users = await _userRepository.GetAllAsync(cancellationToken);
@@ -29,6 +38,9 @@ public class Userservice : IUserService
         return _mapper.Map<IReadOnlyList<UserDto>>(users);
     }
 
+    /// <summary>
+    /// Performs the GetUserByIdAsync operation.
+    /// </summary>
     public async Task<UserDto> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
@@ -36,6 +48,9 @@ public class Userservice : IUserService
         return _mapper.Map<UserDto>(user);
     }
 
+    /// <summary>
+    /// Performs the CreateUserAsync operation.
+    /// </summary>
     public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
@@ -53,6 +68,9 @@ public class Userservice : IUserService
         return _mapper.Map<UserDto>(result);
     }
 
+    /// <summary>
+    /// Performs the DeleteUserByIdAsync operation.
+    /// </summary>
     public async Task DeleteUserByIdAsync(Guid userId, Guid createdByUserId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Deleting user with ID: {UserId}", userId);
@@ -62,6 +80,9 @@ public class Userservice : IUserService
         _logger.LogInformation("User with ID: {UserId} deleted successfully", userId);
     }
 
+    /// <summary>
+    /// Performs the UpdateuUerAsync operation.
+    /// </summary>
     public async Task<UserDto> UpdateuUerAsync(UpdateUserRequest updateUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Updating user with ID: {UserId}", updateUserRequest.Id);

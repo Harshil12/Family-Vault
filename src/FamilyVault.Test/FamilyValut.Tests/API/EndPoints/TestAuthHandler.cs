@@ -1,11 +1,17 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
+/// <summary>
+/// Represents TestAuthHandler.
+/// </summary>
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
+    /// <summary>
+    /// Initializes a new instance of TestAuthHandler.
+    /// </summary>
     public TestAuthHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,

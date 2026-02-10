@@ -1,5 +1,8 @@
-﻿namespace FamilyVault.Application.DTOs.Family;
+namespace FamilyVault.Application.DTOs.Family;
 
+/// <summary>
+/// Represents UpdateFamlyRequest.
+/// </summary>
 public class UpdateFamlyRequest
 {
 

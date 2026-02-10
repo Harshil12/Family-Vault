@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.Interfaces.Repositories;
+using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Infrastructure.Data;
 using FamilyVault.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +7,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FamilyVault.Infrastructure
 {
+    /// <summary>
+    /// Represents DependencyInjection.
+    /// </summary>
     public static class DependencyInjection
     {
+        /// <summary>
+        /// Performs the AddInfrastructureServices operation.
+        /// </summary>
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IUserRepository, UserRepository>();

@@ -1,10 +1,16 @@
-﻿using FamilyVault.Application.DTOs.User;
+using FamilyVault.Application.DTOs.User;
 using FluentValidation;
 
 namespace FamilyVault.Application.Validators.User;
 
+/// <summary>
+/// Represents UpdateUserValidators.
+/// </summary>
 public class UpdateUserValidators : AbstractValidator<UpdateUserRequest>
 {
+    /// <summary>
+    /// Initializes a new instance of UpdateUserValidators.
+    /// </summary>
     public UpdateUserValidators()
     {
         RuleFor(x => x.FirstName).NotEmpty().WithMessage("First name is required.")

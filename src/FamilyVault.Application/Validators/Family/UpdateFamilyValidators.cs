@@ -1,10 +1,16 @@
-﻿using FamilyVault.Application.DTOs.Family;
+using FamilyVault.Application.DTOs.Family;
 using FluentValidation;
 
 namespace FamilyVault.Application.Validators.Family;
 
+/// <summary>
+/// Represents UpdateFamilyValidators.
+/// </summary>
 public class UpdateFamilyValidators : AbstractValidator<UpdateFamlyRequest>
 {
+    /// <summary>
+    /// Initializes a new instance of UpdateFamilyValidators.
+    /// </summary>
     public UpdateFamilyValidators()
     {
         RuleFor(x => x.Id).NotEmpty().WithMessage("Family ID is required.");

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
@@ -12,6 +12,9 @@ using System.Security.Claims;
 
 namespace FamilyVault.Tests.Services;
 
+/// <summary>
+/// Represents AuthServiceTests.
+/// </summary>
 public class AuthServiceTests
 {
     private readonly Mock<IUserRepository> _userRepoMock;
@@ -21,6 +24,9 @@ public class AuthServiceTests
 
     private readonly AuthService _sut;
 
+    /// <summary>
+    /// Initializes a new instance of AuthServiceTests.
+    /// </summary>
     public AuthServiceTests()
     {
         _userRepoMock = new Mock<IUserRepository>();
@@ -48,6 +54,9 @@ public class AuthServiceTests
     #region GetTokenAsync Tests
 
     [Fact]
+    /// <summary>
+    /// Performs the GetTokenAsync_ShouldReturnNull_WhenUserDoesNotExist operation.
+    /// </summary>
     public async Task GetTokenAsync_ShouldReturnNull_WhenUserDoesNotExist()
     {
         // Arrange
@@ -64,6 +73,9 @@ public class AuthServiceTests
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the GetTokenAsync_ShouldReturnNull_WhenPasswordIsInvalid operation.
+    /// </summary>
     public async Task GetTokenAsync_ShouldReturnNull_WhenPasswordIsInvalid()
     {
         // Arrange
@@ -91,6 +103,9 @@ public class AuthServiceTests
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the GetTokenAsync_ShouldReturnToken_WhenCredentialsAreValid operation.
+    /// </summary>
     public async Task GetTokenAsync_ShouldReturnToken_WhenCredentialsAreValid()
     {
         // Arrange
@@ -135,6 +150,9 @@ public class AuthServiceTests
     #region GenerateToken Tests
 
     [Fact]
+    /// <summary>
+    /// Performs the GenerateToken_ShouldCreateValidJwt_WithExpectedClaims operation.
+    /// </summary>
     public void GenerateToken_ShouldCreateValidJwt_WithExpectedClaims()
     {
         // Arrange

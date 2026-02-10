@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FamilyVault.Application.DTOs.FamilyMembers;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Services;
@@ -9,6 +9,9 @@ using Moq;
 
 namespace FamilyVault.Tests.Services;
 
+/// <summary>
+/// Represents FamilyMemberServiceTests.
+/// </summary>
 public class FamilyMemberServiceTests
 {
     private readonly Mock<IFamilyMemberRepository> _familyMemberRepoMock;
@@ -17,6 +20,9 @@ public class FamilyMemberServiceTests
 
     private readonly FamilyMemberService _sut;
 
+    /// <summary>
+    /// Initializes a new instance of FamilyMemberServiceTests.
+    /// </summary>
     public FamilyMemberServiceTests()
     {
         _familyMemberRepoMock = new Mock<IFamilyMemberRepository>();
@@ -32,6 +38,9 @@ public class FamilyMemberServiceTests
     #region GetFamilyMemberByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetFamilyMemberByIdAsync_ShouldReturnMappedDto operation.
+    /// </summary>
     public async Task GetFamilyMemberByIdAsync_ShouldReturnMappedDto()
     {
         // Arrange
@@ -70,6 +79,9 @@ public class FamilyMemberServiceTests
     #region GetFamilyMembersByFamilyIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetFamilyMembersByFamilyIdAsync_ShouldReturnMappedList operation.
+    /// </summary>
     public async Task GetFamilyMembersByFamilyIdAsync_ShouldReturnMappedList()
     {
         // Arrange
@@ -108,6 +120,9 @@ public class FamilyMemberServiceTests
     #region CreateFamilyMemberAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the CreateFamilyMemberAsync_ShouldCreateAndReturnFamilyMember operation.
+    /// </summary>
     public async Task CreateFamilyMemberAsync_ShouldCreateAndReturnFamilyMember()
     {
         // Arrange
@@ -164,6 +179,9 @@ public class FamilyMemberServiceTests
     #region DeleteFamilyMemberByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the DeleteFamilyMemberByIdAsync_ShouldCallRepository operation.
+    /// </summary>
     public async Task DeleteFamilyMemberByIdAsync_ShouldCallRepository()
     {
         // Arrange
@@ -184,6 +202,9 @@ public class FamilyMemberServiceTests
     #region UpdateFamilyMemberAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateFamilyMemberAsync_ShouldUpdateAndReturnFamilyMember operation.
+    /// </summary>
     public async Task UpdateFamilyMemberAsync_ShouldUpdateAndReturnFamilyMember()
     {
         // Arrange

@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.Interfaces.Repositories;
+using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -6,17 +6,26 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
+/// <summary>
+/// Represents DocumentRepository.
+/// </summary>
 public class DocumentRepository : IDocumentRepository
 {
     private readonly AppDbContext _appDbContext;
     private readonly IMemoryCache _memoryCache;
 
+    /// <summary>
+    /// Initializes a new instance of DocumentRepository.
+    /// </summary>
     public DocumentRepository(AppDbContext appDbContext, IMemoryCache memoryCache)
     {
         _appDbContext = appDbContext;
         _memoryCache = memoryCache; 
     }
 
+    /// <summary>
+    /// Performs the GetAllByFamilymemberIdAsync operation.
+    /// </summary>
     public async Task<IReadOnlyList<DocumentDetails>> GetAllByFamilymemberIdAsync(Guid familyMemberId, CancellationToken cancellationToken)
     {
         var cacheOptions = new MemoryCacheEntryOptions
@@ -39,6 +48,9 @@ public class DocumentRepository : IDocumentRepository
         return result;
     }
 
+    /// <summary>
+    /// Performs the GetAsyncbyId operation.
+    /// </summary>
     public async Task<DocumentDetails?> GetAsyncbyId(Guid documentId, CancellationToken cancellationToken)
     {
         return await _appDbContext.Documents
@@ -46,6 +58,9 @@ public class DocumentRepository : IDocumentRepository
             .FirstOrDefaultAsync(d => d.Id == documentId, cancellationToken);
     }
 
+    /// <summary>
+    /// Performs the AddAsync operation.
+    /// </summary>
     public async Task<DocumentDetails> AddAsync(DocumentDetails documentDetails, CancellationToken cancellationToken)
     {
         await _appDbContext.Documents.AddAsync(documentDetails, cancellationToken);
@@ -56,6 +71,9 @@ public class DocumentRepository : IDocumentRepository
         return documentDetails;
     }
 
+    /// <summary>
+    /// Performs the UpdateAsync operation.
+    /// </summary>
     public async Task<DocumentDetails> UpdateAsync(DocumentDetails documentDetails, CancellationToken cancellationToken)
     {
         var existingDocument = await _appDbContext.Documents
@@ -74,6 +92,9 @@ public class DocumentRepository : IDocumentRepository
         return documentDetails;
     }
 
+    /// <summary>
+    /// Performs the DeleteByIdAsync operation.
+    /// </summary>
     public async Task DeleteByIdAsync(Guid documentId, string user, CancellationToken cancellationToken)
     {
         var existingDocument = await _appDbContext.Documents

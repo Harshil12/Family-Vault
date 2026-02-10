@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FamilyVault.Application.DTOs.Family;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Services;
@@ -9,6 +9,9 @@ using Moq;
 
 namespace FamilyVault.Tests.Services;
 
+/// <summary>
+/// Represents FamilyServiceTests.
+/// </summary>
 public class FamilyServiceTests
 {
     private readonly Mock<IFamilyRepository> _familyRepoMock;
@@ -17,6 +20,9 @@ public class FamilyServiceTests
 
     private readonly FamilyService _sut;
 
+    /// <summary>
+    /// Initializes a new instance of FamilyServiceTests.
+    /// </summary>
     public FamilyServiceTests()
     {
         _familyRepoMock = new Mock<IFamilyRepository>();
@@ -32,6 +38,9 @@ public class FamilyServiceTests
     #region GetFamilyByUserIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetFamilyByUserIdAsync_ShouldReturnMappedFamilies operation.
+    /// </summary>
     public async Task GetFamilyByUserIdAsync_ShouldReturnMappedFamilies()
     {
         // Arrange
@@ -70,6 +79,9 @@ public class FamilyServiceTests
     #region GetFamilyByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetFamilyByIdAsync_ShouldReturnMappedFamily operation.
+    /// </summary>
     public async Task GetFamilyByIdAsync_ShouldReturnMappedFamily()
     {
         // Arrange
@@ -107,6 +119,9 @@ public class FamilyServiceTests
     #region CreateFamilyAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the CreateFamilyAsync_ShouldCreateAndReturnFamily operation.
+    /// </summary>
     public async Task CreateFamilyAsync_ShouldCreateAndReturnFamily()
     {
         // Arrange
@@ -160,6 +175,9 @@ public class FamilyServiceTests
     #region DeleteFamilyByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the DeleteFamilyByIdAsync_ShouldCallRepository operation.
+    /// </summary>
     public async Task DeleteFamilyByIdAsync_ShouldCallRepository()
     {
         // Arrange
@@ -180,6 +198,9 @@ public class FamilyServiceTests
     #region UpdateFamilyAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateFamilyAsync_ShouldUpdateAndReturnFamily operation.
+    /// </summary>
     public async Task UpdateFamilyAsync_ShouldUpdateAndReturnFamily()
     {
         // Arrange

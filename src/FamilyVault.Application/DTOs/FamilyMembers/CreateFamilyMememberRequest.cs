@@ -1,7 +1,10 @@
-﻿using FamilyVault.Domain.Enums;
+using FamilyVault.Domain.Enums;
 
 namespace FamilyVault.Application.DTOs.FamilyMembers;
 
+/// <summary>
+/// Represents CreateFamilyMememberRequest.
+/// </summary>
 public class CreateFamilyMememberRequest
 {
     /// <summary>

@@ -1,8 +1,11 @@
-﻿using FamilyVault.Domain.Enums;
+using FamilyVault.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace FamilyVault.Domain.Entities;
 
+/// <summary>
+/// Represents FamilyMember.
+/// </summary>
 public class FamilyMember : BaseEntity  
 {
     /// <summary>

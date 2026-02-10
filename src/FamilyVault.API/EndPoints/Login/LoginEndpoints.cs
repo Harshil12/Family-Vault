@@ -1,10 +1,16 @@
-﻿using FamilyVault.Application.Interfaces.Services;
+using FamilyVault.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Identity.Data;
 
 namespace FamilyVault.API.EndPoints.Login;
 
+/// <summary>
+/// Represents LoginEndpoints.
+/// </summary>
 public static class LoginEndpoints
 {
+    /// <summary>
+    /// Performs the MapLoginPoints operation.
+    /// </summary>
     public static void MapLoginPoints(this WebApplication app)
     {
         app.MapPost("/login", async (

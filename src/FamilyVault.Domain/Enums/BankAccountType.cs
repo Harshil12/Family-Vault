@@ -1,6 +1,9 @@
-﻿namespace FamilyVault.Domain.Enums
+namespace FamilyVault.Domain.Enums
 {
 
+    /// <summary>
+    /// Represents BankAccountType.
+    /// </summary>
     public enum BankAccountType
     {
         Unknown = 0,

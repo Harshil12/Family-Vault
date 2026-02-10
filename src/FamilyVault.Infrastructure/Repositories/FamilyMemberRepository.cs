@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.Interfaces.Repositories;
+using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -6,16 +6,25 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
+/// <summary>
+/// Represents FamilyMemberRepository.
+/// </summary>
 public class FamilyMemberRepository : IFamilyMemberRepository
 {
     private readonly AppDbContext _appDbContext;
     private readonly IMemoryCache _memoryCache;
 
+    /// <summary>
+    /// Initializes a new instance of FamilyMemberRepository.
+    /// </summary>
     public FamilyMemberRepository(AppDbContext appContext, IMemoryCache memoryCache)
     {
         _appDbContext = appContext;
         _memoryCache = memoryCache;
     }
+    /// <summary>
+    /// Performs the AddAsync operation.
+    /// </summary>
     public async Task<FamilyMember> AddAsync(FamilyMember familyMember, CancellationToken cancellationToken)
     {
         await _appDbContext.FamilyMembers.AddAsync(familyMember, cancellationToken);
@@ -27,6 +36,9 @@ public class FamilyMemberRepository : IFamilyMemberRepository
         return familyMember;
     }
 
+    /// <summary>
+    /// Performs the GetAllWithDocumentsAsync operation.
+    /// </summary>
     public async Task<IReadOnlyList<FamilyMember>> GetAllWithDocumentsAsync(CancellationToken cancellationToken)
     {
         var cacheOptions = new MemoryCacheEntryOptions
@@ -50,6 +62,9 @@ public class FamilyMemberRepository : IFamilyMemberRepository
         return result;
     }
 
+    /// <summary>
+    /// Performs the GetByIdAsync operation.
+    /// </summary>
     public async Task<FamilyMember?> GetByIdAsync(Guid familyMemberId, CancellationToken cancellationToken)
     {
         return await _appDbContext.FamilyMembers
@@ -57,6 +72,9 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             .FirstOrDefaultAsync(fm => fm.Id == familyMemberId, cancellationToken);
     }
 
+    /// <summary>
+    /// Performs the GetAllByFamilyIdAsync operation.
+    /// </summary>
     public async Task<IReadOnlyList<FamilyMember>> GetAllByFamilyIdAsync(Guid FamilyId, CancellationToken cancellationToken)
     {
         var cacheOptions = new MemoryCacheEntryOptions
@@ -80,6 +98,9 @@ public class FamilyMemberRepository : IFamilyMemberRepository
         return result;
     }
 
+    /// <summary>
+    /// Performs the UpdateAsync operation.
+    /// </summary>
     public async Task<FamilyMember> UpdateAsync(FamilyMember familyMember, CancellationToken cancellationToken)
     {
         var existingFamilyMember = await _appDbContext.FamilyMembers
@@ -105,6 +126,9 @@ public class FamilyMemberRepository : IFamilyMemberRepository
         return familyMember;
     }
 
+    /// <summary>
+    /// Performs the DeleteByIdAsync operation.
+    /// </summary>
     public async Task DeleteByIdAsync(Guid familyMemberId, string user, CancellationToken cancellationToken)
     {
         using var tx = await _appDbContext.Database.BeginTransactionAsync(cancellationToken);

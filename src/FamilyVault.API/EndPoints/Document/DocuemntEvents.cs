@@ -1,12 +1,18 @@
-﻿using FamilyVault.Application.DTOs.Documents;
+using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Services;
 using System.Security.Claims;
 
 namespace FamilyVault.API.EndPoints.Document;
 
+/// <summary>
+/// Represents DocumentEvents.
+/// </summary>
 public static class DocumentEvents
 {
 
+    /// <summary>
+    /// Performs the MapDocumentEndPoints operation.
+    /// </summary>
     public static void MapDocumentEndPoints(this WebApplication app)
     {
         var documentGroup = app.MapGroup("/documents/{familyMemberId:guid}").RequireAuthorization();

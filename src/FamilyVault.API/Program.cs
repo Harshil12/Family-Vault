@@ -1,4 +1,4 @@
-﻿using FamilyVault.API.EndPoints;
+using FamilyVault.API.EndPoints;
 using FamilyVault.Application;
 using FamilyVault.Application.Interfaces.Services;
 using FamilyVault.Application.Services;
@@ -18,8 +18,14 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace FamilyVault.API;
 
+/// <summary>
+/// Represents Program.
+/// </summary>
 public class Program
 {
+    /// <summary>
+    /// Performs the Main operation.
+    /// </summary>
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);

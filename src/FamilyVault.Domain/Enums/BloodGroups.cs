@@ -1,7 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace FamilyVault.Domain.Enums;
 
+/// <summary>
+/// Represents BloodGroups.
+/// </summary>
 public enum BloodGroups : byte
 {
     [Display(Name = "A+")] A_Positive,

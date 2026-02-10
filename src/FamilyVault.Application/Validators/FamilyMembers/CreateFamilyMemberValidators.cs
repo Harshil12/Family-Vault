@@ -1,11 +1,17 @@
-﻿using FamilyVault.Application.DTOs.FamilyMembers;
+using FamilyVault.Application.DTOs.FamilyMembers;
 using FamilyVault.Domain.Enums;
 using FluentValidation;
 
 namespace FamilyVault.Application.Validators.FamilyMembers;
 
+/// <summary>
+/// Represents CreateFamilyMemberValidators.
+/// </summary>
 public class CreateFamilyMemberValidators : AbstractValidator<CreateFamilyMememberRequest>
 {
+    /// <summary>
+    /// Initializes a new instance of CreateFamilyMemberValidators.
+    /// </summary>
     public CreateFamilyMemberValidators()
     {
         RuleFor(x => x.FirstName).NotEmpty().WithMessage("First name is required.")

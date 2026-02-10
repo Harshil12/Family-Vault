@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.Interfaces.Repositories;
+using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -6,17 +6,26 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Infrastructure.Repositories;
 
+/// <summary>
+/// Represents FamilyRepository.
+/// </summary>
 public class FamilyRepository : IFamilyRepository
 {
     private readonly AppDbContext _appDbContext;
     private readonly IMemoryCache _memoryCache;
 
+    /// <summary>
+    /// Initializes a new instance of FamilyRepository.
+    /// </summary>
     public FamilyRepository(AppDbContext appDbContext, IMemoryCache memoryCache)
     {
         _appDbContext = appDbContext;
         _memoryCache = memoryCache;
     }
 
+    /// <summary>
+    /// Performs the GetAllWithFamilyMembersAsync operation.
+    /// </summary>
     public async Task<IReadOnlyList<Family>> GetAllWithFamilyMembersAsync(CancellationToken cancellationToken)
     {
         var cacheOptions = new MemoryCacheEntryOptions
@@ -41,6 +50,9 @@ public class FamilyRepository : IFamilyRepository
         return result;
     }
 
+    /// <summary>
+    /// Performs the GetAllByUserIdAsync operation.
+    /// </summary>
     public async Task<IReadOnlyList<Family>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         var cacheOptions = new MemoryCacheEntryOptions
@@ -65,6 +77,9 @@ public class FamilyRepository : IFamilyRepository
         return result;
     }
 
+    /// <summary>
+    /// Performs the GetByIdAsync operation.
+    /// </summary>
     public async Task<Family?> GetByIdAsync(Guid familyId, CancellationToken cancellationToken)
     {
         return await _appDbContext.Families
@@ -73,6 +88,9 @@ public class FamilyRepository : IFamilyRepository
             .FirstOrDefaultAsync(x => x.Id == familyId, cancellationToken);
     }
 
+    /// <summary>
+    /// Performs the AddAsync operation.
+    /// </summary>
     public async Task<Family> AddAsync(Family family, CancellationToken cancellationToken)
     {
         await _appDbContext.Families.AddAsync(family, cancellationToken);
@@ -84,6 +102,9 @@ public class FamilyRepository : IFamilyRepository
         return family;
     }
 
+    /// <summary>
+    /// Performs the UpdateAsync operation.
+    /// </summary>
     public async Task<Family> UpdateAsync(Family family, CancellationToken cancellationToken)
     {
         var existingFamily = await _appDbContext.Families
@@ -100,6 +121,9 @@ public class FamilyRepository : IFamilyRepository
         return family;
     }
 
+    /// <summary>
+    /// Performs the DeleteByIdAsync operation.
+    /// </summary>
     public async Task DeleteByIdAsync(Guid familyId, string user, CancellationToken cancellationToken)
     {
         using var tx = await _appDbContext.Database.BeginTransactionAsync(cancellationToken);

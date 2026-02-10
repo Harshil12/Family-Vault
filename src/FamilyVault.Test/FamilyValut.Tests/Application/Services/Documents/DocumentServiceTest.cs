@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Repositories;
 using FamilyVault.Application.Interfaces.Services;
@@ -10,6 +10,9 @@ using Moq;
 
 namespace FamilyVault.Tests.Services;
 
+/// <summary>
+/// Represents DocumentServiceTests.
+/// </summary>
 public class DocumentServiceTests
 {
     private readonly Mock<IDocumentRepository> _documentRepoMock;
@@ -19,6 +22,9 @@ public class DocumentServiceTests
 
     private readonly DocumentService _sut;
 
+    /// <summary>
+    /// Initializes a new instance of DocumentServiceTests.
+    /// </summary>
     public DocumentServiceTests()
     {
         _documentRepoMock = new Mock<IDocumentRepository>();
@@ -36,6 +42,9 @@ public class DocumentServiceTests
     #region GetDocumentsDetailsByFamilyMemberIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetDocumentsDetailsByFamilyMemberIdAsync_ShouldDecryptDocumentNumbers operation.
+    /// </summary>
     public async Task GetDocumentsDetailsByFamilyMemberIdAsync_ShouldDecryptDocumentNumbers()
     {
         // Arrange
@@ -76,6 +85,9 @@ public class DocumentServiceTests
     #region GetDocumentDetailsByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the GetDocumentDetailsByIdAsync_ShouldDecrypt_WhenDocumentExists operation.
+    /// </summary>
     public async Task GetDocumentDetailsByIdAsync_ShouldDecrypt_WhenDocumentExists()
     {
         // Arrange
@@ -110,6 +122,9 @@ public class DocumentServiceTests
     }
 
     [Fact]
+    /// <summary>
+    /// Performs the GetDocumentDetailsByIdAsync_ShouldReturnNullDto_WhenDocumentDoesNotExist operation.
+    /// </summary>
     public async Task GetDocumentDetailsByIdAsync_ShouldReturnNullDto_WhenDocumentDoesNotExist()
     {
         // Arrange
@@ -134,6 +149,9 @@ public class DocumentServiceTests
     #region CreateDocumentDetailsAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the CreateDocumentDetailsAsync_ShouldEncryptAndPersistDocument operation.
+    /// </summary>
     public async Task CreateDocumentDetailsAsync_ShouldEncryptAndPersistDocument()
     {
         // Arrange
@@ -188,6 +206,9 @@ public class DocumentServiceTests
     #region UpdateDocumentDetailsAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the UpdateDocumentDetailsAsync_ShouldEncryptAndUpdateDocument operation.
+    /// </summary>
     public async Task UpdateDocumentDetailsAsync_ShouldEncryptAndUpdateDocument()
     {
         // Arrange
@@ -242,6 +263,9 @@ public class DocumentServiceTests
     #region DeleteDocumentDetailsByIdAsync
 
     [Fact]
+    /// <summary>
+    /// Performs the DeleteDocumentDetailsByIdAsync_ShouldCallRepository operation.
+    /// </summary>
     public async Task DeleteDocumentDetailsByIdAsync_ShouldCallRepository()
     {
         // Arrange

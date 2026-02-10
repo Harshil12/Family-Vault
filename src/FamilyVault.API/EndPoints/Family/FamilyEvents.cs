@@ -1,11 +1,17 @@
-﻿using FamilyVault.Application.DTOs.Family;
+using FamilyVault.Application.DTOs.Family;
 using FamilyVault.Application.Interfaces.Services;
 using System.Security.Claims;
 
 namespace FamilyVault.API.EndPoints.Family;
 
+/// <summary>
+/// Represents FamilymemberEvents.
+/// </summary>
 public static class FamilymemberEvents
 {
+    /// <summary>
+    /// Performs the MapFamilyEndPoints operation.
+    /// </summary>
     public static void MapFamilyEndPoints(this WebApplication app)
     {
         var familyGroup = app.MapGroup("/family/{userId:Guid}").RequireAuthorization();
