@@ -12,6 +12,8 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Diagnostics;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace FamilyVault.API;
 
@@ -67,7 +69,21 @@ public class Program
         // -------------------- Application & Infrastructure --------------------
         builder.Services.AddInfrastructureServices(builder.Configuration);
 
-        builder.Services.AddDataProtection();
+        var dataProtectionBuilder = builder.Services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(
+                Path.Combine(builder.Environment.ContentRootPath, "data-protection-keys")));
+
+        var certThumbprint = builder.Configuration["DataProtection:CertificateThumbprint"];
+        if (!string.IsNullOrWhiteSpace(certThumbprint))
+        {
+            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly);
+            var certs = store.Certificates.Find(X509FindType.FindByThumbprint, certThumbprint, validOnly: false);
+            if (certs.Count > 0)
+            {
+                dataProtectionBuilder.ProtectKeysWithCertificate(certs[0]);
+            }
+        }
 
         builder.Services.AddScoped<IUserService, Userservice>();
         builder.Services.AddScoped<IFamilymemeberService, FamilyMemberService>();

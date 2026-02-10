@@ -22,7 +22,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
         _memoryCache.Remove("AllFamiliesWithDocuments");
-        _memoryCache.Remove("AllFamilies");
+        _memoryCache.Remove($"FamilyMembers:{familyMember.FamilyId}");
 
         return familyMember;
     }
@@ -65,7 +65,8 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             Priority = CacheItemPriority.High
         };
 
-        if (_memoryCache.TryGetValue("AllFamilies", out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
+        var cacheKey = $"FamilyMembers:{FamilyId}";
+        if (_memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FamilyMember>? familyMembers) && familyMembers is not null)
         {
             return familyMembers;
         }
@@ -74,7 +75,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        _memoryCache.Set("AllFamilies", result, cacheOptions);
+        _memoryCache.Set(cacheKey, result, cacheOptions);
         return result;
     }
 
@@ -98,7 +99,7 @@ public class FamilyMemberRepository : IFamilyMemberRepository
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
         _memoryCache.Remove("AllFamiliesWithDocuments");
-        _memoryCache.Remove("AllFamilies");
+        _memoryCache.Remove($"FamilyMembers:{familyMember.FamilyId}");
 
         return familyMember;
     }
@@ -106,6 +107,11 @@ public class FamilyMemberRepository : IFamilyMemberRepository
     public async Task DeleteByIdAsync(Guid familyMemberId, string user, CancellationToken cancellationToken)
     {
         using var tx = await _appDbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var familyId = await _appDbContext.FamilyMembers
+            .Where(fm => fm.Id == familyMemberId)
+            .Select(fm => fm.FamilyId)
+            .FirstOrDefaultAsync(cancellationToken);
 
         await _appDbContext.FamilyMembers
                 .Where(fm => fm.Id == familyMemberId)
@@ -122,6 +128,9 @@ public class FamilyMemberRepository : IFamilyMemberRepository
         await tx.CommitAsync(cancellationToken);
 
         _memoryCache.Remove("AllFamiliesWithDocuments");
-        _memoryCache.Remove("AllFamilies");
+        if (familyId != Guid.Empty)
+        {
+            _memoryCache.Remove($"FamilyMembers:{familyId}");
+        }
     }
 }

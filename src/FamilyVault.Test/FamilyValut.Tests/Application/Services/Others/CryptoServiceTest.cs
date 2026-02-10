@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.DataProtection;
 using Moq;
-using System.Text;
 
 namespace FamilyValut.Tests.Application.Services.Others;
 
@@ -10,54 +9,76 @@ public class CryptoServiceTests
 {
     private readonly CryptoService _sut;
     private readonly Mock<IDataProtectionProvider> _dataProtectorMock;
+    private readonly Mock<IDataProtector> _protectorMock;
 
     public CryptoServiceTests()
     {
         _dataProtectorMock = new Mock<IDataProtectionProvider>();
+        _protectorMock = new Mock<IDataProtector>();
+        _dataProtectorMock
+            .Setup(p => p.CreateProtector(It.IsAny<string>()))
+            .Returns(_protectorMock.Object);
+        _protectorMock
+            .Setup(p => p.Protect(It.IsAny<string>()))
+            .Returns((string input) => $"protected:{input}");
+        _protectorMock
+            .Setup(p => p.Unprotect(It.IsAny<string>()))
+            .Returns((string input) =>
+            {
+                if (!input.StartsWith("protected:", StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException("Invalid protected payload.");
+                }
+                return input["protected:".Length..];
+            });
         _sut = new CryptoService(_dataProtectorMock.Object);
     }
 
     #region Encrypt / Decrypt
 
     [Fact]
-    public void EncryptData_ShouldThrow_WhenKeyIsNotValidBase64()
+    public void EncryptData_ShouldReturnProtectedValue()
     {
         // Arrange
         var plainText = "hello world";
 
         // Act
-        Action act = () => _sut.EncryptData(plainText);
+        var result = _sut.EncryptData(plainText);
 
         // Assert
-        act.Should().Throw<FormatException>()
-           .WithMessage("*base-64*");
+        result.Should().Be("protected:hello world");
+        _protectorMock.Verify(p => p.Protect(plainText), Times.Once);
     }
 
     [Fact]
-    public void DecryptData_ShouldThrow_WhenKeyIsNotValidBase64()
+    public void DecryptData_ShouldReturnOriginalValue()
     {
         // Arrange
-        var encryptedText = Convert.ToBase64String(Encoding.UTF8.GetBytes("dummy"));
+        var encryptedText = "protected:hello world";
 
         // Act
-        Action act = () => _sut.DecryptData(encryptedText);
+        var result = _sut.DecryptData(encryptedText);
 
         // Assert
-        act.Should().Throw<FormatException>()
-           .WithMessage("*base-64*");
+        result.Should().Be("hello world");
+        _protectorMock.Verify(p => p.Unprotect(encryptedText), Times.Once);
     }
 
     [Fact]
-    public void DecryptData_ShouldThrow_WhenEncryptedDataIsNotBase64()
+    public void DecryptData_ShouldThrow_WhenProtectorThrows()
     {
         // Arrange
-        var invalidEncryptedData = "not-base64-data";
+        var invalidEncryptedData = "not-protected-data";
+        _protectorMock
+            .Setup(p => p.Unprotect(It.IsAny<string>()))
+            .Throws(new InvalidOperationException("Invalid protected payload."));
 
         // Act
         Action act = () => _sut.DecryptData(invalidEncryptedData);
 
         // Assert
-        act.Should().Throw<FormatException>();
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("Invalid protected payload.");
     }
 
     #endregion

@@ -31,7 +31,11 @@ public class UserRepository : IUserRepository
             return cachedUsers;
         }
 
-        var result = await _appDbContext.Users.AsNoTracking().Include(f => f.Families).ToListAsync(cancellationToken);
+        var result = await _appDbContext.Users
+            .Where(u => !u.IsDeleted)
+            .AsNoTracking()
+            .Include(u => u.Families.Where(f => !f.IsDeleted))
+            .ToListAsync(cancellationToken);
         _memoryCache.Set("UsersWithFamilies", result, cacheOptions);
         return result;
     }
@@ -49,7 +53,10 @@ public class UserRepository : IUserRepository
         {
             return cachedUsers;
         }
-        var result = await _appDbContext.Users.AsNoTracking().ToListAsync(cancellationToken);
+        var result = await _appDbContext.Users
+            .Where(u => !u.IsDeleted)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
 
         _memoryCache.Set("UsersFamilies", result, cacheOptions);
 
@@ -59,6 +66,7 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         return await _appDbContext.Users
+            .Where(u => !u.IsDeleted)
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
@@ -142,6 +150,7 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
         return await _appDbContext.Users
+           .Where(u => !u.IsDeleted)
            .AsNoTracking()
            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }

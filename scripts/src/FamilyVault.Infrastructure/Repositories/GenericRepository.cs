@@ -27,8 +27,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         Priority = CacheItemPriority.High
     };
 
-    protected string BuildCacheKey(string suffix) => $\"{_cacheKeyPrefix}:{suffix}\";
-    private string CacheEvictionTokenKey => $\"{_cacheKeyPrefix}:_EvictionToken\";
+    protected string BuildCacheKey(string suffix) => $"{_cacheKeyPrefix}:{suffix}";
+    private string CacheEvictionTokenKey => $"{_cacheKeyPrefix}:_EvictionToken";
 
     // Create or retrieve a CancellationTokenSource used to expire related cache entries.
     protected CancellationTokenSource GetOrCreateEvictionToken()
@@ -78,7 +78,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public virtual async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await GetOrCreateCachedAsync(\"All\", async () =>
+        return await GetOrCreateCachedAsync("All", async () =>
         {
             return await _appDbContext.Set<T>().Where(e => !e.IsDeleted).AsNoTracking().ToListAsync(cancellationToken);
         }, cancellationToken);
@@ -96,7 +96,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     public virtual async Task<T> UpdateAsync(T entity, CancellationToken cancellationToken)
     {
         var existing = await _appDbContext.Set<T>().FirstOrDefaultAsync(e => e.Id == entity.Id, cancellationToken)
-            ?? throw new KeyNotFoundException($\"{typeof(T).Name} not found\");
+            ?? throw new KeyNotFoundException($"{typeof(T).Name} not found");
 
         _appDbContext.Entry(existing).CurrentValues.SetValues(entity);
 
@@ -112,7 +112,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     public virtual async Task DeleteByIdAsync(Guid id, string user, CancellationToken cancellationToken)
     {
         var existing = await _appDbContext.Set<T>().FirstOrDefaultAsync(e => e.Id == id, cancellationToken)
-            ?? throw new KeyNotFoundException($\"{typeof(T).Name} not found\");
+            ?? throw new KeyNotFoundException($"{typeof(T).Name} not found");
 
         existing.IsDeleted = true;
         existing.UpdatedAt = DateTimeOffset.UtcNow;

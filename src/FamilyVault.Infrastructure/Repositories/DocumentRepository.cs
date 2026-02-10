@@ -31,7 +31,10 @@ public class DocumentRepository : IDocumentRepository
             return cachedDocuments;
         }
 
-        var result = await _appDbContext.Documents.Where(d => d.FamilyMemberId == FamilyMemberId). AsNoTracking().ToListAsync(cancellationToken);
+        var result = await _appDbContext.Documents
+            .Where(d => d.FamilyMemberId == FamilyMemberId && !d.IsDeleted)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
         _memoryCache.Set("AllDocument", result, cacheOptions);
         return result;
     }

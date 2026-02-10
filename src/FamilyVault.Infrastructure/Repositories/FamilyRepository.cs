@@ -46,13 +46,14 @@ public class FamilyRepository : IFamilyRepository
             Priority = CacheItemPriority.High
         };
 
-        if (_memoryCache.TryGetValue("AllFamilyMembers", out IReadOnlyList<Family>? families) && families is not null)
+        var cacheKey = $"AllFamilyMembers:{userId}";
+        if (_memoryCache.TryGetValue(cacheKey, out IReadOnlyList<Family>? families) && families is not null)
         {
             return families;
         }
         var result = await _appDbContext.Families.Where(f => f.UserId == userId).AsNoTracking().ToListAsync(cancellationToken);
 
-        _memoryCache.Set("AllFamilyMembers", result, cacheOptions);
+        _memoryCache.Set(cacheKey, result, cacheOptions);
 
         return result;
     }
@@ -68,7 +69,7 @@ public class FamilyRepository : IFamilyRepository
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
         _memoryCache.Remove("AllWithFamilyMembers");
-        _memoryCache.Remove("AllFamilyMembers");
+        _memoryCache.Remove($"AllFamilyMembers:{family.UserId}");
 
         return family;
     }
@@ -84,7 +85,7 @@ public class FamilyRepository : IFamilyRepository
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
         _memoryCache.Remove("AllWithFamilyMembers");
-        _memoryCache.Remove("AllFamilyMembers");
+        _memoryCache.Remove($"AllFamilyMembers:{family.UserId}");
 
         return family;
     }
@@ -92,6 +93,11 @@ public class FamilyRepository : IFamilyRepository
     public async Task DeleteByIdAsync(Guid familyId, string user, CancellationToken cancellationToken)
     {
         using var tx = await _appDbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var userId = await _appDbContext.Families
+            .Where(f => f.Id == familyId)
+            .Select(f => f.UserId)
+            .FirstOrDefaultAsync(cancellationToken);
 
         // Soft delete the family
         await _appDbContext.Families
@@ -102,7 +108,7 @@ public class FamilyRepository : IFamilyRepository
 
         // soft delete the family members
         await _appDbContext.FamilyMembers
-               .Where(fm => fm.FamilyId == familyId && !fm.IsDeleted)
+               .Where(fm => fm.FamilyId == familyId)
                .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
                .SetProperty(fm => fm.UpdatedBy, user)
                .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
@@ -110,7 +116,7 @@ public class FamilyRepository : IFamilyRepository
         await _appDbContext.Documents
         .Where(d =>
             _appDbContext.FamilyMembers
-                .Where(m => m.FamilyId == familyId && !m.IsDeleted)
+                .Where(m => m.FamilyId == familyId)
                 .Select(m => m.Id)
                 .Contains(d.FamilyMemberId)
             && !d.IsDeleted
@@ -123,6 +129,9 @@ public class FamilyRepository : IFamilyRepository
         await tx.CommitAsync(cancellationToken);
 
         _memoryCache.Remove("AllWithFamilyMembers");
-        _memoryCache.Remove("AllFamilyMembers");
+        if (userId != Guid.Empty)
+        {
+            _memoryCache.Remove($"AllFamilyMembers:{userId}");
+        }
     }
 }

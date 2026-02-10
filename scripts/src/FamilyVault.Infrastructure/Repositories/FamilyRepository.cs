@@ -15,7 +15,7 @@ public class FamilyRepository : GenericRepository<Family>, IFamilyRepository
 
     public async Task<IReadOnlyList<Family>> GetAllWithFamilyMembersAsync(CancellationToken cancellationToken)
     {
-        return await GetOrCreateCachedAsync(\"WithMembers\", async () =>
+        return await GetOrCreateCachedAsync("WithMembers", async () =>
         {
             return await _appDbContext.Families
                 .Where(f => !f.IsDeleted)
@@ -27,7 +27,7 @@ public class FamilyRepository : GenericRepository<Family>, IFamilyRepository
 
     public async Task<IReadOnlyList<Family>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var suffix = $\"ByUser:{userId}\";
+        var suffix = $"ByUser:{userId}";
         return await GetOrCreateCachedAsync(suffix, async () =>
         {
             return await _appDbContext.Families
