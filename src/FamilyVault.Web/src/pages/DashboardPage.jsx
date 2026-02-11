@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import StatCard from "../components/ui/StatCard";
+import { ArrowRightIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { getFamilies } from "../services/familyService";
 import { getFamilyMembers } from "../services/familyMemberService";
@@ -17,7 +18,7 @@ function formatDate(value) {
 }
 
 export default function DashboardPage() {
-  const { token, userId } = useAuth();
+  const { token, userId, isPreviewMode } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [summary, setSummary] = useState({
@@ -29,9 +30,18 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadDashboard = async () => {
+      if (isPreviewMode) {
+        setSummary({
+          families: [{ id: "preview-family" }],
+          members: [{ id: "preview-member-1" }, { id: "preview-member-2" }],
+          documents: [{ id: "preview-doc-1", documentNumber: "P1234567", expiryDate: "2030-01-01T00:00:00Z" }],
+          bankAccounts: [{ id: "preview-account-1" }]
+        });
+        setLoading(false);
+        return;
+      }
       if (!userId) {
         setLoading(false);
-        setError("JWT token does not contain user id in sub claim.");
         return;
       }
 
@@ -79,7 +89,7 @@ export default function DashboardPage() {
     };
 
     loadDashboard();
-  }, [token, userId]);
+  }, [token, userId, isPreviewMode]);
 
   const expiringDocuments = useMemo(() => {
     const now = new Date();
@@ -107,11 +117,13 @@ export default function DashboardPage() {
           <p className="subtle">A quick view of your family profiles, IDs, and bank records.</p>
         </div>
         <Link className="btn" to="/families">
-          Manage Families
+          <span>Manage Families</span>
+          <span className="btn-icon"><ArrowRightIcon /></span>
         </Link>
       </header>
 
       {error && <p className="error-text">{error}</p>}
+      {isPreviewMode && <p className="subtle">Preview mode is on. Login to load real API data.</p>}
 
       <div className="stats-grid">
         <StatCard title="Families" value={summary.families.length} hint="Households onboarded" />

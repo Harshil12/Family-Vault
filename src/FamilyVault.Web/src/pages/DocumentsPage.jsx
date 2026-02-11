@@ -2,10 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
+import ConfirmModal from "../components/ui/ConfirmModal";
+import { PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { createDocument, deleteDocument, getDocuments, updateDocument } from "../services/documentService";
 import { documentTypeOptions, optionLabelByValue } from "../utils/options";
 import { unwrapData } from "../utils/response";
+import { validateDocument } from "../utils/validation";
 
 const blankDocument = {
   documentType: "",
@@ -39,12 +42,13 @@ function toFormValues(document) {
 
 export default function DocumentsPage() {
   const { familyId, memberId } = useParams();
-  const { token } = useAuth();
+  const { token, isPreviewMode } = useAuth();
   const [documents, setDocuments] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState(null);
+  const [deletingDocument, setDeletingDocument] = useState(null);
 
   const columns = useMemo(
     () => [
@@ -64,6 +68,11 @@ export default function DocumentsPage() {
   );
 
   const loadDocuments = async () => {
+    if (isPreviewMode) {
+      setDocuments([{ id: "preview-doc-1", documentType: 1, documentNumber: "P1234567", expiryDate: "2030-01-01T00:00:00Z" }]);
+      setLoading(false);
+      return;
+    }
     setError("");
     setLoading(true);
 
@@ -79,7 +88,7 @@ export default function DocumentsPage() {
 
   useEffect(() => {
     loadDocuments();
-  }, [memberId, token]);
+  }, [memberId, token, isPreviewMode]);
 
   const openCreate = () => {
     setEditingDocument(null);
@@ -96,6 +105,10 @@ export default function DocumentsPage() {
   };
 
   const handleSubmit = async (values) => {
+    if (isPreviewMode) {
+      window.alert("Preview mode: login to create or edit records.");
+      return;
+    }
     const payload = toPayload(values, memberId);
 
     try {
@@ -113,13 +126,20 @@ export default function DocumentsPage() {
   };
 
   const handleDelete = async (document) => {
-    const shouldDelete = window.confirm(`Delete document "${document.documentNumber}"?`);
-    if (!shouldDelete) {
+    if (isPreviewMode) {
+      window.alert("Preview mode: login to delete records.");
       return;
     }
+    setDeletingDocument(document);
+  };
 
+  const confirmDelete = async () => {
+    if (!deletingDocument) {
+      return;
+    }
     try {
-      await deleteDocument(memberId, document.id, token);
+      await deleteDocument(memberId, deletingDocument.id, token);
+      setDeletingDocument(null);
       await loadDocuments();
     } catch (requestError) {
       setError(requestError.message);
@@ -136,11 +156,13 @@ export default function DocumentsPage() {
           </p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>
-          Add Document
+          <span className="btn-icon"><PlusIcon /></span>
+          <span>Add Document</span>
         </button>
       </header>
 
       {error && <p className="error-text">{error}</p>}
+      {isPreviewMode && <p className="subtle">Preview mode is on. Login to enable CRUD.</p>}
       {loading ? <p>Loading documents...</p> : <CrudTable columns={columns} rows={documents} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
@@ -153,8 +175,16 @@ export default function DocumentsPage() {
           { name: "issueDate", label: "Issue Date", type: "date" },
           { name: "expiryDate", label: "Expiry Date", type: "date" }
         ]}
+        validate={validateDocument}
         onClose={closeModal}
         onSubmit={handleSubmit}
+      />
+      <ConfirmModal
+        isOpen={Boolean(deletingDocument)}
+        title="Delete Document"
+        message={deletingDocument ? `Are you sure you want to delete document "${deletingDocument.documentNumber}"?` : ""}
+        onCancel={() => setDeletingDocument(null)}
+        onConfirm={confirmDelete}
       />
 
       <Link className="inline-link" to={`/families/${familyId}/members`}>

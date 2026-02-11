@@ -2,21 +2,25 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
+import ConfirmModal from "../components/ui/ConfirmModal";
+import { PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { createFamily, deleteFamily, getFamilies, updateFamily } from "../services/familyService";
 import { unwrapData } from "../utils/response";
+import { validateFamily } from "../utils/validation";
 
 const blankFamily = {
   familyName: ""
 };
 
 export default function FamiliesPage() {
-  const { token, userId } = useAuth();
+  const { token, userId, isPreviewMode } = useAuth();
   const [families, setFamilies] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingFamily, setEditingFamily] = useState(null);
+  const [deletingFamily, setDeletingFamily] = useState(null);
 
   const columns = useMemo(
     () => [
@@ -35,9 +39,13 @@ export default function FamiliesPage() {
   );
 
   const loadFamilies = async () => {
+    if (isPreviewMode) {
+      setFamilies([{ id: "preview-family", name: "Demo Family" }]);
+      setLoading(false);
+      return;
+    }
     if (!userId) {
       setLoading(false);
-      setError("Cannot load families: user id not found in token.");
       return;
     }
 
@@ -56,7 +64,7 @@ export default function FamiliesPage() {
 
   useEffect(() => {
     loadFamilies();
-  }, [token, userId]);
+  }, [token, userId, isPreviewMode]);
 
   const openCreate = () => {
     setEditingFamily(null);
@@ -73,6 +81,10 @@ export default function FamiliesPage() {
   };
 
   const handleSubmit = async (values) => {
+    if (isPreviewMode) {
+      window.alert("Preview mode: login to create or edit records.");
+      return;
+    }
     if (!userId) {
       return;
     }
@@ -96,17 +108,23 @@ export default function FamiliesPage() {
   };
 
   const handleDelete = async (row) => {
+    if (isPreviewMode) {
+      window.alert("Preview mode: login to delete records.");
+      return;
+    }
     if (!userId) {
       return;
     }
+    setDeletingFamily(row);
+  };
 
-    const shouldDelete = window.confirm(`Delete family "${row.name}"?`);
-    if (!shouldDelete) {
+  const confirmDelete = async () => {
+    if (!deletingFamily || !userId) {
       return;
     }
-
     try {
-      await deleteFamily(row.id, userId, token);
+      await deleteFamily(deletingFamily.id, userId, token);
+      setDeletingFamily(null);
       await loadFamilies();
     } catch (requestError) {
       setError(requestError.message);
@@ -121,11 +139,13 @@ export default function FamiliesPage() {
           <p className="subtle">Create and manage each family unit.</p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>
-          Add Family
+          <span className="btn-icon"><PlusIcon /></span>
+          <span>Add Family</span>
         </button>
       </header>
 
       {error && <p className="error-text">{error}</p>}
+      {isPreviewMode && <p className="subtle">Preview mode is on. Login to enable CRUD.</p>}
       {loading ? <p>Loading families...</p> : <CrudTable columns={columns} rows={families} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
@@ -133,8 +153,16 @@ export default function FamiliesPage() {
         isOpen={modalOpen}
         initialValues={{ familyName: editingFamily?.name ?? blankFamily.familyName }}
         fields={[{ name: "familyName", label: "Family name", required: true }]}
+        validate={validateFamily}
         onClose={closeModal}
         onSubmit={handleSubmit}
+      />
+      <ConfirmModal
+        isOpen={Boolean(deletingFamily)}
+        title="Delete Family"
+        message={deletingFamily ? `Are you sure you want to delete family "${deletingFamily.name}"?` : ""}
+        onCancel={() => setDeletingFamily(null)}
+        onConfirm={confirmDelete}
       />
     </section>
   );

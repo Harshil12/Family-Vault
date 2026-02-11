@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getUserIdFromToken } from "../utils/jwt";
 
 const TOKEN_KEY = "familyvault_token";
+const SKIP_LOGIN = String(import.meta.env.VITE_SKIP_LOGIN ?? "").toLowerCase() === "true";
 
 const AuthContext = createContext(null);
 
@@ -26,7 +27,8 @@ export function AuthProvider({ children }) {
   const value = {
     token,
     userId,
-    isAuthenticated: Boolean(token),
+    isAuthenticated: SKIP_LOGIN || Boolean(token),
+    isPreviewMode: SKIP_LOGIN && !token,
     login,
     logout
   };

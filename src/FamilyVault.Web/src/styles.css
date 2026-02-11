@@ -1,12 +1,12 @@
 :root {
-  --bg: #f4f6fb;
+  --bg: #f8fafc;
   --card: #ffffff;
-  --text: #15203b;
-  --subtle: #5f6b85;
-  --accent: #1d4ed8;
-  --accent-soft: #dbeafe;
-  --danger: #be123c;
-  --border: #d7deea;
+  --text: #0f172a;
+  --subtle: #64748b;
+  --accent: #0ea5a4;
+  --accent-soft: #ccfbf1;
+  --danger: #dc2626;
+  --border: #dbe4ee;
 }
 
 * {
@@ -17,7 +17,7 @@ body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at top right, #e8efff 0%, var(--bg) 45%);
+  background: radial-gradient(circle at top right, #dff7f6 0%, var(--bg) 45%);
 }
 
 a {
@@ -38,7 +38,7 @@ p {
 }
 
 .sidebar {
-  background: #111b34;
+  background: #0f172a;
   color: #f8fafc;
   padding: 1.5rem;
   display: flex;
@@ -66,8 +66,8 @@ p {
 
 .nav-link.active {
   color: #f8fafc;
-  border-color: #3b82f6;
-  background: #1e3a8a;
+  border-color: #2dd4bf;
+  background: #134e4a;
 }
 
 .sidebar-footer {
@@ -79,6 +79,7 @@ p {
 
 .content {
   padding: 1.5rem;
+  animation: fadeUp 220ms ease-out;
 }
 
 .page-header {
@@ -99,6 +100,7 @@ p {
   border-radius: 0.9rem;
   padding: 1rem;
   margin-top: 1rem;
+  animation: fadeUp 220ms ease-out;
 }
 
 .stats-grid {
@@ -112,6 +114,7 @@ p {
   border: 1px solid var(--border);
   border-radius: 0.9rem;
   padding: 1rem;
+  animation: fadeUp 220ms ease-out;
 }
 
 .stat-card h3 {
@@ -137,10 +140,12 @@ p {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.35rem;
 }
 
 .btn:hover {
-  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
 }
 
 .btn:disabled {
@@ -161,6 +166,13 @@ p {
 
 .btn.danger {
   background: var(--danger);
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
 }
 
 .inline-link {
@@ -189,14 +201,27 @@ td {
 }
 
 th {
-  background: #f7faff;
+  background: #f0fdfa;
   font-size: 0.86rem;
-  color: #304263;
+  color: #334155;
+}
+
+tbody tr {
+  transition: background-color 160ms ease;
+}
+
+tbody tr:hover {
+  background: #f8fffe;
 }
 
 .actions-cell {
   display: flex;
   gap: 0.4rem;
+}
+
+.actions-cell .btn.tiny {
+  min-width: 84px;
+  justify-content: center;
 }
 
 .form-grid {
@@ -208,6 +233,7 @@ label {
   display: grid;
   gap: 0.3rem;
   font-size: 0.9rem;
+  font-weight: 600;
 }
 
 input,
@@ -250,6 +276,11 @@ select:focus {
   font-size: 0.9rem;
 }
 
+.field-error {
+  color: var(--danger);
+  font-size: 0.8rem;
+}
+
 .empty-state {
   color: var(--subtle);
   padding: 0.65rem 0;
@@ -285,12 +316,23 @@ select:focus {
   border: 1px solid var(--border);
   display: grid;
   gap: 0.85rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn 180ms ease-out;
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.6rem;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 0.5rem;
+}
+
+.confirm-modal {
+  max-width: 460px;
 }
 
 @media (max-width: 900px) {
@@ -305,5 +347,27 @@ select:focus {
   .nav-links {
     flex-direction: row;
     flex-wrap: wrap;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }

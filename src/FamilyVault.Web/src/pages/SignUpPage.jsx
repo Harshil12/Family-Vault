@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { signUpRequest } from "../services/authService";
+import useCountryCodes from "../hooks/useCountryCodes";
+import { validateSignup } from "../utils/validation";
 
 const initialForm = {
   username: "",
@@ -13,20 +15,38 @@ const initialForm = {
 };
 
 export default function SignUpPage() {
+  const countryCodeOptions = useCountryCodes();
   const [form, setForm] = useState(initialForm);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const updateField = (event) => {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
+    setFieldErrors((current) => {
+      if (!current[name]) {
+        return current;
+      }
+      const next = { ...current };
+      delete next[name];
+      return next;
+    });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError("");
+    setFieldErrors({});
+    setApiError("");
     setMessage("");
+
+    const validationErrors = validateSignup(form);
+    if (Object.keys(validationErrors).length) {
+      setFieldErrors(validationErrors);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -34,7 +54,7 @@ export default function SignUpPage() {
       setMessage("User created successfully. You can now login.");
       setForm(initialForm);
     } catch (requestError) {
-      setError(requestError.message);
+      setApiError(requestError.message);
     } finally {
       setLoading(false);
     }
@@ -50,39 +70,53 @@ export default function SignUpPage() {
           <label>
             <span>Username</span>
             <input name="username" value={form.username} onChange={updateField} required />
+            {fieldErrors.username && <small className="field-error">{fieldErrors.username}</small>}
           </label>
 
           <label>
             <span>First name</span>
             <input name="firstName" value={form.firstName} onChange={updateField} required />
+            {fieldErrors.firstName && <small className="field-error">{fieldErrors.firstName}</small>}
           </label>
 
           <label>
             <span>Last name</span>
             <input name="lastName" value={form.lastName} onChange={updateField} />
+            {fieldErrors.lastName && <small className="field-error">{fieldErrors.lastName}</small>}
           </label>
 
           <label>
             <span>Email</span>
             <input type="email" name="email" value={form.email} onChange={updateField} required />
+            {fieldErrors.email && <small className="field-error">{fieldErrors.email}</small>}
           </label>
 
           <label>
             <span>Password</span>
             <input type="password" name="password" value={form.password} onChange={updateField} required />
+            {fieldErrors.password && <small className="field-error">{fieldErrors.password}</small>}
           </label>
 
           <label>
             <span>Country code</span>
-            <input name="countryCode" value={form.countryCode} onChange={updateField} />
+            <select name="countryCode" value={form.countryCode} onChange={updateField}>
+              <option value="">Select country code</option>
+              {countryCodeOptions.map((option) => (
+                <option key={`${option.label}-${option.value}`} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {fieldErrors.countryCode && <small className="field-error">{fieldErrors.countryCode}</small>}
           </label>
 
           <label>
             <span>Mobile</span>
             <input name="mobile" value={form.mobile} onChange={updateField} />
+            {fieldErrors.mobile && <small className="field-error">{fieldErrors.mobile}</small>}
           </label>
 
-          {error && <p className="error-text">{error}</p>}
+          {apiError && <p className="error-text">{apiError}</p>}
           {message && <p className="success-text">{message}</p>}
 
           <button type="submit" className="btn" disabled={loading}>

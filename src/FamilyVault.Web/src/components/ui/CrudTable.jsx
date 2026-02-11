@@ -1,4 +1,5 @@
 import React from "react";
+import { DeleteIcon, EditIcon } from "./Icons";
 export default function CrudTable({ columns, rows, onEdit, onDelete, emptyMessage = "No records found." }) {
   if (!rows.length) {
     return <p className="empty-state">{emptyMessage}</p>;
@@ -23,10 +24,12 @@ export default function CrudTable({ columns, rows, onEdit, onDelete, emptyMessag
               ))}
               <td className="actions-cell">
                 <button type="button" className="btn tiny" onClick={() => onEdit(row)}>
-                  Edit
+                  <span className="btn-icon"><EditIcon /></span>
+                  <span>Edit</span>
                 </button>
                 <button type="button" className="btn tiny danger" onClick={() => onDelete(row)}>
-                  Delete
+                  <span className="btn-icon"><DeleteIcon /></span>
+                  <span>Delete</span>
                 </button>
               </td>
             </tr>

@@ -2,10 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
+import ConfirmModal from "../components/ui/ConfirmModal";
+import { PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { createBankAccount, deleteBankAccount, getBankAccounts, updateBankAccount } from "../services/bankAccountService";
 import { accountTypeOptions, optionLabelByValue } from "../utils/options";
 import { unwrapData } from "../utils/response";
+import { validateBankAccount } from "../utils/validation";
 
 const blankAccount = {
   bankName: "",
@@ -45,12 +48,13 @@ function toFormValues(account) {
 
 export default function BankAccountsPage() {
   const { familyId, memberId } = useParams();
-  const { token } = useAuth();
+  const { token, isPreviewMode } = useAuth();
   const [accounts, setAccounts] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
+  const [deletingAccount, setDeletingAccount] = useState(null);
 
   const columns = useMemo(
     () => [
@@ -71,6 +75,11 @@ export default function BankAccountsPage() {
   );
 
   const loadAccounts = async () => {
+    if (isPreviewMode) {
+      setAccounts([{ id: "preview-account-1", bankName: "State Bank", accountType: 1, accountNumberLast4: "9012", ifsc: "SBIN0001234" }]);
+      setLoading(false);
+      return;
+    }
     setError("");
     setLoading(true);
 
@@ -86,7 +95,7 @@ export default function BankAccountsPage() {
 
   useEffect(() => {
     loadAccounts();
-  }, [memberId, token]);
+  }, [memberId, token, isPreviewMode]);
 
   const openCreate = () => {
     setEditingAccount(null);
@@ -103,6 +112,10 @@ export default function BankAccountsPage() {
   };
 
   const handleSubmit = async (values) => {
+    if (isPreviewMode) {
+      window.alert("Preview mode: login to create or edit records.");
+      return;
+    }
     const payload = toPayload(values, memberId);
 
     try {
@@ -120,13 +133,20 @@ export default function BankAccountsPage() {
   };
 
   const handleDelete = async (account) => {
-    const shouldDelete = window.confirm(`Delete account from "${account.bankName}"?`);
-    if (!shouldDelete) {
+    if (isPreviewMode) {
+      window.alert("Preview mode: login to delete records.");
       return;
     }
+    setDeletingAccount(account);
+  };
 
+  const confirmDelete = async () => {
+    if (!deletingAccount) {
+      return;
+    }
     try {
-      await deleteBankAccount(memberId, account.id, token);
+      await deleteBankAccount(memberId, deletingAccount.id, token);
+      setDeletingAccount(null);
       await loadAccounts();
     } catch (requestError) {
       setError(requestError.message);
@@ -143,11 +163,13 @@ export default function BankAccountsPage() {
           </p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>
-          Add Account
+          <span className="btn-icon"><PlusIcon /></span>
+          <span>Add Account</span>
         </button>
       </header>
 
       {error && <p className="error-text">{error}</p>}
+      {isPreviewMode && <p className="subtle">Preview mode is on. Login to enable CRUD.</p>}
       {loading ? <p>Loading bank accounts...</p> : <CrudTable columns={columns} rows={accounts} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
@@ -162,8 +184,16 @@ export default function BankAccountsPage() {
           { name: "ifsc", label: "IFSC" },
           { name: "branch", label: "Branch" }
         ]}
+        validate={validateBankAccount}
         onClose={closeModal}
         onSubmit={handleSubmit}
+      />
+      <ConfirmModal
+        isOpen={Boolean(deletingAccount)}
+        title="Delete Bank Account"
+        message={deletingAccount ? `Are you sure you want to delete account from "${deletingAccount.bankName}"?` : ""}
+        onCancel={() => setDeletingAccount(null)}
+        onConfirm={confirmDelete}
       />
 
       <Link className="inline-link" to={`/families/${familyId}/members`}>

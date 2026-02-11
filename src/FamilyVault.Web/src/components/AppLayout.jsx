@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { LogoutIcon } from "./ui/Icons";
 
 const links = [
   { to: "/", label: "Dashboard", end: true },
@@ -8,13 +9,13 @@ const links = [
 ];
 
 export default function AppLayout() {
-  const { userId, logout } = useAuth();
+  const { userId, logout, isPreviewMode } = useAuth();
 
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <h1 className="brand">FamilyVault</h1>
-        <p className="subtle">Protect documents and financial records.</p>
+        <p className="subtle">{isPreviewMode ? "Preview mode (login skipped)." : "Protect documents and financial records."}</p>
         <nav className="nav-links">
           {links.map((link) => (
             <NavLink
@@ -28,10 +29,13 @@ export default function AppLayout() {
           ))}
         </nav>
         <div className="sidebar-footer">
-          <small className="subtle">User ID: {userId ?? "unknown"}</small>
-          <button type="button" className="btn ghost" onClick={logout}>
-            Logout
-          </button>
+          <small className="subtle">User ID: {userId ?? "preview-user"}</small>
+          {!isPreviewMode && (
+            <button type="button" className="btn ghost" onClick={logout}>
+              <span className="btn-icon"><LogoutIcon /></span>
+              <span>Logout</span>
+            </button>
+          )}
         </div>
       </aside>
 

@@ -2,10 +2,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
+import ConfirmModal from "../components/ui/ConfirmModal";
+import { PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
+import useCountryCodes from "../hooks/useCountryCodes";
 import { createFamilyMember, deleteFamilyMember, getFamilyMembers, updateFamilyMember } from "../services/familyMemberService";
 import { bloodGroupOptions, optionLabelByValue, relationshipOptions } from "../utils/options";
 import { unwrapData } from "../utils/response";
+import { validateFamilyMember } from "../utils/validation";
 
 const blankMember = {
   firstName: "",
@@ -57,12 +61,14 @@ function toFormValues(member) {
 
 export default function FamilyMembersPage() {
   const { familyId } = useParams();
-  const { token } = useAuth();
+  const { token, isPreviewMode } = useAuth();
+  const countryCodeOptions = useCountryCodes();
   const [members, setMembers] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
+  const [deletingMember, setDeletingMember] = useState(null);
 
   const columns = useMemo(
     () => [
@@ -100,6 +106,13 @@ export default function FamilyMembersPage() {
   );
 
   const loadMembers = async () => {
+    if (isPreviewMode) {
+      setMembers([
+        { id: "preview-member-1", firstName: "Jane", lastName: "Doe", relationshipType: 1, email: "jane@example.com" }
+      ]);
+      setLoading(false);
+      return;
+    }
     setError("");
     setLoading(true);
 
@@ -115,7 +128,7 @@ export default function FamilyMembersPage() {
 
   useEffect(() => {
     loadMembers();
-  }, [familyId, token]);
+  }, [familyId, token, isPreviewMode]);
 
   const openCreate = () => {
     setEditingMember(null);
@@ -132,6 +145,10 @@ export default function FamilyMembersPage() {
   };
 
   const handleSubmit = async (values) => {
+    if (isPreviewMode) {
+      window.alert("Preview mode: login to create or edit records.");
+      return;
+    }
     const payload = toPayload(values, familyId);
 
     try {
@@ -149,13 +166,20 @@ export default function FamilyMembersPage() {
   };
 
   const handleDelete = async (member) => {
-    const shouldDelete = window.confirm(`Delete member "${member.firstName}"?`);
-    if (!shouldDelete) {
+    if (isPreviewMode) {
+      window.alert("Preview mode: login to delete records.");
       return;
     }
+    setDeletingMember(member);
+  };
 
+  const confirmDelete = async () => {
+    if (!deletingMember) {
+      return;
+    }
     try {
-      await deleteFamilyMember(familyId, member.id, token);
+      await deleteFamilyMember(familyId, deletingMember.id, token);
+      setDeletingMember(null);
       await loadMembers();
     } catch (requestError) {
       setError(requestError.message);
@@ -170,11 +194,13 @@ export default function FamilyMembersPage() {
           <p className="subtle">Family ID: {familyId}</p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>
-          Add Member
+          <span className="btn-icon"><PlusIcon /></span>
+          <span>Add Member</span>
         </button>
       </header>
 
       {error && <p className="error-text">{error}</p>}
+      {isPreviewMode && <p className="subtle">Preview mode is on. Login to enable CRUD.</p>}
       {loading ? <p>Loading family members...</p> : <CrudTable columns={columns} rows={members} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
@@ -184,7 +210,7 @@ export default function FamilyMembersPage() {
         fields={[
           { name: "firstName", label: "First Name", required: true },
           { name: "lastName", label: "Last Name" },
-          { name: "countryCode", label: "Country Code" },
+          { name: "countryCode", label: "Country Code", type: "select", options: countryCodeOptions },
           { name: "mobile", label: "Mobile" },
           { name: "relationshipType", label: "Relationship", type: "select", options: relationshipOptions, required: true },
           { name: "dateOfBirth", label: "Date Of Birth", type: "date" },
@@ -193,8 +219,16 @@ export default function FamilyMembersPage() {
           { name: "pan", label: "PAN" },
           { name: "aadhar", label: "Aadhar" }
         ]}
+        validate={validateFamilyMember}
         onClose={closeModal}
         onSubmit={handleSubmit}
+      />
+      <ConfirmModal
+        isOpen={Boolean(deletingMember)}
+        title="Delete Family Member"
+        message={deletingMember ? `Are you sure you want to delete member "${deletingMember.firstName}"?` : ""}
+        onCancel={() => setDeletingMember(null)}
+        onConfirm={confirmDelete}
       />
     </section>
   );
