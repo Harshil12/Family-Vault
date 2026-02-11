@@ -169,6 +169,67 @@ public class UserserviceTests
 
     #endregion
 
+    #region RegisterUserAsync
+
+    [Fact]
+    /// <summary>
+    /// Performs the RegisterUserAsync_ShouldHashPassword_AndSetSelfRegisterCreator operation.
+    /// </summary>
+    public async Task RegisterUserAsync_ShouldHashPassword_AndSetSelfRegisterCreator()
+    {
+        // Arrange
+        var request = new CreateUserRequest
+        {
+            Username = "selfuser",
+            Password = "plain-password"
+        };
+
+        var userEntity = new User
+        {
+            Username = request.Username,
+            Password = request.Password
+        };
+
+        User? capturedUser = null;
+
+        var savedUser = new User
+        {
+            Id = Guid.NewGuid(),
+            Username = request.Username,
+            Password = "hashed-password"
+        };
+
+        var userDto = new UserDto { Id = savedUser.Id };
+
+        _mapperMock
+            .Setup(m => m.Map<User>(request))
+            .Returns(userEntity);
+
+        _cryptoMock
+            .Setup(c => c.HashPassword("plain-password"))
+            .Returns("hashed-password");
+
+        _userRepoMock
+            .Setup(r => r.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()))
+            .Callback<User, CancellationToken>((user, _) => capturedUser = user)
+            .ReturnsAsync(savedUser);
+
+        _mapperMock
+            .Setup(m => m.Map<UserDto>(savedUser))
+            .Returns(userDto);
+
+        // Act
+        var result = await _sut.RegisterUserAsync(request, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        capturedUser.Should().NotBeNull();
+        capturedUser!.CreatedBy.Should().Be("SELF_REGISTER");
+        _cryptoMock.Verify(c => c.HashPassword("plain-password"), Times.Once);
+    }
+
+    #endregion
+
     #region DeleteUserByIdAsync
 
     [Fact]
