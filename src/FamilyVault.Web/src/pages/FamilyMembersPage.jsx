@@ -212,8 +212,8 @@ export default function FamilyMembersPage() {
     <section>
       <header className="page-header">
         <div>
-          <h2>Family Members</h2>
-          <p className="subtle">Family ID: {familyId}</p>
+          <h2>Member Profiles</h2>
+          <p className="subtle page-intro">People linked to Family ID: {familyId}</p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>
           <span className="btn-icon"><PlusIcon /></span>
@@ -275,4 +275,5 @@ export default function FamilyMembersPage() {
     </section>
   );
 }
+
 

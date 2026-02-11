@@ -247,9 +247,9 @@ export default function DocumentsPage() {
     <section>
       <header className="page-header">
         <div>
-          <h2>Documents</h2>
-          <p className="subtle">
-            Family: {familyId} | Member: {memberId}
+          <h2>Document Library</h2>
+          <p className="subtle page-intro">
+            Records for Family {familyId} and Member {memberId}
           </p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>
@@ -275,10 +275,14 @@ export default function DocumentsPage() {
             </option>
           ))}
         </select>
-        <label className="inline-check">
-          <input type="checkbox" checked={expiringOnly} onChange={(event) => setExpiringOnly(event.target.checked)} />
-          <span>Expiring in 45 days</span>
-        </label>
+        <button
+          type="button"
+          className={`filter-pill ${expiringOnly ? "active" : ""}`}
+          onClick={() => setExpiringOnly((current) => !current)}
+          aria-pressed={expiringOnly}
+        >
+          Expiring Soon (45d)
+        </button>
       </div>
       {loading ? <p>Loading documents...</p> : <CrudTable columns={columns} rows={filteredDocuments} onEdit={openEdit} onDelete={handleDelete} />}
 
@@ -340,4 +344,5 @@ export default function DocumentsPage() {
     </section>
   );
 }
+
 

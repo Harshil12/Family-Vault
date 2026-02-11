@@ -170,9 +170,9 @@ export default function BankAccountsPage() {
     <section>
       <header className="page-header">
         <div>
-          <h2>Bank Accounts</h2>
-          <p className="subtle">
-            Family: {familyId} | Member: {memberId}
+          <h2>Banking Records</h2>
+          <p className="subtle page-intro">
+            Records for Family {familyId} and Member {memberId}
           </p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>
@@ -232,4 +232,5 @@ export default function BankAccountsPage() {
     </section>
   );
 }
+
 

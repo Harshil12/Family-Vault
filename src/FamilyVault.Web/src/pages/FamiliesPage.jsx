@@ -141,8 +141,8 @@ export default function FamiliesPage() {
     <section>
       <header className="page-header">
         <div>
-          <h2>Families</h2>
-          <p className="subtle">Create and manage each family unit.</p>
+          <h2>Family Profiles</h2>
+          <p className="subtle page-intro">Organize each household with members, documents, and accounts.</p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>
           <span className="btn-icon"><PlusIcon /></span>
@@ -181,4 +181,5 @@ export default function FamiliesPage() {
     </section>
   );
 }
+
 

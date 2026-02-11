@@ -5,7 +5,7 @@ import { LogoutIcon } from "./ui/Icons";
 
 const links = [
   { to: "/", label: "Dashboard", end: true },
-  { to: "/families", label: "Families" }
+  { to: "/families", label: "Family Profiles" }
 ];
 
 export default function AppLayout() {
@@ -14,8 +14,8 @@ export default function AppLayout() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <h1 className="brand">FamilyVault</h1>
-        <p className="subtle">{isPreviewMode ? "Preview mode (login skipped)." : "Protect documents and financial records."}</p>
+        <h1 className="brand">Family Vault</h1>
+        <p className="subtle">{isPreviewMode ? "Preview mode (login skipped)." : "Your family’s secure records hub."}</p>
         <nav className="nav-links">
           {links.map((link) => (
             <NavLink
@@ -45,4 +45,5 @@ export default function AppLayout() {
     </div>
   );
 }
+
 

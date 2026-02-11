@@ -38,8 +38,8 @@ export default function LoginPage() {
   return (
     <div className="auth-shell">
       <section className="auth-card">
-        <h1>Welcome back</h1>
-        <p>Sign in to open your FamilyVault dashboard.</p>
+        <h1>Welcome Back</h1>
+        <p>Sign in to access your Family Vault workspace.</p>
 
         <form onSubmit={handleSubmit} className="form-grid">
           <label>
@@ -55,15 +55,17 @@ export default function LoginPage() {
           {error && <p className="error-text">{error}</p>}
 
           <button type="submit" className="btn" disabled={loading}>
-            {loading ? "Signing in..." : "Login"}
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
         <p className="subtle">
-          Need an account? <Link to="/signup">Create user</Link>
+          Need an account? <Link to="/signup">Create Account</Link>
         </p>
       </section>
     </div>
   );
 }
+
+
 

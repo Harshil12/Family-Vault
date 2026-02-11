@@ -10,6 +10,23 @@ export default function FormModal({ title, isOpen, initialValues, fields, onClos
     setErrors({});
   }, [initialValues]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) {
     return null;
   }
@@ -52,7 +69,12 @@ export default function FormModal({ title, isOpen, initialValues, fields, onClos
   return (
     <div className="modal-backdrop">
       <div className="modal">
-        <h3>{title}</h3>
+        <div className="modal-head">
+          <h3>{title}</h3>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close form">
+            <CancelIcon />
+          </button>
+        </div>
         <form onSubmit={handleSubmit} className="form-grid">
           {fields.map((field) => (
             <label key={field.name}>

@@ -67,8 +67,8 @@ export default function SignUpPage() {
   return (
     <div className="auth-shell">
       <section className="auth-card">
-        <h1>Create user</h1>
-        <p>Register the primary FamilyVault owner profile.</p>
+        <h1>Create Account</h1>
+        <p>Set up the primary owner account for your Family Vault.</p>
 
         <form onSubmit={handleSubmit} className="form-grid">
           <label>
@@ -124,15 +124,16 @@ export default function SignUpPage() {
           {message && <p className="success-text">{message}</p>}
 
           <button type="submit" className="btn" disabled={loading}>
-            {loading ? "Creating..." : "Create User"}
+            {loading ? "Creating..." : "Create Account"}
           </button>
         </form>
 
         <p className="subtle">
-          Already have access? <Link to="/login">Back to login</Link>
+          Already have access? <Link to="/login">Back to Sign In</Link>
         </p>
       </section>
     </div>
   );
 }
+
 

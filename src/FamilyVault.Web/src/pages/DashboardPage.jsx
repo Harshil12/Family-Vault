@@ -152,10 +152,10 @@ export default function DashboardPage() {
       <header className="page-header">
         <div>
           <h2>Dashboard</h2>
-          <p className="subtle">A quick view of your family profiles, IDs, and bank records.</p>
+          <p className="subtle page-intro">A clear view of your family’s members, documents, and financial details.</p>
         </div>
         <Link className="btn" to="/families">
-          <span>Manage Families</span>
+          <span>Open Family Profiles</span>
           <span className="btn-icon"><ArrowRightIcon /></span>
         </Link>
       </header>
@@ -204,4 +204,5 @@ export default function DashboardPage() {
     </section>
   );
 }
+
 
