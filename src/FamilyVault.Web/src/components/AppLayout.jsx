@@ -1,7 +1,8 @@
 import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { LogoutIcon } from "./ui/Icons";
+import { useTheme } from "../context/ThemeContext";
+import { LogoutIcon, MoonIcon, SunIcon } from "./ui/Icons";
 
 const links = [
   { to: "/", label: "Dashboard", end: true },
@@ -11,6 +12,7 @@ const links = [
 
 export default function AppLayout() {
   const { userId, logout, isPreviewMode } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <div className="app-shell">
@@ -30,6 +32,10 @@ export default function AppLayout() {
           ))}
         </nav>
         <div className="sidebar-footer">
+          <button type="button" className="btn ghost theme-toggle" onClick={toggleTheme}>
+            <span className="btn-icon">{isDark ? <SunIcon /> : <MoonIcon />}</span>
+            <span>{isDark ? "Light Theme" : "Dark Theme"}</span>
+          </button>
           <small className="subtle">User ID: {userId ?? "preview-user"}</small>
           {!isPreviewMode && (
             <button type="button" className="btn ghost" onClick={logout}>

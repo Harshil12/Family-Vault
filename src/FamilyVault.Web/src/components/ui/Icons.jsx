@@ -124,3 +124,19 @@ export function CancelIcon() {
     </IconBase>
   );
 }
+
+export function SunIcon() {
+  return (
+    <IconBase>
+      <path fill="currentColor" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-5h1.2v3H12V3Zm0 18h1.2v-3H12v3ZM3 12h3v1.2H3V12Zm15 0h3v1.2h-3V12Zm-11.9-6.8.85-.85 2.1 2.1-.85.85-2.1-2.1Zm8.9 8.9.85-.85 2.1 2.1-.85.85-2.1-2.1Zm2.95-9.75.85.85-2.1 2.1-.85-.85 2.1-2.1ZM6.95 16.7l.85.85-2.1 2.1-.85-.85 2.1-2.1Z" />
+    </IconBase>
+  );
+}
+
+export function MoonIcon() {
+  return (
+    <IconBase>
+      <path fill="currentColor" d="M14.5 3.5A8.5 8.5 0 1 0 20.5 16 7.2 7.2 0 1 1 14.5 3.5Z" />
+    </IconBase>
+  );
+}
