@@ -21,6 +21,7 @@ namespace FamilyVault.Infrastructure
             services.AddScoped<IFamilyRepository, FamilyRepository>();
             services.AddScoped<IFamilyMemberRepository, FamilyMemberRepository>();
             services.AddScoped<IDocumentRepository, DocumentRepository>();
+            services.AddScoped<IBankAccountRepository, BankAccountRepository>();
 
             services.AddDbContext<AppDbContext>(options =>
             {

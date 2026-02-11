@@ -167,6 +167,22 @@ public class UserRepository : IUserRepository
                       .SetProperty(d => d.UpdatedAt, DateTimeOffset.UtcNow),
                 cancellationToken);
 
+        await (
+                from b in _appDbContext.BankAccounts
+                join m in _appDbContext.FamilyMembers on b.FamilyMemberId equals m.Id
+                join f in _appDbContext.Families on m.FamilyId equals f.Id
+                where f.UserId == userId
+                      && !f.IsDeleted
+                      && !m.IsDeleted
+                      && !b.IsDeleted
+                select b
+              )
+              .ExecuteUpdateAsync(setter =>
+                setter.SetProperty(b => b.IsDeleted, true)
+                      .SetProperty(b => b.UpdatedBy, user)
+                      .SetProperty(b => b.UpdatedAt, DateTimeOffset.UtcNow),
+                cancellationToken);
+
         _memoryCache.Remove("UsersWithFamilies");
         _memoryCache.Remove("UsersFamilies");
     }
