@@ -54,7 +54,11 @@ export default function SignUpPage() {
       setMessage("User created successfully. You can now login.");
       setForm(initialForm);
     } catch (requestError) {
-      setApiError(requestError.message);
+      if (requestError?.fieldErrors && typeof requestError.fieldErrors === "object") {
+        setFieldErrors(requestError.fieldErrors);
+      } else {
+        setApiError(requestError.message);
+      }
     } finally {
       setLoading(false);
     }

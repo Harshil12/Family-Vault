@@ -36,6 +36,7 @@ This app is mapped to current backend routes:
 - `POST /documents/{familyMemberId}/documents`
 - `POST /documents/{familyMemberId}/documents/upload` (multipart/form-data)
 - `GET /documents/{familyMemberId}/{id}/file?download=true|false`
+- `PUT /documents/{familyMemberId}/documents/{id}/file` (multipart/form-data, replace file)
 - `PUT /documents/{familyMemberId}/documents/{id}`
 - `DELETE /documents/{familyMemberId}/{id}`
 - `GET /bankaccounts/{familyMemberId}`
@@ -66,6 +67,7 @@ npm run dev
 ## Document Upload
 
 - Allowed file types: PDF, Word (`.doc/.docx`), Excel (`.xls/.xlsx`), images (`.png/.jpg/.jpeg/.gif/.bmp/.webp`)
+- Max file size: 10 MB
 - Files are saved on server under:
   - `uploads/{userId}/{familyName}/{generatedFileName}`
 - Relative path is stored in document `SavedLocation`.

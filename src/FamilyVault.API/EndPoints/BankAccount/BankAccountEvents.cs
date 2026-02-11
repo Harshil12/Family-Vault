@@ -18,10 +18,19 @@ public static class BankAccountEvents
 
         bankAccountGroup.MapGet("/", async (Guid familyMemberId,
             IBankAccountService bankAccountService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
             ILoggerFactory loggerFactory,
+            ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
+
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("BankAccountEvents");
 
@@ -39,10 +48,19 @@ public static class BankAccountEvents
         bankAccountGroup.MapGet("/{id:guid}", async (Guid familyMemberId,
             Guid id,
             IBankAccountService bankAccountService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
             ILoggerFactory loggerFactory,
+            ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
+
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("BankAccountEvents");
 
@@ -63,11 +81,17 @@ public static class BankAccountEvents
         bankAccountGroup.MapPost("/bankaccounts", async (Guid familyMemberId,
             CreateBankAccountRequest createBankAccountRequest,
             IBankAccountService bankAccountService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
             var traceId = httpContext.TraceIdentifier;
             createBankAccountRequest.FamilyMemberId = familyMemberId;
 
@@ -81,11 +105,17 @@ public static class BankAccountEvents
             Guid id,
             UpdateBankAccountRequest updateBankAccountRequest,
             IBankAccountService bankAccountService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
             var traceId = httpContext.TraceIdentifier;
             updateBankAccountRequest.Id = id;
             updateBankAccountRequest.FamilyMemberId = familyMemberId;
@@ -98,12 +128,18 @@ public static class BankAccountEvents
         bankAccountGroup.MapDelete("/{id:guid}", async (Guid familyMemberId,
             Guid id,
             IBankAccountService bankAccountService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
             ILoggerFactory loggerFactory,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("BankAccountEvents");
 
@@ -121,5 +157,22 @@ public static class BankAccountEvents
 
             return Results.Ok(ApiResponse<BankAccountDetailsDto>.Success(null, "Bank account has been successfully deleted.", traceId));
         });
+    }
+
+    private static async Task<bool> UserOwnsFamilyMemberAsync(
+        Guid familyMemberId,
+        Guid userId,
+        IFamilyMemberService familyMemberService,
+        IFamilyService familyService,
+        CancellationToken cancellationToken)
+    {
+        var familyMember = await familyMemberService.GetFamilyMemberByIdAsync(familyMemberId, cancellationToken);
+        if (familyMember is null)
+        {
+            return false;
+        }
+
+        var family = await familyService.GetFamilyByIdAsync(familyMember.FamilyId, cancellationToken);
+        return family is not null && family.UserId == userId;
     }
 }

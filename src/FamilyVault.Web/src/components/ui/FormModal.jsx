@@ -31,14 +31,22 @@ export default function FormModal({ title, isOpen, initialValues, fields, onClos
     });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const nextErrors = validate ? validate(values) : {};
     if (Object.keys(nextErrors).length) {
       setErrors(nextErrors);
       return;
     }
-    onSubmit(values);
+    try {
+      await onSubmit(values);
+    } catch (submitError) {
+      if (submitError?.fieldErrors && typeof submitError.fieldErrors === "object") {
+        setErrors(submitError.fieldErrors);
+      } else {
+        setErrors({ _form: submitError?.message ?? "Unable to submit form." });
+      }
+    }
   };
 
   return (

@@ -10,6 +10,8 @@ namespace FamilyVault.API.EndPoints.Document;
 /// </summary>
 public static class DocumentEvents
 {
+    private const long MaxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
+
     private static readonly HashSet<string> AllowedFileExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"
@@ -39,10 +41,19 @@ public static class DocumentEvents
 
         documentGroup.MapGet("/", async (Guid familyMemberId,
             IDocumentService _documentService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
             ILoggerFactory loggerFactory,
+            ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
+
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("DocumentEvents");
 
@@ -59,17 +70,26 @@ public static class DocumentEvents
 
         });
 
-        documentGroup.MapGet("/{id:guid}", async (Guid id, IDocumentService _documentService,
+        documentGroup.MapGet("/{id:guid}", async (Guid familyMemberId, Guid id, IDocumentService _documentService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
             ILoggerFactory loggerFactory,
+            ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
+
             var traceId = httpContext.TraceIdentifier;
             var logger = loggerFactory.CreateLogger("DocumentEvents");
 
             var documentDetail = await _documentService.GetDocumentDetailsByIdAsync(id, cancellationToken);
 
-            if (documentDetail is null)
+            if (documentDetail is null || documentDetail.FamilyMemberId != familyMemberId)
             {
                 logger.LogWarning($"No documents found for id - {id}. TraceId: {traceId}");
 
@@ -87,9 +107,18 @@ public static class DocumentEvents
             Guid id,
             bool? download,
             IDocumentService documentService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
+            ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
+
             var traceId = httpContext.TraceIdentifier;
             var document = await documentService.GetDocumentDetailsByIdAsync(id, cancellationToken);
 
@@ -133,13 +162,24 @@ public static class DocumentEvents
             );
         });
 
-        documentGroup.MapDelete("/{id:guid}", async (Guid id, IDocumentService _documentService,
+        documentGroup.MapDelete("/{id:guid}", async (Guid familyMemberId, Guid id, IDocumentService _documentService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
             var traceId = httpContext.TraceIdentifier;
+            var existingDocument = await _documentService.GetDocumentDetailsByIdAsync(id, cancellationToken);
+            if (existingDocument is null || existingDocument.FamilyMemberId != familyMemberId)
+            {
+                return Results.Forbid();
+            }
 
             await _documentService.DeleteDocumentDetailsByIdAsync(id, userId, cancellationToken);
 
@@ -148,13 +188,21 @@ public static class DocumentEvents
         });
 
         documentGroup.MapPost("/documents", async (CreateDocumentRequest createDocumentRequest,
+            Guid familyMemberId,
             IDocumentService _documentService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
             var traceId = httpContext.TraceIdentifier;
+            createDocumentRequest.FamilyMemberId = familyMemberId;
 
             var createdDocument = await _documentService.CreateDocumentDetailsAsync(createDocumentRequest, userId, cancellationToken);
 
@@ -175,12 +223,23 @@ public static class DocumentEvents
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
 
             if (uploadDocumentRequest.File is null || uploadDocumentRequest.File.Length <= 0)
             {
                 return Results.BadRequest(ApiResponse<DocumentDetailsDto>.Failure(
                     message: "File is required.",
                     errorCode: "FILE_REQUIRED",
+                    traceId: traceId));
+            }
+            if (uploadDocumentRequest.File.Length > MaxFileSizeBytes)
+            {
+                return Results.BadRequest(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "File size cannot exceed 10 MB.",
+                    errorCode: "FILE_TOO_LARGE",
                     traceId: traceId));
             }
 
@@ -240,14 +299,125 @@ public static class DocumentEvents
                 ApiResponse<DocumentDetailsDto>.Success(createdDocument, "Document has been successfully uploaded.", traceId));
         });
 
-        documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest,
-            IDocumentService _documentService,
+        documentGroup.MapPut("/documents/{id:Guid}/file", async (Guid familyMemberId,
+            Guid id,
+            [FromForm] ReplaceDocumentFileRequest replaceDocumentFileRequest,
+            IDocumentService documentService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
+            IWebHostEnvironment hostEnvironment,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
             var traceId = httpContext.TraceIdentifier;
+
+            if (replaceDocumentFileRequest.File is null || replaceDocumentFileRequest.File.Length <= 0)
+            {
+                return Results.BadRequest(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "File is required.",
+                    errorCode: "FILE_REQUIRED",
+                    traceId: traceId));
+            }
+            if (replaceDocumentFileRequest.File.Length > MaxFileSizeBytes)
+            {
+                return Results.BadRequest(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "File size cannot exceed 10 MB.",
+                    errorCode: "FILE_TOO_LARGE",
+                    traceId: traceId));
+            }
+
+            var extension = Path.GetExtension(replaceDocumentFileRequest.File.FileName);
+            if (string.IsNullOrWhiteSpace(extension) || !AllowedFileExtensions.Contains(extension))
+            {
+                return Results.BadRequest(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "Only PDF, Word, Excel and image files are allowed.",
+                    errorCode: "FILE_TYPE_NOT_ALLOWED",
+                    traceId: traceId));
+            }
+
+            var existingDocument = await documentService.GetDocumentDetailsByIdAsync(id, cancellationToken);
+            if (existingDocument is null || existingDocument.FamilyMemberId != familyMemberId)
+            {
+                return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "No documents found for given id",
+                    errorCode: "DOC_NOT_FOUND",
+                    traceId: traceId));
+            }
+
+            var familyMember = await familyMemberService.GetFamilyMemberByIdAsync(familyMemberId, cancellationToken);
+            if (familyMember is null)
+            {
+                return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "No family member found for given id",
+                    errorCode: "FAMILY_MEMBER_NOT_FOUND",
+                    traceId: traceId));
+            }
+
+            var family = await familyService.GetFamilyByIdAsync(familyMember.FamilyId, cancellationToken);
+            if (family is null)
+            {
+                return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "No family found for family member",
+                    errorCode: "FAMILY_NOT_FOUND",
+                    traceId: traceId));
+            }
+
+            var safeFamilyName = SanitizePathPart(family.Name);
+            var safeFileName = $"{DateTimeOffset.UtcNow:yyyyMMddHHmmssfff}_{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+            var relativePath = Path.Combine("uploads", userId.ToString(), safeFamilyName, safeFileName);
+            var fullPath = Path.Combine(hostEnvironment.ContentRootPath, relativePath);
+
+            var directoryPath = Path.GetDirectoryName(fullPath)!;
+            Directory.CreateDirectory(directoryPath);
+
+            await using (var stream = File.Create(fullPath))
+            {
+                await replaceDocumentFileRequest.File.CopyToAsync(stream, cancellationToken);
+            }
+
+            var updateDocumentRequest = new UpdateDocumentRequest
+            {
+                Id = id,
+                FamilyMemberId = familyMemberId,
+                DocumentType = replaceDocumentFileRequest.DocumentType ?? existingDocument.DocumentType,
+                DocumentNumber = string.IsNullOrWhiteSpace(replaceDocumentFileRequest.DocumentNumber)
+                    ? existingDocument.DocumentNumber
+                    : replaceDocumentFileRequest.DocumentNumber,
+                IssueDate = replaceDocumentFileRequest.IssueDate ?? existingDocument.IssueDate,
+                ExpiryDate = replaceDocumentFileRequest.ExpiryDate ?? existingDocument.ExpiryDate,
+                SavedLocation = relativePath.Replace("\\", "/")
+            };
+
+            var updatedDocument = await documentService.UpdateDocumentDetailsAsync(updateDocumentRequest, userId, cancellationToken);
+            TryDeleteOldDocumentFile(existingDocument.SavedLocation, hostEnvironment.ContentRootPath);
+
+            return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updatedDocument, "Document file has been successfully replaced.", traceId));
+        });
+
+        documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest,
+            Guid familyMemberId,
+            IDocumentService _documentService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
+            HttpContext httpContext,
+            ClaimsPrincipal claimsPrincipal,
+            CancellationToken cancellationToken) =>
+        {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            var traceId = httpContext.TraceIdentifier;
+            if (!await UserOwnsFamilyMemberAsync(familyMemberId, userId, familyMemberService, familyService, cancellationToken))
+            {
+                return Results.Forbid();
+            }
+            var existingDocument = await _documentService.GetDocumentDetailsByIdAsync(id, cancellationToken);
+            if (existingDocument is null || existingDocument.FamilyMemberId != familyMemberId)
+            {
+                return Results.Forbid();
+            }
+            updateDocumentRequest.Id = id;
+            updateDocumentRequest.FamilyMemberId = familyMemberId;
 
             var updatedDocument = await _documentService.UpdateDocumentDetailsAsync(updateDocumentRequest, userId, cancellationToken);
 
@@ -264,5 +434,44 @@ public static class DocumentEvents
         }
 
         return string.IsNullOrWhiteSpace(value) ? "UnknownFamily" : value.Trim();
+    }
+
+    private static void TryDeleteOldDocumentFile(string? oldRelativePath, string contentRootPath)
+    {
+        if (string.IsNullOrWhiteSpace(oldRelativePath))
+        {
+            return;
+        }
+
+        var normalized = oldRelativePath.Replace('/', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
+        var fullPath = Path.GetFullPath(Path.Combine(contentRootPath, normalized));
+        var uploadsRoot = Path.GetFullPath(Path.Combine(contentRootPath, "uploads"));
+
+        if (!fullPath.StartsWith(uploadsRoot, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (File.Exists(fullPath))
+        {
+            File.Delete(fullPath);
+        }
+    }
+
+    private static async Task<bool> UserOwnsFamilyMemberAsync(
+        Guid familyMemberId,
+        Guid userId,
+        IFamilyMemberService familyMemberService,
+        IFamilyService familyService,
+        CancellationToken cancellationToken)
+    {
+        var familyMember = await familyMemberService.GetFamilyMemberByIdAsync(familyMemberId, cancellationToken);
+        if (familyMember is null)
+        {
+            return false;
+        }
+
+        var family = await familyService.GetFamilyByIdAsync(familyMember.FamilyId, cancellationToken);
+        return family is not null && family.UserId == userId;
     }
 }

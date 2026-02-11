@@ -33,6 +33,33 @@ function getErrorMessage(errorPayload, fallbackMessage) {
   return fallbackMessage;
 }
 
+function toCamelCaseKey(key) {
+  if (!key || typeof key !== "string") {
+    return key;
+  }
+  return key.charAt(0).toLowerCase() + key.slice(1);
+}
+
+function normalizeFieldErrors(errorPayload) {
+  // New API shape from global validation handler
+  if (errorPayload?.errorCode === "VALIDATION_ERROR" && errorPayload?.data && typeof errorPayload.data === "object") {
+    return Object.entries(errorPayload.data).reduce((acc, [k, v]) => {
+      acc[toCamelCaseKey(k)] = Array.isArray(v) ? v[0] : String(v);
+      return acc;
+    }, {});
+  }
+
+  // ASP.NET ValidationProblem fallback shape
+  if (errorPayload?.errors && typeof errorPayload.errors === "object") {
+    return Object.entries(errorPayload.errors).reduce((acc, [k, v]) => {
+      acc[toCamelCaseKey(k)] = Array.isArray(v) ? v[0] : String(v);
+      return acc;
+    }, {});
+  }
+
+  return null;
+}
+
 export async function apiRequest(path, { method = "GET", token, payload } = {}) {
   const headers = {
     Accept: "application/json"
@@ -62,7 +89,11 @@ export async function apiRequest(path, { method = "GET", token, payload } = {}) 
   const responseData = contentType.includes("application/json") ? await response.json() : null;
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(responseData, `Request failed (${response.status})`));
+    const error = new Error(getErrorMessage(responseData, `Request failed (${response.status})`));
+    error.status = response.status;
+    error.payload = responseData;
+    error.fieldErrors = normalizeFieldErrors(responseData);
+    throw error;
   }
 
   return responseData;

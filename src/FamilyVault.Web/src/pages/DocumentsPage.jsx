@@ -5,7 +5,7 @@ import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import { BackIcon, DocumentIcon, PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
-import { createDocument, deleteDocument, downloadDocumentFile, getDocuments, previewDocumentFile, updateDocument, uploadDocument } from "../services/documentService";
+import { createDocument, deleteDocument, downloadDocumentFile, getDocuments, previewDocumentFile, replaceDocumentFile, updateDocument, uploadDocument } from "../services/documentService";
 import { documentTypeOptions, optionLabelByValue } from "../utils/options";
 import { unwrapData } from "../utils/response";
 import { validateDocument } from "../utils/validation";
@@ -54,6 +54,7 @@ export default function DocumentsPage() {
   const [searchText, setSearchText] = useState("");
   const [documentTypeFilter, setDocumentTypeFilter] = useState("");
   const [expiringOnly, setExpiringOnly] = useState(false);
+  const [previewState, setPreviewState] = useState(null);
 
   const columns = [
     {
@@ -122,6 +123,14 @@ export default function DocumentsPage() {
     loadDocuments();
   }, [memberId, token, isPreviewMode]);
 
+  useEffect(() => {
+    return () => {
+      if (previewState?.objectUrl) {
+        URL.revokeObjectURL(previewState.objectUrl);
+      }
+    };
+  }, [previewState]);
+
   const openCreate = () => {
     setEditingDocument(null);
     setModalOpen(true);
@@ -145,8 +154,12 @@ export default function DocumentsPage() {
 
     try {
       if (editingDocument) {
-        payload.savedLocation = editingDocument.savedLocation ?? null;
-        await updateDocument(memberId, editingDocument.id, payload, token);
+        if (values.file) {
+          await replaceDocumentFile(memberId, editingDocument.id, { ...payload, file: values.file }, token);
+        } else {
+          payload.savedLocation = editingDocument.savedLocation ?? null;
+          await updateDocument(memberId, editingDocument.id, payload, token);
+        }
       } else {
         if (values.file) {
           await uploadDocument(memberId, { ...payload, file: values.file }, token);
@@ -172,10 +185,23 @@ export default function DocumentsPage() {
 
   const handlePreview = async (document) => {
     try {
-      await previewDocumentFile(memberId, document.id, token);
+      const preview = await previewDocumentFile(memberId, document.id, token);
+      setPreviewState({
+        id: document.id,
+        objectUrl: preview.objectUrl,
+        contentType: preview.contentType,
+        documentNumber: document.documentNumber
+      });
     } catch (requestError) {
       setError(requestError.message);
     }
+  };
+
+  const closePreview = () => {
+    if (previewState?.objectUrl) {
+      URL.revokeObjectURL(previewState.objectUrl);
+    }
+    setPreviewState(null);
   };
 
   const handleDownload = async (document) => {
@@ -266,7 +292,7 @@ export default function DocumentsPage() {
           { name: "issueDate", label: "Issue Date", type: "date" },
           { name: "expiryDate", label: "Expiry Date", type: "date" },
           ...(editingDocument
-            ? []
+            ? [{ name: "file", label: "Replace File (Optional)", type: "file", accept: ".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.bmp,.webp" }]
             : [{ name: "file", label: "Upload File", type: "file", accept: ".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.bmp,.webp" }])
         ]}
         validate={(values) => validateDocument(values, { requireFile: !editingDocument })}
@@ -280,6 +306,32 @@ export default function DocumentsPage() {
         onCancel={() => setDeletingDocument(null)}
         onConfirm={confirmDelete}
       />
+      {previewState && (
+        <div className="modal-backdrop">
+          <div className="modal file-preview-modal">
+            <h3>Preview: {previewState.documentNumber}</h3>
+            {previewState.contentType.startsWith("image/") ? (
+              <img src={previewState.objectUrl} alt={previewState.documentNumber} className="preview-image" />
+            ) : previewState.contentType.includes("pdf") ? (
+              <iframe src={previewState.objectUrl} title="Document Preview" className="preview-frame" />
+            ) : (
+              <p className="subtle">Inline preview is available for PDF and images. Use download for this file type.</p>
+            )}
+            <div className="modal-actions">
+              <button type="button" className="btn ghost" onClick={closePreview}>
+                Close
+              </button>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => downloadDocumentFile(memberId, previewState.id, token, previewState.documentNumber)}
+              >
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Link className="inline-link back-link" to={`/families/${familyId}/members`}>
         <span className="btn-icon"><BackIcon /></span>

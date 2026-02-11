@@ -1,3 +1,5 @@
+using FluentValidation;
+
 namespace FamilyVault.API;
 
 /// <summary>
@@ -25,6 +27,30 @@ public class MiddlewearGlobalExceaption
         try
         {
             await _requestDelegate(httpContext); ;
+        }
+        catch (ValidationException validationException)
+        {
+            _logger.LogWarning(validationException, "Validation exception occurred");
+
+            var validationErrors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray());
+
+            var response = new ApiResponse<Dictionary<string, string[]>>
+            {
+                IsSuccess = false,
+                Message = "Validation failed.",
+                ErrorCode = "VALIDATION_ERROR",
+                TraceId = httpContext.TraceIdentifier,
+                Data = validationErrors
+            };
+
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            httpContext.Response.ContentType = "application/json";
+            var jsonResponse = System.Text.Json.JsonSerializer.Serialize(response);
+            await httpContext.Response.WriteAsync(jsonResponse);
         }
         catch (Exception ex)
         {

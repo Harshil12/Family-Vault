@@ -59,6 +59,7 @@ export function validateFamilyMember(values) {
 export function validateDocument(values, { requireFile = false } = {}) {
   const errors = {};
   const allowedFileExtensions = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"];
+  const maxFileSizeBytes = 10 * 1024 * 1024;
   if (!values.documentNumber?.trim()) errors.documentNumber = "Document number is required.";
   if (values.documentType === "" || values.documentType === null || values.documentType === undefined) errors.documentType = "Type is required.";
   if (values.issueDate && values.expiryDate && new Date(values.expiryDate) <= new Date(values.issueDate)) {
@@ -78,6 +79,9 @@ export function validateDocument(values, { requireFile = false } = {}) {
     const hasAllowedExt = allowedFileExtensions.some((ext) => lower.endsWith(ext));
     if (!hasAllowedExt) {
       errors.file = "Only PDF, Word, Excel and image files are allowed.";
+    }
+    if (values.file.size > maxFileSizeBytes) {
+      errors.file = "File size cannot exceed 10 MB.";
     }
   }
   return errors;

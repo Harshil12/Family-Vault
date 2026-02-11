@@ -23,12 +23,7 @@ public class ValidationFilter<T> : IEndpointFilter
 
             if (!result.IsValid)
             {
-                return Results.ValidationProblem(
-                    result.Errors
-                        .GroupBy(e => e.PropertyName)
-                        .ToDictionary(
-                            g => g.Key,
-                            g => g.Select(e => e.ErrorMessage).ToArray()));
+                throw new ValidationException(result.Errors);
             }
         }
 

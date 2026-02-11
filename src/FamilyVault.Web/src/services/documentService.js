@@ -32,6 +32,29 @@ export async function uploadDocument(memberId, payload, token) {
   });
 }
 
+export async function replaceDocumentFile(memberId, documentId, payload, token) {
+  const formData = new FormData();
+  formData.append("file", payload.file);
+  if (payload.documentType !== undefined && payload.documentType !== null) {
+    formData.append("documentType", String(payload.documentType));
+  }
+  if (payload.documentNumber) {
+    formData.append("documentNumber", payload.documentNumber);
+  }
+  if (payload.issueDate) {
+    formData.append("issueDate", payload.issueDate);
+  }
+  if (payload.expiryDate) {
+    formData.append("expiryDate", payload.expiryDate);
+  }
+
+  return apiRequest(`/documents/${memberId}/documents/${documentId}/file`, {
+    method: "PUT",
+    token,
+    payload: formData
+  });
+}
+
 export async function updateDocument(memberId, id, payload, token) {
   return apiRequest(`/documents/${memberId}/documents/${id}`, {
     method: "PUT",
@@ -72,10 +95,9 @@ async function fetchDocumentBlob(memberId, documentId, token, mode = "preview") 
 }
 
 export async function previewDocumentFile(memberId, documentId, token) {
-  const { blob } = await fetchDocumentBlob(memberId, documentId, token, "preview");
+  const { blob, contentType } = await fetchDocumentBlob(memberId, documentId, token, "preview");
   const objectUrl = URL.createObjectURL(blob);
-  window.open(objectUrl, "_blank", "noopener,noreferrer");
-  setTimeout(() => URL.revokeObjectURL(objectUrl), 15000);
+  return { objectUrl, contentType };
 }
 
 export async function downloadDocumentFile(memberId, documentId, token, suggestedName = "document") {
