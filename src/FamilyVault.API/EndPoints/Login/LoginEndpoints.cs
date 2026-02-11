@@ -1,3 +1,4 @@
+using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Identity.Data;
 
@@ -25,5 +26,20 @@ public static class LoginEndpoints
                 else
                     return Results.Ok(new { token });
             });
+
+        app.MapPost("/register", async (
+            CreateUserRequest createUserRequest,
+            IUserService userService,
+            HttpContext httpContext,
+            CancellationToken cancellationToken) =>
+        {
+            var traceId = httpContext.TraceIdentifier;
+
+            var createdUser = await userService.RegisterUserAsync(createUserRequest, cancellationToken);
+
+            return Results.Created($"/user/{createdUser.Id}",
+                ApiResponse<UserDto>.Success(createdUser, "User has been successfully registered.", traceId));
+
+        }).AddEndpointFilter<ValidationFilter<CreateUserRequest>>();
     }
 }

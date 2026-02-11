@@ -14,6 +14,14 @@
   <Folder Name="/FamilyVault.Infrastructure/">
     <Project Path="src/FamilyVault.Infrastructure/FamilyVault.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/FamilyVault.Web/">
+    <File Path="src/FamilyVault.Web/package.json" />
+    <File Path="src/FamilyVault.Web/vite.config.js" />
+    <File Path="src/FamilyVault.Web/README.md" />
+    <File Path="src/FamilyVault.Web/.env.example" />
+    <File Path="src/FamilyVault.Web/postman/FamilyVault_API_E2E.postman_collection.json" />
+    <File Path="src/FamilyVault.Web/postman/FamilyVault_Local.postman_environment.json" />
+  </Folder>
   <Folder Name="/SolutionItems/">
     <File Path="Directory.Packages.props" />
   </Folder>

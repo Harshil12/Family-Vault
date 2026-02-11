@@ -53,19 +53,15 @@ public class Userservice : IUserService
     /// </summary>
     public async Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, Guid createdByUserId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
+        return await CreateUserInternalAsync(createUserRequest, createdByUserId.ToString(), cancellationToken);
+    }
 
-        var userToCreate = _mapper.Map<User>(createUserRequest);
-
-        userToCreate.Password = _cryptoService.HashPassword(createUserRequest.Password);
-        userToCreate.CreatedAt = DateTimeOffset.Now;
-        userToCreate.CreatedBy = createdByUserId.ToString();
-
-        var result = await _userRepository.AddAsync(userToCreate, cancellationToken);
-
-        _logger.LogInformation("User created successfully with ID: {UserId}", result.Id);
-
-        return _mapper.Map<UserDto>(result);
+    /// <summary>
+    /// Performs user self-registration operation.
+    /// </summary>
+    public async Task<UserDto> RegisterUserAsync(CreateUserRequest createUserRequest, CancellationToken cancellationToken)
+    {
+        return await CreateUserInternalAsync(createUserRequest, "SELF_REGISTER", cancellationToken);
     }
 
     /// <summary>
@@ -98,5 +94,22 @@ public class Userservice : IUserService
         _logger.LogInformation("User with ID: {UserId} updated successfully", updateUserRequest.Id);
 
         return _mapper.Map<UserDto>(user);
+    }
+
+    private async Task<UserDto> CreateUserInternalAsync(CreateUserRequest createUserRequest, string createdBy, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Creating a new user with username: {Username}", createUserRequest.Username);
+
+        var userToCreate = _mapper.Map<User>(createUserRequest);
+
+        userToCreate.Password = _cryptoService.HashPassword(createUserRequest.Password);
+        userToCreate.CreatedAt = DateTimeOffset.Now;
+        userToCreate.CreatedBy = createdBy;
+
+        var result = await _userRepository.AddAsync(userToCreate, cancellationToken);
+
+        _logger.LogInformation("User created successfully with ID: {UserId}", result.Id);
+
+        return _mapper.Map<UserDto>(result);
     }
 }

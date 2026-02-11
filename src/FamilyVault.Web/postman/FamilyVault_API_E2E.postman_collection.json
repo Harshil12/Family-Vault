@@ -1,0 +1,470 @@
+{
+  "info": {
+    "name": "FamilyVault API E2E",
+    "description": "End-to-end flow for FamilyVault: register, login, families, members, documents, bank accounts.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"firstName\": \"{{firstName}}\",\n  \"lastName\": \"{{lastName}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"countryCode\": \"{{countryCode}}\",\n  \"mobile\": \"{{mobile}}\"\n}"
+            },
+            "description": "Creates a new user anonymously via /register"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Register status is 201/200', function () {",
+                  "  pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "const res = pm.response.json();",
+                  "if (res?.data?.id) { pm.collectionVariables.set('userId', res.data.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns token', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const res = pm.response.json();",
+                  "if (res?.token) { pm.collectionVariables.set('token', res.token); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Families",
+      "item": [
+        {
+          "name": "Get Families",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/family/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["family", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Family",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/family/{{userId}}/family",
+              "host": ["{{baseUrl}}"],
+              "path": ["family", "{{userId}}", "family"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"familyName\": \"{{familyName}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Create family success', function () {",
+                  "  pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "const res = pm.response.json();",
+                  "if (res?.data?.id) { pm.collectionVariables.set('familyId', res.data.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Family",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/family/{{userId}}/family/{{familyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["family", "{{userId}}", "family", "{{familyId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{familyId}}\",\n  \"familyName\": \"{{familyNameUpdated}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Family",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/family/{{userId}}/{{familyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["family", "{{userId}}", "{{familyId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Family Members",
+      "item": [
+        {
+          "name": "Get Family Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/familymember/{{familyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["familymember", "{{familyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Family Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/familymember/{{familyId}}/familymember",
+              "host": ["{{baseUrl}}"],
+              "path": ["familymember", "{{familyId}}", "familymember"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"{{memberFirstName}}\",\n  \"lastName\": \"{{memberLastName}}\",\n  \"familyId\": \"{{familyId}}\",\n  \"countryCode\": \"{{countryCode}}\",\n  \"mobile\": \"{{memberMobile}}\",\n  \"relationshipType\": {{relationshipType}},\n  \"dateOfBirth\": \"{{memberDob}}\",\n  \"bloodGroup\": {{bloodGroup}},\n  \"email\": \"{{memberEmail}}\",\n  \"pan\": \"{{memberPan}}\",\n  \"aadhar\": \"{{memberAadhar}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Create member success', function () {",
+                  "  pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "const res = pm.response.json();",
+                  "if (res?.data?.id) { pm.collectionVariables.set('memberId', res.data.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Family Member",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/familymember/{{familyId}}/familymember/{{memberId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["familymember", "{{familyId}}", "familymember", "{{memberId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{memberId}}\",\n  \"firstName\": \"{{memberFirstNameUpdated}}\",\n  \"lastName\": \"{{memberLastName}}\",\n  \"familyId\": \"{{familyId}}\",\n  \"countryCode\": \"{{countryCode}}\",\n  \"mobile\": \"{{memberMobile}}\",\n  \"relationshipType\": {{relationshipType}},\n  \"dateOfBirth\": \"{{memberDob}}\",\n  \"bloodGroup\": {{bloodGroup}},\n  \"email\": \"{{memberEmail}}\",\n  \"pan\": \"{{memberPan}}\",\n  \"aadhar\": \"{{memberAadhar}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Family Member",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/familymember/{{familyId}}/{{memberId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["familymember", "{{familyId}}", "{{memberId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "Get Documents",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/documents/{{memberId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "{{memberId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/documents/{{memberId}}/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "{{memberId}}", "documents"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentType\": {{documentType}},\n  \"documentNumber\": \"{{documentNumber}}\",\n  \"issueDate\": \"{{docIssueDate}}\",\n  \"expiryDate\": \"{{docExpiryDate}}\",\n  \"familyMemberId\": \"{{memberId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Create document success', function () {",
+                  "  pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "const res = pm.response.json();",
+                  "if (res?.data?.id) { pm.collectionVariables.set('documentId', res.data.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Document",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/documents/{{memberId}}/documents/{{documentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "{{memberId}}", "documents", "{{documentId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{documentId}}\",\n  \"documentType\": {{documentType}},\n  \"documentNumber\": \"{{documentNumberUpdated}}\",\n  \"issueDate\": \"{{docIssueDate}}\",\n  \"expiryDate\": \"{{docExpiryDate}}\",\n  \"familyMemberId\": \"{{memberId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Document",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/documents/{{memberId}}/{{documentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "{{memberId}}", "{{documentId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bank Accounts",
+      "item": [
+        {
+          "name": "Get Bank Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bankaccounts/{{memberId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["bankaccounts", "{{memberId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Bank Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bankaccounts/{{memberId}}/bankaccounts",
+              "host": ["{{baseUrl}}"],
+              "path": ["bankaccounts", "{{memberId}}", "bankaccounts"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bankName\": \"{{bankName}}\",\n  \"accountNumber\": \"{{accountNumber}}\",\n  \"accountType\": {{accountType}},\n  \"accountHolderName\": \"{{accountHolderName}}\",\n  \"ifsc\": \"{{ifsc}}\",\n  \"branch\": \"{{branch}}\",\n  \"familyMemberId\": \"{{memberId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Create account success', function () {",
+                  "  pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "const res = pm.response.json();",
+                  "if (res?.data?.id) { pm.collectionVariables.set('bankAccountId', res.data.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Bank Account",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bankaccounts/{{memberId}}/bankaccounts/{{bankAccountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["bankaccounts", "{{memberId}}", "bankaccounts", "{{bankAccountId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{bankAccountId}}\",\n  \"bankName\": \"{{bankNameUpdated}}\",\n  \"accountNumber\": \"{{accountNumber}}\",\n  \"accountType\": {{accountType}},\n  \"accountHolderName\": \"{{accountHolderName}}\",\n  \"ifsc\": \"{{ifsc}}\",\n  \"branch\": \"{{branch}}\",\n  \"familyMemberId\": \"{{memberId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Bank Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bankaccounts/{{memberId}}/{{bankAccountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["bankaccounts", "{{memberId}}", "{{bankAccountId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "familyId", "value": "" },
+    { "key": "memberId", "value": "" },
+    { "key": "documentId", "value": "" },
+    { "key": "bankAccountId", "value": "" },
+
+    { "key": "username", "value": "john.doe" },
+    { "key": "firstName", "value": "John" },
+    { "key": "lastName", "value": "Doe" },
+    { "key": "email", "value": "john.doe@example.com" },
+    { "key": "password", "value": "Pass@1234" },
+    { "key": "countryCode", "value": "+91" },
+    { "key": "mobile", "value": "9876543210" },
+
+    { "key": "familyName", "value": "Doe Family" },
+    { "key": "familyNameUpdated", "value": "Doe Family Updated" },
+
+    { "key": "memberFirstName", "value": "Jane" },
+    { "key": "memberFirstNameUpdated", "value": "Janet" },
+    { "key": "memberLastName", "value": "Doe" },
+    { "key": "memberMobile", "value": "9876500000" },
+    { "key": "relationshipType", "value": "1" },
+    { "key": "bloodGroup", "value": "0" },
+    { "key": "memberDob", "value": "1992-01-15T00:00:00Z" },
+    { "key": "memberEmail", "value": "jane.doe@example.com" },
+    { "key": "memberPan", "value": "ABCDE1234F" },
+    { "key": "memberAadhar", "value": "123456789012" },
+
+    { "key": "documentType", "value": "1" },
+    { "key": "documentNumber", "value": "P1234567" },
+    { "key": "documentNumberUpdated", "value": "P7654321" },
+    { "key": "docIssueDate", "value": "2020-01-01T00:00:00Z" },
+    { "key": "docExpiryDate", "value": "2030-01-01T00:00:00Z" },
+
+    { "key": "bankName", "value": "State Bank" },
+    { "key": "bankNameUpdated", "value": "State Bank Updated" },
+    { "key": "accountNumber", "value": "123456789012" },
+    { "key": "accountType", "value": "1" },
+    { "key": "accountHolderName", "value": "Jane Doe" },
+    { "key": "ifsc", "value": "SBIN0001234" },
+    { "key": "branch", "value": "Ahmedabad" }
+  ]
+}

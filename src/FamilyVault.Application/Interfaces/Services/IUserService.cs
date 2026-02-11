@@ -1,4 +1,4 @@
-﻿using FamilyVault.Application.DTOs.User;
+using FamilyVault.Application.DTOs.User;
 
 namespace FamilyVault.Application.Interfaces.Services;
 
@@ -46,6 +46,14 @@ public interface IUserService
     /// A <see cref="Task{UserDto}"/> that completes with the newly created <see cref="UserDto"/>.
     /// </returns>
     public Task<UserDto> CreateUserAsync(CreateUserRequest createUserRequest, Guid createdByUserId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Registers a new user without requiring an authenticated caller.
+    /// </summary>
+    /// <param name="createUserRequest">The request containing data for the new user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A <see cref="Task{UserDto}"/> with the created user.</returns>
+    public Task<UserDto> RegisterUserAsync(CreateUserRequest createUserRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes the user with the specified unique identifier.
