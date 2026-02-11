@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
@@ -9,6 +10,8 @@ using System.Text.Encodings.Web;
 /// </summary>
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
+    public static readonly Guid TestUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+
     /// <summary>
     /// Initializes a new instance of TestAuthHandler.
     /// </summary>
@@ -23,7 +26,8 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, TestUserId.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, TestUserId.ToString()),
             new Claim(ClaimTypes.Email, "test@test.com")
         };
 

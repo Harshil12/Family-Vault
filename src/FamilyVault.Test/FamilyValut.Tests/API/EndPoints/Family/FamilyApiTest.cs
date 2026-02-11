@@ -1,10 +1,10 @@
+using FamilyVault.API;
 using FamilyVault.Application.DTOs.Family;
 using FamilyVault.Application.Interfaces.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Moq;
 using System.Net;
 using System.Net.Http.Json;
@@ -18,6 +18,7 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly Mock<IFamilyService> _familyServiceMock = new();
+    private readonly Mock<IAuditService> _auditServiceMock = new();
 
     /// <summary>
     /// Initializes a new instance of FamilymemberEventsTests.
@@ -29,12 +30,28 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
             builder.ConfigureServices(services =>
             {
                 services.AddSingleton(_familyServiceMock.Object);
+                services.AddSingleton(_auditServiceMock.Object);
 
                 services.AddAuthentication("Test")
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                         "Test", _ => { });
             });
         });
+
+        _auditServiceMock
+            .Setup(s => s.LogAsync(
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<string?>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<string?>(),
+                It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
     }
 
     private HttpClient CreateClient()
@@ -53,7 +70,7 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
     public async Task GetFamilies_ShouldReturnEmptyList_WhenNoFamilies()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = TestAuthHandler.TestUserId;
 
         _familyServiceMock
             .Setup(s => s.GetFamilyByUserIdAsync(userId, It.IsAny<CancellationToken>()))
@@ -79,7 +96,7 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
     public async Task GetFamilyById_ShouldReturnNotFound_WhenFamilyDoesNotExist()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = TestAuthHandler.TestUserId;
         var familyId = Guid.NewGuid();
 
         _familyServiceMock
@@ -106,7 +123,7 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
     public async Task CreateFamily_ShouldReturnCreated()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = TestAuthHandler.TestUserId;
 
         var request = new CreateFamilyRequest
         {
@@ -116,7 +133,8 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
         var created = new FamilyDto
         {
             Id = Guid.NewGuid(),
-            Name = request.FamilyName
+            Name = request.FamilyName,
+            UserId = userId
         };
 
         _familyServiceMock
@@ -147,7 +165,7 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
     public async Task UpdateFamily_ShouldReturnOk()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = TestAuthHandler.TestUserId;
         var familyId = Guid.NewGuid();
 
         var request = new UpdateFamilyRequest
@@ -159,8 +177,18 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
         var updated = new FamilyDto
         {
             Id = familyId,
-            Name = request.FamilyName
+            Name = request.FamilyName,
+            UserId = userId
         };
+
+        _familyServiceMock
+            .Setup(s => s.GetFamilyByIdAsync(familyId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new FamilyDto
+            {
+                Id = familyId,
+                Name = "Existing",
+                UserId = userId
+            });
 
         _familyServiceMock
             .Setup(s => s.UpdateFamilyAsync(
@@ -190,8 +218,17 @@ public class FamilymemberEventsTests : IClassFixture<WebApplicationFactory<Progr
     public async Task DeleteFamily_ShouldReturnOk()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = TestAuthHandler.TestUserId;
         var familyId = Guid.NewGuid();
+
+        _familyServiceMock
+            .Setup(s => s.GetFamilyByIdAsync(familyId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new FamilyDto
+            {
+                Id = familyId,
+                Name = "Existing",
+                UserId = userId
+            });
 
         _familyServiceMock
             .Setup(s => s.DeleteFamilyByIdAsync(

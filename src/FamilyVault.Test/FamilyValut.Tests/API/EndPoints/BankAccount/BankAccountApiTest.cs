@@ -1,5 +1,5 @@
 using FamilyVault.API;
-using FamilyVault.Application.DTOs.Documents;
+using FamilyVault.Application.DTOs.BankAccounts;
 using FamilyVault.Application.DTOs.Family;
 using FamilyVault.Application.DTOs.FamilyMembers;
 using FamilyVault.Application.Interfaces.Services;
@@ -12,36 +12,35 @@ using Moq;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace FamilyVault.Tests.API.EndPoints.Document;
+namespace FamilyVault.Tests.API.EndPoints.BankAccount;
 
 /// <summary>
-/// Represents DocumentApiTests.
+/// Represents BankAccountApiTest.
 /// </summary>
-public class DocumentApiTests : IClassFixture<WebApplicationFactory<Program>>
+public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
-    private readonly Mock<IDocumentService> _documentServiceMock = new();
+    private readonly Mock<IBankAccountService> _bankAccountServiceMock = new();
     private readonly Mock<IFamilyMemberService> _familyMemberServiceMock = new();
     private readonly Mock<IFamilyService> _familyServiceMock = new();
     private readonly Mock<IAuditService> _auditServiceMock = new();
 
     /// <summary>
-    /// Initializes a new instance of DocumentApiTests.
+    /// Initializes a new instance of BankAccountApiTest.
     /// </summary>
-    public DocumentApiTests(WebApplicationFactory<Program> factory)
+    public BankAccountApiTest(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder =>
         {
             builder.ConfigureServices(services =>
             {
-                services.AddSingleton(_documentServiceMock.Object);
+                services.AddSingleton(_bankAccountServiceMock.Object);
                 services.AddSingleton(_familyMemberServiceMock.Object);
                 services.AddSingleton(_familyServiceMock.Object);
                 services.AddSingleton(_auditServiceMock.Object);
 
                 services.AddAuthentication("Test")
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                        "Test", options => { });
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
             });
         });
 
@@ -91,196 +90,167 @@ public class DocumentApiTests : IClassFixture<WebApplicationFactory<Program>>
             });
     }
 
-    #region GET /documents/{familyMemberId}
-
     [Fact]
     /// <summary>
-    /// Performs the GetDocuments_ShouldReturnEmptyList_WhenNoDocuments operation.
+    /// Performs the GetBankAccounts_ShouldReturnEmptyList_WhenNoBankAccounts operation.
     /// </summary>
-    public async Task GetDocuments_ShouldReturnEmptyList_WhenNoDocuments()
+    public async Task GetBankAccounts_ShouldReturnEmptyList_WhenNoBankAccounts()
     {
         // Arrange
         var familyMemberId = Guid.NewGuid();
         SetupOwnership(familyMemberId);
 
-        _documentServiceMock
-            .Setup(s => s.GetDocumentsDetailsByFamilyMemberIdAsync(
-                familyMemberId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<DocumentDetailsDto>());
+        _bankAccountServiceMock
+            .Setup(s => s.GetBankAccountsByFamilyMemberIdAsync(familyMemberId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<BankAccountDetailsDto>());
 
         var client = CreateClient();
 
         // Act
-        var response = await client.GetAsync($"/documents/{familyMemberId}");
+        var response = await client.GetAsync($"/bankaccounts/{familyMemberId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    #endregion
-
-    #region GET /documents/{familyMemberId}/{id}
-
     [Fact]
     /// <summary>
-    /// Performs the GetDocumentById_ShouldReturnNotFound_WhenDocumentDoesNotExist operation.
+    /// Performs the GetBankAccountById_ShouldReturnNotFound_WhenBankAccountDoesNotExist operation.
     /// </summary>
-    public async Task GetDocumentById_ShouldReturnNotFound_WhenDocumentDoesNotExist()
+    public async Task GetBankAccountById_ShouldReturnNotFound_WhenBankAccountDoesNotExist()
     {
         // Arrange
         var familyMemberId = Guid.NewGuid();
-        var docId = Guid.NewGuid();
+        var bankAccountId = Guid.NewGuid();
         SetupOwnership(familyMemberId);
 
-        _documentServiceMock
-            .Setup(s => s.GetDocumentDetailsByIdAsync(docId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((DocumentDetailsDto?)null);
+        _bankAccountServiceMock
+            .Setup(s => s.GetBankAccountByIdAsync(bankAccountId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((BankAccountDetailsDto?)null);
 
         var client = CreateClient();
 
         // Act
-        var response = await client.GetAsync($"/documents/{familyMemberId}/{docId}");
+        var response = await client.GetAsync($"/bankaccounts/{familyMemberId}/{bankAccountId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    #endregion
-
-    #region POST /documents
-
     [Fact]
     /// <summary>
-    /// Performs the CreateDocument_ShouldReturnCreated operation.
+    /// Performs the CreateBankAccount_ShouldReturnCreated operation.
     /// </summary>
-    public async Task CreateDocument_ShouldReturnCreated()
+    public async Task CreateBankAccount_ShouldReturnCreated()
     {
         // Arrange
         var familyMemberId = Guid.NewGuid();
         SetupOwnership(familyMemberId);
 
-        var request = new CreateDocumentRequest
+        var request = new CreateBankAccountRequest
         {
             FamilyMemberId = familyMemberId,
-            DocumentNumber = "P1234567",
-            DocumentType = DocumentTypes.Passport
+            BankName = "SBI",
+            AccountNumber = "1234567890",
+            AccountType = BankAccountType.Savings
         };
 
-        var created = new DocumentDetailsDto
-        {
-            Id = Guid.NewGuid()
-        };
-
-        _documentServiceMock
-            .Setup(s => s.CreateDocumentDetailsAsync(
-                It.IsAny<CreateDocumentRequest>(),
+        _bankAccountServiceMock
+            .Setup(s => s.CreateBankAccountAsync(
+                It.IsAny<CreateBankAccountRequest>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(created);
+            .ReturnsAsync(new BankAccountDetailsDto
+            {
+                Id = Guid.NewGuid(),
+                FamilyMemberId = familyMemberId,
+                BankName = "SBI",
+                AccountNumber = "1234567890"
+            });
 
         var client = CreateClient();
 
         // Act
-        var response = await client.PostAsJsonAsync(
-            $"/documents/{familyMemberId}/documents", request);
+        var response = await client.PostAsJsonAsync($"/bankaccounts/{familyMemberId}/bankaccounts", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
-    #endregion
-
-    #region PUT /documents/{id}
-
     [Fact]
     /// <summary>
-    /// Performs the UpdateDocument_ShouldReturnOk operation.
+    /// Performs the UpdateBankAccount_ShouldReturnOk operation.
     /// </summary>
-    public async Task UpdateDocument_ShouldReturnOk()
+    public async Task UpdateBankAccount_ShouldReturnOk()
     {
         // Arrange
         var familyMemberId = Guid.NewGuid();
-        var docId = Guid.NewGuid();
+        var bankAccountId = Guid.NewGuid();
         SetupOwnership(familyMemberId);
 
-        var request = new UpdateDocumentRequest
+        var request = new UpdateBankAccountRequest
         {
-            Id = docId,
+            Id = bankAccountId,
             FamilyMemberId = familyMemberId,
-            DocumentNumber = "P1234567",
-            DocumentType = DocumentTypes.Passport
+            BankName = "SBI",
+            AccountNumber = "1234567890",
+            AccountType = BankAccountType.Savings
         };
 
-        _documentServiceMock
-            .Setup(s => s.GetDocumentDetailsByIdAsync(docId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new DocumentDetailsDto
-            {
-                Id = docId,
-                FamilyMemberId = familyMemberId,
-                DocumentNumber = "P1234567",
-                DocumentType = DocumentTypes.Passport
-            });
-
-        var updated = new DocumentDetailsDto { Id = docId };
-
-        _documentServiceMock
-            .Setup(s => s.UpdateDocumentDetailsAsync(
-                It.IsAny<UpdateDocumentRequest>(),
+        _bankAccountServiceMock
+            .Setup(s => s.UpdateBankAccountAsync(
+                It.IsAny<UpdateBankAccountRequest>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(updated);
+            .ReturnsAsync(new BankAccountDetailsDto
+            {
+                Id = bankAccountId,
+                FamilyMemberId = familyMemberId,
+                BankName = "SBI",
+                AccountNumber = "1234567890"
+            });
 
         var client = CreateClient();
 
         // Act
-        var response = await client.PutAsJsonAsync(
-            $"/documents/{familyMemberId}/documents/{docId}", request);
+        var response = await client.PutAsJsonAsync($"/bankaccounts/{familyMemberId}/bankaccounts/{bankAccountId}", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    #endregion
-
-    #region DELETE /documents/{id}
-
     [Fact]
     /// <summary>
-    /// Performs the DeleteDocument_ShouldReturnOk operation.
+    /// Performs the DeleteBankAccount_ShouldReturnOk operation.
     /// </summary>
-    public async Task DeleteDocument_ShouldReturnOk()
+    public async Task DeleteBankAccount_ShouldReturnOk()
     {
         // Arrange
         var familyMemberId = Guid.NewGuid();
-        var docId = Guid.NewGuid();
+        var bankAccountId = Guid.NewGuid();
         SetupOwnership(familyMemberId);
 
-        _documentServiceMock
-            .Setup(s => s.GetDocumentDetailsByIdAsync(docId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new DocumentDetailsDto
+        _bankAccountServiceMock
+            .Setup(s => s.GetBankAccountByIdAsync(bankAccountId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new BankAccountDetailsDto
             {
-                Id = docId,
+                Id = bankAccountId,
                 FamilyMemberId = familyMemberId,
-                DocumentNumber = "P1234567",
-                DocumentType = DocumentTypes.Passport
+                BankName = "SBI",
+                AccountNumber = "1234567890"
             });
 
-        _documentServiceMock
-            .Setup(s => s.DeleteDocumentDetailsByIdAsync(
-                docId,
-                It.IsAny<Guid>(),
-                It.IsAny<CancellationToken>()))
+        _bankAccountServiceMock
+            .Setup(s => s.DeleteBankAccountByIdAsync(bankAccountId, It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         var client = CreateClient();
 
         // Act
-        var response = await client.DeleteAsync(
-            $"/documents/{familyMemberId}/{docId}");
+        var response = await client.DeleteAsync($"/bankaccounts/{familyMemberId}/{bankAccountId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
-
-    #endregion
 }
+

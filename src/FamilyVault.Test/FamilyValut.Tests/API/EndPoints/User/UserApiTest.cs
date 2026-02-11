@@ -1,10 +1,10 @@
+using FamilyVault.API;
 using FamilyVault.Application.DTOs.User;
 using FamilyVault.Application.Interfaces.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Moq;
 using System.Net;
 using System.Net.Http.Json;
@@ -109,7 +109,9 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
             Password = "Password@123",
             Email   = "Iz9Ou@example.com",
             FirstName = "Test",
-            LastName = "User"
+            LastName = "User",
+            CountryCode = "+91",
+            Mobile = "9876543210"
         };
 
         var createdUser = new UserDto
@@ -152,7 +154,9 @@ public class UserEventsTests : IClassFixture<WebApplicationFactory<Program>>
             Id = userId,
             FirstName = "updatedUser",
             Email = "Iz9Ou@example.com",
-            Password = "NewPassword@123"
+            Password = "NewPassword@123",
+            CountryCode = "+91",
+            Mobile = "9876543210"
         };
 
         var updatedUser = new UserDto

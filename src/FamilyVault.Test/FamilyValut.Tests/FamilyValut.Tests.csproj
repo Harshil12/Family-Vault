@@ -10,11 +10,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="API\**" />
 	  <Compile Remove="Infrastructure\**" />
-	  <EmbeddedResource Remove="API\**" />
 	  <EmbeddedResource Remove="Infrastructure\**" />
-	  <None Remove="API\**" />
 	  <None Remove="Infrastructure\**" />
 	</ItemGroup>
 

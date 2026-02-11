@@ -26,11 +26,11 @@ public class UpdateUserValidators : AbstractValidator<UpdateUserRequest>
 
         RuleFor(x => x).Custom((request, context) =>
         {
-            if (string.IsNullOrEmpty(request.CountryCode))
+            if (!string.IsNullOrEmpty(request.Mobile) && string.IsNullOrEmpty(request.CountryCode))
             {
                 context.AddFailure("CountryCode", "Country code is required when mobile number is provided.");
             }
-            if (!string.IsNullOrEmpty(request.CountryCode))
+            if (!string.IsNullOrEmpty(request.CountryCode) && string.IsNullOrEmpty(request.Mobile))
             {
                 context.AddFailure("Mobile", "Mobile number is required when country code is provided.");
             }

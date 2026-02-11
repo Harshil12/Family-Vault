@@ -1,10 +1,12 @@
+using FamilyVault.API;
+using FamilyVault.Application.DTOs.Family;
 using FamilyVault.Application.DTOs.FamilyMembers;
 using FamilyVault.Application.Interfaces.Services;
+using FamilyVault.Domain.Enums;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Moq;
 using System.Net;
 using System.Net.Http.Json;
@@ -18,6 +20,8 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly Mock<IFamilyMemberService> _familyMemberServiceMock = new();
+    private readonly Mock<IFamilyService> _familyServiceMock = new();
+    private readonly Mock<IAuditService> _auditServiceMock = new();
 
     /// <summary>
     /// Initializes a new instance of FamilyMemberApiTest.
@@ -29,12 +33,29 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
             builder.ConfigureServices(services =>
             {
                 services.AddSingleton(_familyMemberServiceMock.Object);
+                services.AddSingleton(_familyServiceMock.Object);
+                services.AddSingleton(_auditServiceMock.Object);
 
                 services.AddAuthentication("Test")
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                         "Test", _ => { });
             });
         });
+
+        _auditServiceMock
+            .Setup(s => s.LogAsync(
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<string?>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<string?>(),
+                It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
     }
 
     private HttpClient CreateClient()
@@ -42,6 +63,18 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("Authorization", "Test");
         return client;
+    }
+
+    private void SetupFamilyOwnership(Guid familyId)
+    {
+        _familyServiceMock
+            .Setup(s => s.GetFamilyByIdAsync(familyId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new FamilyDto
+            {
+                Id = familyId,
+                Name = "Test Family",
+                UserId = TestAuthHandler.TestUserId
+            });
     }
 
     #region GET /familymember/{familyId}
@@ -54,6 +87,7 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         var familyId = Guid.NewGuid();
+        SetupFamilyOwnership(familyId);
 
         _familyMemberServiceMock
             .Setup(s => s.GetFamilyMembersByFamilyIdAsync(familyId, It.IsAny<CancellationToken>()))
@@ -81,6 +115,7 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var familyId = Guid.NewGuid();
         var memberId = Guid.NewGuid();
+        SetupFamilyOwnership(familyId);
 
         _familyMemberServiceMock
             .Setup(s => s.GetFamilyMemberByIdAsync(memberId, It.IsAny<CancellationToken>()))
@@ -107,17 +142,22 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         var familyId = Guid.NewGuid();
+        SetupFamilyOwnership(familyId);
 
         var request = new CreateFamilyMemberRequest
         {
             FamilyId = familyId,
             FirstName = "John",
-            LastName = "Doe"
+            LastName = "Doe",
+            RelationshipType = Relationships.Spouse,
+            CountryCode = "+91",
+            Mobile = "9876543210"
         };
 
         var created = new FamilyMemberDto
         {
             Id = Guid.NewGuid(),
+            FamilyId = familyId,
             FirstName = request.FirstName
         };
 
@@ -151,16 +191,31 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var familyId = Guid.NewGuid();
         var memberId = Guid.NewGuid();
+        SetupFamilyOwnership(familyId);
 
         var request = new UpdateFamilyMemberRequest
         {
             Id = memberId,
-            FirstName = "Updated"
+            FamilyId = familyId,
+            FirstName = "Updated",
+            RelationshipType = Relationships.Spouse,
+            CountryCode = "+91",
+            Mobile = "9876543210"
         };
+
+        _familyMemberServiceMock
+            .Setup(s => s.GetFamilyMemberByIdAsync(memberId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new FamilyMemberDto
+            {
+                Id = memberId,
+                FamilyId = familyId,
+                FirstName = "Existing"
+            });
 
         var updated = new FamilyMemberDto
         {
             Id = memberId,
+            FamilyId = familyId,
             FirstName = request.FirstName
         };
 
@@ -194,6 +249,16 @@ public class FamilyMemberApiTest : IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var familyId = Guid.NewGuid();
         var memberId = Guid.NewGuid();
+        SetupFamilyOwnership(familyId);
+
+        _familyMemberServiceMock
+            .Setup(s => s.GetFamilyMemberByIdAsync(memberId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new FamilyMemberDto
+            {
+                Id = memberId,
+                FamilyId = familyId,
+                FirstName = "Existing"
+            });
 
         _familyMemberServiceMock
             .Setup(s => s.DeleteFamilyMemberByIdAsync(

@@ -70,7 +70,8 @@ public class CryptoServiceTests
         Action act = () => _sut.DecryptData(invalidEncryptedData);
 
         // Assert
-        act.Should().Throw<CryptographicException>();
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("Failed to decrypt the provided data.");
     }
 
     [Fact]
@@ -216,10 +217,11 @@ public class CryptoServiceTests
         var password = "AnyPassword";
 
         // Act
-        var result = _sut.VerifyPassword(invalidHash, password);
+        Action act = () => _sut.VerifyPassword(invalidHash, password);
 
         // Assert
-        result.Should().BeFalse();
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("Malformed password hash.");
     }
 
     [Fact]
