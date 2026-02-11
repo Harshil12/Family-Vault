@@ -31,4 +31,9 @@ public class CreateDocumentRequest
     /// Family member to whom this document belongs.
     /// </summary>
     public Guid FamilyMemberId { get; set; }
+
+    /// <summary>
+    /// Relative saved path of uploaded file on server.
+    /// </summary>
+    public string? SavedLocation { get; set; }
 }

@@ -56,8 +56,9 @@ export function validateFamilyMember(values) {
   return errors;
 }
 
-export function validateDocument(values) {
+export function validateDocument(values, { requireFile = false } = {}) {
   const errors = {};
+  const allowedFileExtensions = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"];
   if (!values.documentNumber?.trim()) errors.documentNumber = "Document number is required.";
   if (values.documentType === "" || values.documentType === null || values.documentType === undefined) errors.documentType = "Type is required.";
   if (values.issueDate && values.expiryDate && new Date(values.expiryDate) <= new Date(values.issueDate)) {
@@ -68,6 +69,16 @@ export function validateDocument(values) {
   }
   if (Number(values.documentType) === 15 && values.documentNumber && !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(values.documentNumber)) {
     errors.documentNumber = "PAN must be in the corect format";
+  }
+  if (requireFile && !values.file) {
+    errors.file = "File is required.";
+  }
+  if (values.file?.name) {
+    const lower = values.file.name.toLowerCase();
+    const hasAllowedExt = allowedFileExtensions.some((ext) => lower.endsWith(ext));
+    if (!hasAllowedExt) {
+      errors.file = "Only PDF, Word, Excel and image files are allowed.";
+    }
   }
   return errors;
 }

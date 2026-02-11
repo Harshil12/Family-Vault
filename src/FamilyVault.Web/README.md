@@ -34,6 +34,7 @@ This app is mapped to current backend routes:
 - `DELETE /familymember/{familyId}/{id}`
 - `GET /documents/{familyMemberId}`
 - `POST /documents/{familyMemberId}/documents`
+- `POST /documents/{familyMemberId}/documents/upload` (multipart/form-data)
 - `PUT /documents/{familyMemberId}/documents/{id}`
 - `DELETE /documents/{familyMemberId}/{id}`
 - `GET /bankaccounts/{familyMemberId}`
@@ -60,3 +61,10 @@ npm run dev
 
 `/register` is anonymous for self-signup.
 `/User/*` routes remain protected and require JWT.
+
+## Document Upload
+
+- Allowed file types: PDF, Word (`.doc/.docx`), Excel (`.xls/.xlsx`), images (`.png/.jpg/.jpeg/.gif/.bmp/.webp`)
+- Files are saved on server under:
+  - `uploads/{userId}/{familyName}/{generatedFileName}`
+- Relative path is stored in document `SavedLocation`.

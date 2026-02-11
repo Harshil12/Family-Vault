@@ -5,7 +5,7 @@ import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import { PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
-import { createDocument, deleteDocument, getDocuments, updateDocument } from "../services/documentService";
+import { createDocument, deleteDocument, getDocuments, updateDocument, uploadDocument } from "../services/documentService";
 import { documentTypeOptions, optionLabelByValue } from "../utils/options";
 import { unwrapData } from "../utils/response";
 import { validateDocument } from "../utils/validation";
@@ -14,7 +14,8 @@ const blankDocument = {
   documentType: "",
   documentNumber: "",
   issueDate: "",
-  expiryDate: ""
+  expiryDate: "",
+  file: null
 };
 
 function toPayload(values, memberId) {
@@ -36,7 +37,8 @@ function toFormValues(document) {
     documentType: String(document.documentType ?? ""),
     documentNumber: document.documentNumber ?? "",
     issueDate: document.issueDate ? document.issueDate.slice(0, 10) : "",
-    expiryDate: document.expiryDate ? document.expiryDate.slice(0, 10) : ""
+    expiryDate: document.expiryDate ? document.expiryDate.slice(0, 10) : "",
+    file: null
   };
 }
 
@@ -113,9 +115,14 @@ export default function DocumentsPage() {
 
     try {
       if (editingDocument) {
+        payload.savedLocation = editingDocument.savedLocation ?? null;
         await updateDocument(memberId, editingDocument.id, payload, token);
       } else {
-        await createDocument(memberId, payload, token);
+        if (values.file) {
+          await uploadDocument(memberId, { ...payload, file: values.file }, token);
+        } else {
+          await createDocument(memberId, payload, token);
+        }
       }
 
       closeModal();
@@ -173,9 +180,12 @@ export default function DocumentsPage() {
           { name: "documentType", label: "Type", type: "select", options: documentTypeOptions, required: true },
           { name: "documentNumber", label: "Document Number", required: true },
           { name: "issueDate", label: "Issue Date", type: "date" },
-          { name: "expiryDate", label: "Expiry Date", type: "date" }
+          { name: "expiryDate", label: "Expiry Date", type: "date" },
+          ...(editingDocument
+            ? []
+            : [{ name: "file", label: "Upload File", type: "file", accept: ".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.bmp,.webp" }])
         ]}
-        validate={validateDocument}
+        validate={(values) => validateDocument(values, { requireFile: !editingDocument })}
         onClose={closeModal}
         onSubmit={handleSubmit}
       />

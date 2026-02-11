@@ -1,5 +1,6 @@
 using FamilyVault.Application.DTOs.Documents;
 using FamilyVault.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace FamilyVault.API.EndPoints.Document;
@@ -9,6 +10,10 @@ namespace FamilyVault.API.EndPoints.Document;
 /// </summary>
 public static class DocumentEvents
 {
+    private static readonly HashSet<string> AllowedFileExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"
+    };
 
     /// <summary>
     /// Performs the MapDocumentEndPoints operation.
@@ -93,6 +98,83 @@ public static class DocumentEvents
 
         }).AddEndpointFilter<ValidationFilter<CreateDocumentRequest>>();
 
+        documentGroup.MapPost("/documents/upload", async (Guid familyMemberId,
+            [FromForm] UploadDocumentRequest uploadDocumentRequest,
+            IDocumentService documentService,
+            IFamilyMemberService familyMemberService,
+            IFamilyService familyService,
+            IWebHostEnvironment hostEnvironment,
+            HttpContext httpContext,
+            ClaimsPrincipal claimsPrincipal,
+            CancellationToken cancellationToken) =>
+        {
+            var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
+            var traceId = httpContext.TraceIdentifier;
+
+            if (uploadDocumentRequest.File is null || uploadDocumentRequest.File.Length <= 0)
+            {
+                return Results.BadRequest(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "File is required.",
+                    errorCode: "FILE_REQUIRED",
+                    traceId: traceId));
+            }
+
+            var extension = Path.GetExtension(uploadDocumentRequest.File.FileName);
+            if (string.IsNullOrWhiteSpace(extension) || !AllowedFileExtensions.Contains(extension))
+            {
+                return Results.BadRequest(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "Only PDF, Word, Excel and image files are allowed.",
+                    errorCode: "FILE_TYPE_NOT_ALLOWED",
+                    traceId: traceId));
+            }
+
+            var familyMember = await familyMemberService.GetFamilyMemberByIdAsync(familyMemberId, cancellationToken);
+            if (familyMember is null)
+            {
+                return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "No family member found for given id",
+                    errorCode: "FAMILY_MEMBER_NOT_FOUND",
+                    traceId: traceId));
+            }
+
+            var family = await familyService.GetFamilyByIdAsync(familyMember.FamilyId, cancellationToken);
+            if (family is null)
+            {
+                return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "No family found for family member",
+                    errorCode: "FAMILY_NOT_FOUND",
+                    traceId: traceId));
+            }
+
+            var safeFamilyName = SanitizePathPart(family.Name);
+            var safeFileName = $"{DateTimeOffset.UtcNow:yyyyMMddHHmmssfff}_{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+            var relativePath = Path.Combine("uploads", userId.ToString(), safeFamilyName, safeFileName);
+            var fullPath = Path.Combine(hostEnvironment.ContentRootPath, relativePath);
+
+            var directoryPath = Path.GetDirectoryName(fullPath)!;
+            Directory.CreateDirectory(directoryPath);
+
+            await using (var stream = File.Create(fullPath))
+            {
+                await uploadDocumentRequest.File.CopyToAsync(stream, cancellationToken);
+            }
+
+            var createDocumentRequest = new CreateDocumentRequest
+            {
+                FamilyMemberId = familyMemberId,
+                DocumentType = uploadDocumentRequest.DocumentType,
+                DocumentNumber = uploadDocumentRequest.DocumentNumber,
+                IssueDate = uploadDocumentRequest.IssueDate,
+                ExpiryDate = uploadDocumentRequest.ExpiryDate,
+                SavedLocation = relativePath.Replace("\\", "/")
+            };
+
+            var createdDocument = await documentService.CreateDocumentDetailsAsync(createDocumentRequest, userId, cancellationToken);
+
+            return Results.Created($"/documents/{createdDocument.Id}",
+                ApiResponse<DocumentDetailsDto>.Success(createdDocument, "Document has been successfully uploaded.", traceId));
+        });
+
         documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest,
             IDocumentService _documentService,
             HttpContext httpContext,
@@ -107,5 +189,15 @@ public static class DocumentEvents
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updatedDocument, "Document has been successfully updatedDocument.", traceId));
 
         }).AddEndpointFilter<ValidationFilter<UpdateDocumentRequest>>(); ;
+    }
+
+    private static string SanitizePathPart(string value)
+    {
+        foreach (var invalid in Path.GetInvalidFileNameChars())
+        {
+            value = value.Replace(invalid, '_');
+        }
+
+        return string.IsNullOrWhiteSpace(value) ? "UnknownFamily" : value.Trim();
     }
 }

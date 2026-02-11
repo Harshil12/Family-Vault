@@ -37,4 +37,9 @@ public class UpdateDocumentRequest
     /// </summary>
     public Guid FamilyMemberId { get; set; }
 
+    /// <summary>
+    /// Gets or sets SavedLocation.
+    /// </summary>
+    public string? SavedLocation { get; set; }
+
 }

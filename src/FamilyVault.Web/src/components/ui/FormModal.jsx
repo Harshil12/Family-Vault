@@ -15,10 +15,11 @@ export default function FormModal({ title, isOpen, initialValues, fields, onClos
   }
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value, files, type } = event.target;
+    const nextValue = type === "file" ? (files && files[0] ? files[0] : null) : value;
     setValues((current) => ({
       ...current,
-      [name]: value
+      [name]: nextValue
     }));
     setErrors((current) => {
       if (!current[name]) {
@@ -57,6 +58,14 @@ export default function FormModal({ title, isOpen, initialValues, fields, onClos
                     </option>
                   ))}
                 </select>
+              ) : field.type === "file" ? (
+                <input
+                  type="file"
+                  name={field.name}
+                  onChange={handleChange}
+                  required={field.required}
+                  accept={field.accept}
+                />
               ) : (
                 <input
                   type={field.type ?? "text"}

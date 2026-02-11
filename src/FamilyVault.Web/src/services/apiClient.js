@@ -9,6 +9,10 @@ function toJsonBody(payload) {
   };
 }
 
+function isFormData(value) {
+  return typeof FormData !== "undefined" && value instanceof FormData;
+}
+
 function getErrorMessage(errorPayload, fallbackMessage) {
   if (!errorPayload) {
     return fallbackMessage;
@@ -44,9 +48,13 @@ export async function apiRequest(path, { method = "GET", token, payload } = {}) 
   };
 
   if (payload !== undefined) {
-    const bodyData = toJsonBody(payload);
-    requestInit.headers = { ...requestInit.headers, ...bodyData.headers };
-    requestInit.body = bodyData.body;
+    if (isFormData(payload)) {
+      requestInit.body = payload;
+    } else {
+      const bodyData = toJsonBody(payload);
+      requestInit.headers = { ...requestInit.headers, ...bodyData.headers };
+      requestInit.body = bodyData.body;
+    }
   }
 
   const response = await fetch(`${API_BASE_URL}${path}`, requestInit);

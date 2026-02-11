@@ -83,7 +83,10 @@ public class DocumentRepository : IDocumentRepository
         existingDocument.DocumentNumber = documentDetails.DocumentNumber;
         existingDocument.IssueDate = documentDetails.IssueDate;
         existingDocument.ExpiryDate = documentDetails.ExpiryDate;
-        existingDocument.SavedLocation = documentDetails.SavedLocation;
+        if (!string.IsNullOrWhiteSpace(documentDetails.SavedLocation))
+        {
+            existingDocument.SavedLocation = documentDetails.SavedLocation;
+        }
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
