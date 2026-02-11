@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import HelpTip from "../components/ui/HelpTip";
 import { exportAuditReport, getActivityLog, getDownloadHistory } from "../services/auditService";
 
 function formatDateTime(value) {
@@ -110,7 +111,10 @@ export default function AuditPage() {
     <section>
       <header className="page-header">
         <div>
-          <h2>Audit & Activity</h2>
+          <div className="heading-with-help">
+            <h2>Audit & Activity</h2>
+            <HelpTip text="Use this screen to review who changed records, who downloaded files, and export CSV reports." />
+          </div>
           <p className="subtle page-intro">Track who changed records, file downloads, and export audit reports.</p>
         </div>
       </header>

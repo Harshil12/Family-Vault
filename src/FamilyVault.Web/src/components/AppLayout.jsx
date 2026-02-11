@@ -3,6 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { LogoutIcon, MoonIcon, SunIcon } from "./ui/Icons";
+import logo from "../assets/familyvault-logo-option-4.svg";
 
 const links = [
   { to: "/", label: "Dashboard", end: true },
@@ -17,7 +18,9 @@ export default function AppLayout() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <h1 className="brand">Family Vault</h1>
+        <div className="brand-wrap">
+          <img className="brand-logo" src={logo} alt="Family Vault" />
+        </div>
         <p className="subtle">{isPreviewMode ? "Preview mode (login skipped)." : "Your family’s secure records hub."}</p>
         <nav className="nav-links">
           {links.map((link) => (

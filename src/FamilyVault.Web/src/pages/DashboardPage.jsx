@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import StatCard from "../components/ui/StatCard";
+import HelpTip from "../components/ui/HelpTip";
 import { ArrowRightIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { getFamilies } from "../services/familyService";
@@ -151,7 +152,10 @@ export default function DashboardPage() {
     <section>
       <header className="page-header">
         <div>
-          <h2>Dashboard</h2>
+          <div className="heading-with-help">
+            <h2>Dashboard</h2>
+            <HelpTip text="This summary rolls up families, members, documents, and bank records linked to your account." />
+          </div>
           <p className="subtle page-intro">A clear view of your family’s members, documents, and financial details.</p>
         </div>
         <Link className="btn" to="/families">

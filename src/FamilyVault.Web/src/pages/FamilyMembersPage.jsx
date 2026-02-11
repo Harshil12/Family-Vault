@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import HelpTip from "../components/ui/HelpTip";
 import { BackIcon, BankIcon, DocumentIcon, PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import useCountryCodes from "../hooks/useCountryCodes";
@@ -212,7 +213,10 @@ export default function FamilyMembersPage() {
     <section>
       <header className="page-header">
         <div>
-          <h2>Member Profiles</h2>
+          <div className="heading-with-help">
+            <h2>Member Profiles</h2>
+            <HelpTip text="PAN and Aadhaar are sensitive fields. Share access only with trusted users." />
+          </div>
           <p className="subtle page-intro">People linked to Family ID: {familyId}</p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>

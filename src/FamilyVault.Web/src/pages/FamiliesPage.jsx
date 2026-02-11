@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import HelpTip from "../components/ui/HelpTip";
 import { MembersIcon, PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { createFamily, deleteFamily, getFamilies, updateFamily } from "../services/familyService";
@@ -141,7 +142,10 @@ export default function FamiliesPage() {
     <section>
       <header className="page-header">
         <div>
-          <h2>Family Profiles</h2>
+          <div className="heading-with-help">
+            <h2>Family Profiles</h2>
+            <HelpTip text="Create a household first, then open members to manage documents and bank records." />
+          </div>
           <p className="subtle page-intro">Organize each household with members, documents, and accounts.</p>
         </div>
         <button type="button" className="btn" onClick={openCreate}>

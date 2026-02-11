@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import HelpTip from "../components/ui/HelpTip";
 import { BackIcon, PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { createBankAccount, deleteBankAccount, getBankAccounts, updateBankAccount } from "../services/bankAccountService";
@@ -170,7 +171,10 @@ export default function BankAccountsPage() {
     <section>
       <header className="page-header">
         <div>
-          <h2>Banking Records</h2>
+          <div className="heading-with-help">
+            <h2>Banking Records</h2>
+            <HelpTip text="Only masked account details are shown in lists for extra privacy." />
+          </div>
           <p className="subtle page-intro">
             Records for Family {familyId} and Member {memberId}
           </p>

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import HelpTip from "../components/ui/HelpTip";
 import { BackIcon, DocumentIcon, PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { createDocument, deleteDocument, downloadDocumentFile, getDocuments, previewDocumentFile, replaceDocumentFile, updateDocument, uploadDocument } from "../services/documentService";
@@ -283,6 +284,7 @@ export default function DocumentsPage() {
         >
           Expiring Soon (45d)
         </button>
+        <HelpTip text="Turn this on to show only documents with expiry dates in the next 45 days." />
       </div>
       {loading ? <p>Loading documents...</p> : <CrudTable columns={columns} rows={filteredDocuments} onEdit={openEdit} onDelete={handleDelete} />}
 
