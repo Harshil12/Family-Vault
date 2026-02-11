@@ -35,6 +35,7 @@ This app is mapped to current backend routes:
 - `GET /documents/{familyMemberId}`
 - `POST /documents/{familyMemberId}/documents`
 - `POST /documents/{familyMemberId}/documents/upload` (multipart/form-data)
+- `GET /documents/{familyMemberId}/{id}/file?download=true|false`
 - `PUT /documents/{familyMemberId}/documents/{id}`
 - `DELETE /documents/{familyMemberId}/{id}`
 - `GET /bankaccounts/{familyMemberId}`

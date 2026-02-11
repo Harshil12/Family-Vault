@@ -15,6 +15,21 @@ public static class DocumentEvents
         ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"
     };
 
+    private static readonly Dictionary<string, string> ContentTypeByExtension = new(StringComparer.OrdinalIgnoreCase)
+    {
+        [".pdf"] = "application/pdf",
+        [".doc"] = "application/msword",
+        [".docx"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        [".xls"] = "application/vnd.ms-excel",
+        [".xlsx"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        [".png"] = "image/png",
+        [".jpg"] = "image/jpeg",
+        [".jpeg"] = "image/jpeg",
+        [".gif"] = "image/gif",
+        [".bmp"] = "image/bmp",
+        [".webp"] = "image/webp"
+    };
+
     /// <summary>
     /// Performs the MapDocumentEndPoints operation.
     /// </summary>
@@ -66,6 +81,56 @@ public static class DocumentEvents
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(documentDetail, string.Empty, traceId));
 
+        });
+
+        documentGroup.MapGet("/{id:guid}/file", async (Guid familyMemberId,
+            Guid id,
+            bool? download,
+            IDocumentService documentService,
+            HttpContext httpContext,
+            CancellationToken cancellationToken) =>
+        {
+            var traceId = httpContext.TraceIdentifier;
+            var document = await documentService.GetDocumentDetailsByIdAsync(id, cancellationToken);
+
+            if (document is null || document.FamilyMemberId != familyMemberId)
+            {
+                return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "No documents found for given id",
+                    errorCode: "DOC_NOT_FOUND",
+                    traceId: traceId));
+            }
+
+            if (string.IsNullOrWhiteSpace(document.SavedLocation))
+            {
+                return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "No file is attached to this document.",
+                    errorCode: "DOC_FILE_NOT_FOUND",
+                    traceId: traceId));
+            }
+
+            var normalizedRelative = document.SavedLocation.Replace('/', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
+            var contentRoot = httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
+            var fullPath = Path.GetFullPath(Path.Combine(contentRoot, normalizedRelative));
+            var uploadsRoot = Path.GetFullPath(Path.Combine(contentRoot, "uploads"));
+
+            if (!fullPath.StartsWith(uploadsRoot, StringComparison.OrdinalIgnoreCase) || !File.Exists(fullPath))
+            {
+                return Results.NotFound(ApiResponse<DocumentDetailsDto>.Failure(
+                    message: "Document file not found on server.",
+                    errorCode: "DOC_FILE_NOT_FOUND",
+                    traceId: traceId));
+            }
+
+            var extension = Path.GetExtension(fullPath);
+            var contentType = ContentTypeByExtension.TryGetValue(extension, out var value) ? value : "application/octet-stream";
+            var fileName = Path.GetFileName(fullPath);
+
+            return Results.File(
+                fileContents: await File.ReadAllBytesAsync(fullPath, cancellationToken),
+                contentType: contentType,
+                fileDownloadName: download == true ? fileName : null
+            );
         });
 
         documentGroup.MapDelete("/{id:guid}", async (Guid id, IDocumentService _documentService,

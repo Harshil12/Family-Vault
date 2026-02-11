@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
-import { BackIcon, PlusIcon } from "../components/ui/Icons";
+import { BackIcon, DocumentIcon, PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
-import { createDocument, deleteDocument, getDocuments, updateDocument, uploadDocument } from "../services/documentService";
+import { createDocument, deleteDocument, downloadDocumentFile, getDocuments, previewDocumentFile, updateDocument, uploadDocument } from "../services/documentService";
 import { documentTypeOptions, optionLabelByValue } from "../utils/options";
 import { unwrapData } from "../utils/response";
 import { validateDocument } from "../utils/validation";
@@ -51,23 +51,53 @@ export default function DocumentsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState(null);
   const [deletingDocument, setDeletingDocument] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [documentTypeFilter, setDocumentTypeFilter] = useState("");
+  const [expiringOnly, setExpiringOnly] = useState(false);
 
-  const columns = useMemo(
-    () => [
-      {
-        key: "documentType",
-        header: "Type",
-        render: (row) => optionLabelByValue(documentTypeOptions, row.documentType)
-      },
-      { key: "documentNumber", header: "Document Number" },
-      {
-        key: "expiryDate",
-        header: "Expiry",
-        render: (row) => (row.expiryDate ? new Date(row.expiryDate).toLocaleDateString() : "-")
-      }
-    ],
-    []
-  );
+  const columns = [
+    {
+      key: "documentType",
+      header: "Type",
+      render: (row) => optionLabelByValue(documentTypeOptions, row.documentType)
+    },
+    { key: "documentNumber", header: "Document Number" },
+    {
+      key: "expiryDate",
+      header: "Expiry",
+      render: (row) => (row.expiryDate ? new Date(row.expiryDate).toLocaleDateString() : "-")
+    },
+    {
+      key: "file",
+      header: "File",
+      render: (row) => (
+        row.savedLocation ? (
+          <div className="inline-actions">
+            <button
+              type="button"
+              className="icon-link"
+              title="Preview file"
+              aria-label="Preview file"
+              onClick={() => handlePreview(row)}
+            >
+              <DocumentIcon />
+            </button>
+            <button
+              type="button"
+              className="icon-link"
+              title="Download file"
+              aria-label="Download file"
+              onClick={() => handleDownload(row)}
+            >
+              <span className="download-glyph">D</span>
+            </button>
+          </div>
+        ) : (
+          <span className="subtle">-</span>
+        )
+      )
+    }
+  ];
 
   const loadDocuments = async () => {
     if (isPreviewMode) {
@@ -140,6 +170,40 @@ export default function DocumentsPage() {
     setDeletingDocument(document);
   };
 
+  const handlePreview = async (document) => {
+    try {
+      await previewDocumentFile(memberId, document.id, token);
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  };
+
+  const handleDownload = async (document) => {
+    try {
+      await downloadDocumentFile(memberId, document.id, token, document.documentNumber || "document");
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  };
+
+  const filteredDocuments = documents.filter((document) => {
+    const search = searchText.trim().toLowerCase();
+    const matchesSearch = !search || (document.documentNumber || "").toLowerCase().includes(search);
+    const matchesType = documentTypeFilter === "" || String(document.documentType) === documentTypeFilter;
+    const matchesExpiring = !expiringOnly || (() => {
+      if (!document.expiryDate) {
+        return false;
+      }
+      const now = new Date();
+      const next45 = new Date();
+      next45.setDate(now.getDate() + 45);
+      const expiry = new Date(document.expiryDate);
+      return expiry >= now && expiry <= next45;
+    })();
+
+    return matchesSearch && matchesType && matchesExpiring;
+  });
+
   const confirmDelete = async () => {
     if (!deletingDocument) {
       return;
@@ -170,7 +234,27 @@ export default function DocumentsPage() {
 
       {error && <p className="error-text">{error}</p>}
       {isPreviewMode && <p className="subtle">Preview mode is on. Login to enable CRUD.</p>}
-      {loading ? <p>Loading documents...</p> : <CrudTable columns={columns} rows={documents} onEdit={openEdit} onDelete={handleDelete} />}
+      <div className="toolbar">
+        <input
+          type="text"
+          placeholder="Search by document number..."
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+        />
+        <select value={documentTypeFilter} onChange={(event) => setDocumentTypeFilter(event.target.value)}>
+          <option value="">All types</option>
+          {documentTypeOptions.map((option) => (
+            <option key={`${option.label}-${option.value}`} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <label className="inline-check">
+          <input type="checkbox" checked={expiringOnly} onChange={(event) => setExpiringOnly(event.target.checked)} />
+          <span>Expiring in 45 days</span>
+        </label>
+      </div>
+      {loading ? <p>Loading documents...</p> : <CrudTable columns={columns} rows={filteredDocuments} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
         title={editingDocument ? "Edit Document" : "Add Document"}

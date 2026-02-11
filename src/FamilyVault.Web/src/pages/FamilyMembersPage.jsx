@@ -69,6 +69,8 @@ export default function FamilyMembersPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [deletingMember, setDeletingMember] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [relationFilter, setRelationFilter] = useState("");
 
   const columns = useMemo(
     () => [
@@ -196,6 +198,16 @@ export default function FamilyMembersPage() {
     }
   };
 
+  const filteredMembers = members.filter((member) => {
+    const search = searchText.trim().toLowerCase();
+    const matchesSearch =
+      !search ||
+      `${member.firstName || ""} ${member.lastName || ""}`.toLowerCase().includes(search) ||
+      (member.email || "").toLowerCase().includes(search);
+    const matchesRelation = relationFilter === "" || String(member.relationshipType) === relationFilter;
+    return matchesSearch && matchesRelation;
+  });
+
   return (
     <section>
       <header className="page-header">
@@ -211,7 +223,23 @@ export default function FamilyMembersPage() {
 
       {error && <p className="error-text">{error}</p>}
       {isPreviewMode && <p className="subtle">Preview mode is on. Login to enable CRUD.</p>}
-      {loading ? <p>Loading family members...</p> : <CrudTable columns={columns} rows={members} onEdit={openEdit} onDelete={handleDelete} />}
+      <div className="toolbar">
+        <input
+          type="text"
+          placeholder="Search members by name/email..."
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+        />
+        <select value={relationFilter} onChange={(event) => setRelationFilter(event.target.value)}>
+          <option value="">All relations</option>
+          {relationshipOptions.map((option) => (
+            <option key={`${option.label}-${option.value}`} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      {loading ? <p>Loading family members...</p> : <CrudTable columns={columns} rows={filteredMembers} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
         title={editingMember ? "Edit Family Member" : "Add Family Member"}

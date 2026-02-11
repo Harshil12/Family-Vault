@@ -17,6 +17,13 @@ function formatDate(value) {
   return new Date(value).toLocaleDateString();
 }
 
+function daysBetween(fromDate, toDate) {
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const from = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+  const to = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
+  return Math.floor((to - from) / msPerDay);
+}
+
 export default function DashboardPage() {
   const { token, userId, isPreviewMode } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -91,19 +98,50 @@ export default function DashboardPage() {
     loadDashboard();
   }, [token, userId, isPreviewMode]);
 
-  const expiringDocuments = useMemo(() => {
+  const timelineItems = useMemo(() => {
     const now = new Date();
-    const next30Days = new Date(now);
-    next30Days.setDate(now.getDate() + 30);
+    const next60 = new Date();
+    next60.setDate(now.getDate() + 60);
 
-    return summary.documents.filter((doc) => {
-      if (!doc.expiryDate) {
-        return false;
-      }
-      const expiry = new Date(doc.expiryDate);
-      return expiry >= now && expiry <= next30Days;
-    });
-  }, [summary.documents]);
+    const documentEvents = summary.documents
+      .filter((doc) => doc.expiryDate)
+      .map((doc) => {
+        const expiryDate = new Date(doc.expiryDate);
+        const dayDiff = daysBetween(now, expiryDate);
+        const category = dayDiff <= 30 ? "Expiring Soon" : "Renewal";
+        return {
+          id: `doc-${doc.id}`,
+          date: expiryDate,
+          title: `Document: ${doc.documentNumber}`,
+          category
+        };
+      })
+      .filter((event) => event.date >= now && event.date <= next60);
+
+    const birthdayEvents = summary.members
+      .filter((member) => member.dateOfBirth)
+      .map((member) => {
+        const dob = new Date(member.dateOfBirth);
+        const nextBirthday = new Date(now.getFullYear(), dob.getMonth(), dob.getDate());
+        if (nextBirthday < now) {
+          nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+        }
+
+        return {
+          id: `dob-${member.id}`,
+          date: nextBirthday,
+          title: `Birthday: ${member.firstName} ${member.lastName || ""}`.trim(),
+          category: "Birthday"
+        };
+      })
+      .filter((event) => event.date >= now && event.date <= next60);
+
+    return [...documentEvents, ...birthdayEvents]
+      .sort((a, b) => a.date - b.date)
+      .slice(0, 8);
+  }, [summary.documents, summary.members]);
+
+  const expiringSoonCount = timelineItems.filter((item) => item.category === "Expiring Soon").length;
 
   if (loading) {
     return <p>Loading dashboard...</p>;
@@ -133,15 +171,31 @@ export default function DashboardPage() {
       </div>
 
       <section className="panel">
-        <h3>Documents expiring in 30 days</h3>
-        {!expiringDocuments.length ? (
-          <p className="empty-state">No near-expiry documents.</p>
+        <div className="panel-head">
+          <h3>Heads Up, Family! Don&apos;t Miss These Dates (60-Day View)</h3>
+          <span className="timeline-chip">{expiringSoonCount} expiring soon</span>
+        </div>
+        {!timelineItems.length ? (
+          <p className="empty-state">No upcoming events in next 60 days.</p>
         ) : (
-          <ul className="simple-list">
-            {expiringDocuments.map((doc) => (
-              <li key={doc.id}>
-                <strong>{doc.documentNumber}</strong>
-                <span>Expiry: {formatDate(doc.expiryDate)}</span>
+          <ul className="timeline-list">
+            {timelineItems.map((item) => (
+              <li key={item.id}>
+                <span
+                  className={`timeline-dot ${
+                    item.category === "Birthday"
+                      ? "birthday"
+                      : item.category === "Expiring Soon"
+                        ? "expiring"
+                        : "renewal"
+                  }`}
+                />
+                <div>
+                  <strong>{item.title}</strong>
+                  <p className="subtle">
+                    {item.category} | {formatDate(item.date)}
+                  </p>
+                </div>
               </li>
             ))}
           </ul>

@@ -55,6 +55,8 @@ export default function BankAccountsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
   const [deletingAccount, setDeletingAccount] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [accountTypeFilter, setAccountTypeFilter] = useState("");
 
   const columns = useMemo(
     () => [
@@ -153,6 +155,17 @@ export default function BankAccountsPage() {
     }
   };
 
+  const filteredAccounts = accounts.filter((account) => {
+    const search = searchText.trim().toLowerCase();
+    const matchesSearch =
+      !search ||
+      (account.bankName || "").toLowerCase().includes(search) ||
+      (account.ifsc || "").toLowerCase().includes(search) ||
+      (account.accountNumberLast4 || "").toLowerCase().includes(search);
+    const matchesType = accountTypeFilter === "" || String(account.accountType) === accountTypeFilter;
+    return matchesSearch && matchesType;
+  });
+
   return (
     <section>
       <header className="page-header">
@@ -170,7 +183,23 @@ export default function BankAccountsPage() {
 
       {error && <p className="error-text">{error}</p>}
       {isPreviewMode && <p className="subtle">Preview mode is on. Login to enable CRUD.</p>}
-      {loading ? <p>Loading bank accounts...</p> : <CrudTable columns={columns} rows={accounts} onEdit={openEdit} onDelete={handleDelete} />}
+      <div className="toolbar">
+        <input
+          type="text"
+          placeholder="Search bank / IFSC / last4..."
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+        />
+        <select value={accountTypeFilter} onChange={(event) => setAccountTypeFilter(event.target.value)}>
+          <option value="">All account types</option>
+          {accountTypeOptions.map((option) => (
+            <option key={`${option.label}-${option.value}`} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      {loading ? <p>Loading bank accounts...</p> : <CrudTable columns={columns} rows={filteredAccounts} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
         title={editingAccount ? "Edit Bank Account" : "Add Bank Account"}

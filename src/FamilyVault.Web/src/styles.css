@@ -103,10 +103,49 @@ p {
   animation: fadeUp 220ms ease-out;
 }
 
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.35rem;
+}
+
+.timeline-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #fecaca;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 0.8rem;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.toolbar input,
+.toolbar select {
+  min-width: 220px;
+}
+
+.inline-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .stat-card {
@@ -205,6 +244,16 @@ p {
 .back-link {
   display: inline-flex;
   margin-top: 1.25rem;
+}
+
+.inline-actions {
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.download-glyph {
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .table-wrap {
@@ -323,6 +372,40 @@ select:focus {
 .simple-list li {
   display: grid;
   gap: 0.15rem;
+}
+
+.timeline-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.timeline-list li {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  margin-top: 0.35rem;
+}
+
+.timeline-dot.renewal {
+  background: #0ea5a4;
+}
+
+.timeline-dot.birthday {
+  background: #f59e0b;
+}
+
+.timeline-dot.expiring {
+  background: #ef4444;
 }
 
 .modal-backdrop {

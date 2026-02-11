@@ -1,4 +1,5 @@
 import { apiRequest } from "./apiClient";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "https://localhost:7037";
 
 export async function getDocuments(memberId, token) {
   return apiRequest(`/documents/${memberId}`, { token });
@@ -48,4 +49,53 @@ export async function deleteDocument(memberId, id, token) {
     method: "DELETE",
     token
   });
+}
+
+function getDocumentFileUrl(memberId, documentId, mode = "preview") {
+  const download = mode === "download" ? "true" : "false";
+  return `${API_BASE_URL}/documents/${memberId}/${documentId}/file?download=${download}`;
+}
+
+async function fetchDocumentBlob(memberId, documentId, token, mode = "preview") {
+  const response = await fetch(getDocumentFileUrl(memberId, documentId, mode), {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to open file (${response.status})`);
+  }
+
+  const blob = await response.blob();
+  return { blob, contentType: response.headers.get("content-type") ?? "application/octet-stream" };
+}
+
+export async function previewDocumentFile(memberId, documentId, token) {
+  const { blob } = await fetchDocumentBlob(memberId, documentId, token, "preview");
+  const objectUrl = URL.createObjectURL(blob);
+  window.open(objectUrl, "_blank", "noopener,noreferrer");
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 15000);
+}
+
+export async function downloadDocumentFile(memberId, documentId, token, suggestedName = "document") {
+  const { blob, contentType } = await fetchDocumentBlob(memberId, documentId, token, "download");
+  const extension = contentType.includes("pdf")
+    ? ".pdf"
+    : contentType.includes("word")
+      ? ".docx"
+      : contentType.includes("sheet")
+        ? ".xlsx"
+        : contentType.includes("image/")
+          ? `.${contentType.split("/")[1]}`
+          : "";
+
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = `${suggestedName}${extension}`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(objectUrl);
 }

@@ -21,6 +21,7 @@ export default function FamiliesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingFamily, setEditingFamily] = useState(null);
   const [deletingFamily, setDeletingFamily] = useState(null);
+  const [searchText, setSearchText] = useState("");
 
   const columns = useMemo(
     () => [
@@ -131,6 +132,11 @@ export default function FamiliesPage() {
     }
   };
 
+  const filteredFamilies = families.filter((family) => {
+    const search = searchText.trim().toLowerCase();
+    return !search || (family.name || "").toLowerCase().includes(search);
+  });
+
   return (
     <section>
       <header className="page-header">
@@ -146,7 +152,15 @@ export default function FamiliesPage() {
 
       {error && <p className="error-text">{error}</p>}
       {isPreviewMode && <p className="subtle">Preview mode is on. Login to enable CRUD.</p>}
-      {loading ? <p>Loading families...</p> : <CrudTable columns={columns} rows={families} onEdit={openEdit} onDelete={handleDelete} />}
+      <div className="toolbar">
+        <input
+          type="text"
+          placeholder="Search families..."
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+        />
+      </div>
+      {loading ? <p>Loading families...</p> : <CrudTable columns={columns} rows={filteredFamilies} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
         title={editingFamily ? "Edit Family" : "Create Family"}
