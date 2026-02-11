@@ -107,6 +107,7 @@ public class Program
         builder.Services.AddScoped<IFamilyMemberService, FamilyMemberService>();
         builder.Services.AddScoped<IFamilyService, FamilyService>();
         builder.Services.AddScoped<IDocumentService, DocumentService>();
+        builder.Services.AddScoped<IBankAccountService, BankAccountService>();
         builder.Services.AddScoped<ICryptoService, CryptoService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
 

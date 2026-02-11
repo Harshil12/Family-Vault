@@ -86,4 +86,9 @@ public class FamilyMember : BaseEntity
     /// </summary>
     public ICollection<DocumentDetails>? DocumentDetails { get; set; }
 
+    /// <summary>
+    /// List of related <see cref="BankAccountDetails"/> entities that belong to this member.
+    /// </summary>
+    public ICollection<BankAccountDetails>? BankAccountDetails { get; set; }
+
 }

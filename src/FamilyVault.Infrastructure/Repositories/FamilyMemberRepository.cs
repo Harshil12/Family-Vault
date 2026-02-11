@@ -150,6 +150,12 @@ public class FamilyMemberRepository : IFamilyMemberRepository
                .SetProperty(fm => fm.UpdatedBy, user)
                .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
 
+        await _appDbContext.BankAccounts
+               .Where(b => b.FamilyMemberId == familyMemberId)
+               .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.IsDeleted, true)
+               .SetProperty(b => b.UpdatedBy, user)
+               .SetProperty(b => b.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
+
         await tx.CommitAsync(cancellationToken);
 
         _memoryCache.Remove("AllFamiliesWithDocuments");

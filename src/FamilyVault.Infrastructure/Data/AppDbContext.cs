@@ -30,6 +30,10 @@ public class AppDbContext : DbContext
     /// Gets or sets Documents.
     /// </summary>
     public DbSet<DocumentDetails> Documents { get; set; }
+    /// <summary>
+    /// Gets or sets BankAccounts.
+    /// </summary>
+    public DbSet<BankAccountDetails> BankAccounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,6 +55,32 @@ public class AppDbContext : DbContext
                   .HasColumnType("TINYINT");
         });
 
+        modelBuilder.Entity<BankAccountDetails>(entity =>
+        {
+            entity.Property(e => e.AccountType)
+                  .HasConversion<byte>()
+                  .HasColumnType("TINYINT");
+
+            entity.Property(e => e.BankName)
+                  .IsRequired()
+                  .HasMaxLength(150);
+
+            entity.Property(e => e.AccountNumber)
+                  .IsRequired();
+
+            entity.Property(e => e.AccountNumberLast4)
+                  .HasMaxLength(4);
+
+            entity.Property(e => e.AccountHolderName)
+                  .HasMaxLength(150);
+
+            entity.Property(e => e.IFSC)
+                  .HasMaxLength(20);
+
+            entity.Property(e => e.Branch)
+                  .HasMaxLength(150);
+        });
+
         modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
 
@@ -59,10 +89,12 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<FamilyMember>().HasIndex(f => f.PAN).IsUnique();
         modelBuilder.Entity<FamilyMember>().HasIndex(f => f.Aadhar).IsUnique();
         modelBuilder.Entity<FamilyMember>().HasIndex(f => new { f.FirstName, f.LastName, f.FamilyId }).IsUnique();
+        modelBuilder.Entity<BankAccountDetails>().HasIndex(b => b.FamilyMemberId);
 
         modelBuilder.Entity<User>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<Family>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<FamilyMember>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<DocumentDetails>().HasQueryFilter(d => !d.IsDeleted);
+        modelBuilder.Entity<BankAccountDetails>().HasQueryFilter(d => !d.IsDeleted);
     }
 }
