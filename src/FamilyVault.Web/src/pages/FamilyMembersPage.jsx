@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
-import { PlusIcon } from "../components/ui/Icons";
+import { BackIcon, BankIcon, DocumentIcon, PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import useCountryCodes from "../hooks/useCountryCodes";
 import { createFamilyMember, deleteFamilyMember, getFamilyMembers, updateFamilyMember } from "../services/familyMemberService";
@@ -87,8 +87,13 @@ export default function FamilyMembersPage() {
         key: "documents",
         header: "Documents",
         render: (row) => (
-          <Link className="inline-link" to={`/families/${familyId}/members/${row.id}/documents`}>
-            Manage
+          <Link
+            className="icon-link"
+            to={`/families/${familyId}/members/${row.id}/documents`}
+            title="View documents"
+            aria-label="View documents"
+          >
+            <DocumentIcon />
           </Link>
         )
       },
@@ -96,8 +101,13 @@ export default function FamilyMembersPage() {
         key: "accounts",
         header: "Bank Accounts",
         render: (row) => (
-          <Link className="inline-link" to={`/families/${familyId}/members/${row.id}/accounts`}>
-            Manage
+          <Link
+            className="icon-link"
+            to={`/families/${familyId}/members/${row.id}/accounts`}
+            title="View bank accounts"
+            aria-label="View bank accounts"
+          >
+            <BankIcon />
           </Link>
         )
       }
@@ -223,6 +233,10 @@ export default function FamilyMembersPage() {
         onClose={closeModal}
         onSubmit={handleSubmit}
       />
+      <Link className="inline-link back-link" to="/families">
+        <span className="btn-icon"><BackIcon /></span>
+        <span>Back to Families</span>
+      </Link>
       <ConfirmModal
         isOpen={Boolean(deletingMember)}
         title="Delete Family Member"

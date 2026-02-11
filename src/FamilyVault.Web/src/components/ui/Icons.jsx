@@ -57,6 +57,58 @@ export function LogoutIcon() {
   );
 }
 
+export function ViewIcon() {
+  return (
+    <IconBase>
+      <path
+        fill="currentColor"
+        d="M12 5c-5.5 0-9.5 4.7-10.8 6.5a.9.9 0 0 0 0 1c1.3 1.8 5.3 6.5 10.8 6.5s9.5-4.7 10.8-6.5a.9.9 0 0 0 0-1C21.5 9.7 17.5 5 12 5Zm0 12c-3.9 0-7-3-8.7-5 1.7-2 4.8-5 8.7-5s7 3 8.7 5c-1.7 2-4.8 5-8.7 5Zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+      />
+    </IconBase>
+  );
+}
+
+export function MembersIcon() {
+  return (
+    <IconBase>
+      <path
+        fill="currentColor"
+        d="M16 11a3 3 0 1 0-2.99-3A3 3 0 0 0 16 11Zm-8 0A2.5 2.5 0 1 0 8 6a2.5 2.5 0 0 0 0 5Zm0 2c-2.5 0-4.5 1.4-4.5 3v1h9v-1c0-1.6-2-3-4.5-3Zm8 0c-.63 0-1.22.08-1.77.23 1.01.75 1.77 1.78 1.77 2.77v1h6v-1c0-1.66-2.69-3-6-3Z"
+      />
+    </IconBase>
+  );
+}
+
+export function DocumentIcon() {
+  return (
+    <IconBase>
+      <path
+        fill="currentColor"
+        d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm6 1.5V9h4.5L13 4.5ZM8 12h8v1.5H8V12Zm0 3.5h8V17H8v-1.5Z"
+      />
+    </IconBase>
+  );
+}
+
+export function BankIcon() {
+  return (
+    <IconBase>
+      <path
+        fill="currentColor"
+        d="M12 3 3 7.5V9h18V7.5L12 3Zm8 8H4v2h16v-2ZM5 14v4h2v-4H5Zm4 0v4h2v-4H9Zm4 0v4h2v-4h-2Zm4 0v4h2v-4h-2ZM3 20h18v2H3v-2Z"
+      />
+    </IconBase>
+  );
+}
+
+export function BackIcon() {
+  return (
+    <IconBase>
+      <path fill="currentColor" d="m11 6-6 6 6 6 1.4-1.4L8.8 13H20v-2H8.8l3.6-3.6L11 6Z" />
+    </IconBase>
+  );
+}
+
 export function SaveIcon() {
   return (
     <IconBase>

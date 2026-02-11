@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
-import { PlusIcon } from "../components/ui/Icons";
+import { BackIcon, PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { createBankAccount, deleteBankAccount, getBankAccounts, updateBankAccount } from "../services/bankAccountService";
 import { accountTypeOptions, optionLabelByValue } from "../utils/options";
@@ -196,8 +196,9 @@ export default function BankAccountsPage() {
         onConfirm={confirmDelete}
       />
 
-      <Link className="inline-link" to={`/families/${familyId}/members`}>
-        Back to members
+      <Link className="inline-link back-link" to={`/families/${familyId}/members`}>
+        <span className="btn-icon"><BackIcon /></span>
+        <span>Back to Members</span>
       </Link>
     </section>
   );

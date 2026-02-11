@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import CrudTable from "../components/ui/CrudTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
-import { PlusIcon } from "../components/ui/Icons";
+import { MembersIcon, PlusIcon } from "../components/ui/Icons";
 import { useAuth } from "../context/AuthContext";
 import { createFamily, deleteFamily, getFamilies, updateFamily } from "../services/familyService";
 import { unwrapData } from "../utils/response";
@@ -27,10 +27,10 @@ export default function FamiliesPage() {
       { key: "name", header: "Family Name" },
       {
         key: "members",
-        header: "Flow",
+        header: "Members",
         render: (row) => (
-          <Link className="inline-link" to={`/families/${row.id}/members`}>
-            Open members
+          <Link className="icon-link" to={`/families/${row.id}/members`} title="View members" aria-label="View members">
+            <MembersIcon />
           </Link>
         )
       }
