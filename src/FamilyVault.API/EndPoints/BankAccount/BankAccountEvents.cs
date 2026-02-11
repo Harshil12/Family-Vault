@@ -85,6 +85,7 @@ public static class BankAccountEvents
             IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
+            IAuditService auditService,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
@@ -96,6 +97,18 @@ public static class BankAccountEvents
             createBankAccountRequest.FamilyMemberId = familyMemberId;
 
             var createdBankAccount = await bankAccountService.CreateBankAccountAsync(createBankAccountRequest, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Create",
+                "BankAccount",
+                createdBankAccount.Id,
+                $"Created bank account for {createdBankAccount.BankName}",
+                null,
+                familyMemberId,
+                null,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Created($"/bankaccounts/{createdBankAccount.Id}",
                 ApiResponse<BankAccountDetailsDto>.Success(createdBankAccount, "Bank account has been successfully created.", traceId));
@@ -109,6 +122,7 @@ public static class BankAccountEvents
             IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
+            IAuditService auditService,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
@@ -121,6 +135,18 @@ public static class BankAccountEvents
             updateBankAccountRequest.FamilyMemberId = familyMemberId;
 
             var updatedBankAccount = await bankAccountService.UpdateBankAccountAsync(updateBankAccountRequest, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Update",
+                "BankAccount",
+                updatedBankAccount.Id,
+                $"Updated bank account for {updatedBankAccount.BankName}",
+                null,
+                familyMemberId,
+                null,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Ok(ApiResponse<BankAccountDetailsDto>.Success(updatedBankAccount, "Bank account has been successfully updated.", traceId));
         }).AddEndpointFilter<ValidationFilter<UpdateBankAccountRequest>>();
@@ -133,6 +159,7 @@ public static class BankAccountEvents
             HttpContext httpContext,
             ILoggerFactory loggerFactory,
             ClaimsPrincipal claimsPrincipal,
+            IAuditService auditService,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
@@ -154,6 +181,18 @@ public static class BankAccountEvents
             }
 
             await bankAccountService.DeleteBankAccountByIdAsync(id, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Delete",
+                "BankAccount",
+                id,
+                $"Deleted bank account {id}",
+                null,
+                familyMemberId,
+                null,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Ok(ApiResponse<BankAccountDetailsDto>.Success(null, "Bank account has been successfully deleted.", traceId));
         });

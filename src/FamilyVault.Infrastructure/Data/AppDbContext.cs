@@ -34,6 +34,10 @@ public class AppDbContext : DbContext
     /// Gets or sets BankAccounts.
     /// </summary>
     public DbSet<BankAccountDetails> BankAccounts { get; set; }
+    /// <summary>
+    /// Gets or sets AuditEvents.
+    /// </summary>
+    public DbSet<AuditEvent> AuditEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -81,6 +85,23 @@ public class AppDbContext : DbContext
                   .HasMaxLength(150);
         });
 
+        modelBuilder.Entity<AuditEvent>(entity =>
+        {
+            entity.Property(e => e.Action)
+                  .IsRequired()
+                  .HasMaxLength(50);
+
+            entity.Property(e => e.EntityType)
+                  .IsRequired()
+                  .HasMaxLength(50);
+
+            entity.Property(e => e.Description)
+                  .HasMaxLength(500);
+
+            entity.Property(e => e.IpAddress)
+                  .HasMaxLength(64);
+        });
+
         modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
 
@@ -90,11 +111,14 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<FamilyMember>().HasIndex(f => f.Aadhar).IsUnique();
         modelBuilder.Entity<FamilyMember>().HasIndex(f => new { f.FirstName, f.LastName, f.FamilyId }).IsUnique();
         modelBuilder.Entity<BankAccountDetails>().HasIndex(b => b.FamilyMemberId);
+        modelBuilder.Entity<AuditEvent>().HasIndex(a => new { a.UserId, a.CreatedAt });
+        modelBuilder.Entity<AuditEvent>().HasIndex(a => new { a.Action, a.EntityType, a.CreatedAt });
 
         modelBuilder.Entity<User>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<Family>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<FamilyMember>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<DocumentDetails>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<BankAccountDetails>().HasQueryFilter(d => !d.IsDeleted);
+        modelBuilder.Entity<AuditEvent>().HasQueryFilter(d => !d.IsDeleted);
     }
 }

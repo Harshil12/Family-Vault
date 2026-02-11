@@ -110,6 +110,7 @@ public class Program
         builder.Services.AddScoped<IBankAccountService, BankAccountService>();
         builder.Services.AddScoped<ICryptoService, CryptoService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IAuditService, AuditService>();
 
         // -------------------- AutoMapper --------------------
         builder.Services.AddAutoMapper(cfg =>

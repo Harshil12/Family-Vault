@@ -74,6 +74,7 @@ public static class FamilyMemberEvents
             IFamilyService familyOwnerService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
+            IAuditService auditService,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
@@ -91,6 +92,18 @@ public static class FamilyMemberEvents
             }
 
             await familyService.DeleteFamilyMemberByIdAsync(id, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Delete",
+                "FamilyMember",
+                id,
+                $"Deleted family member {id}",
+                familyId,
+                id,
+                null,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Ok(ApiResponse<FamilyMemberDto>.Success(null, "Family member has been successfully deleted.", traceId));
 
@@ -101,6 +114,7 @@ public static class FamilyMemberEvents
             IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
+            IAuditService auditService,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
@@ -114,6 +128,18 @@ public static class FamilyMemberEvents
             createFamilyRequest.FamilyId = familyId;
 
             var createdFamilyMember = await familyMemberService.CreateFamilyMemberAsync(createFamilyRequest, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Create",
+                "FamilyMember",
+                createdFamilyMember.Id,
+                $"Created family member {createdFamilyMember.FirstName} {createdFamilyMember.LastName}",
+                familyId,
+                createdFamilyMember.Id,
+                null,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Created($"/familymember/{createdFamilyMember.Id}",
                     ApiResponse<FamilyMemberDto>.Success(createdFamilyMember, "Family member has been successfully created.", traceId));
@@ -127,6 +153,7 @@ public static class FamilyMemberEvents
             IFamilyService familyService,
             HttpContext httpContext,
             ClaimsPrincipal claimsPrincipal,
+            IAuditService auditService,
             CancellationToken cancellationToken) =>
         {
             var userId = Helper.GetUserIdFromClaims(claimsPrincipal);
@@ -146,6 +173,18 @@ public static class FamilyMemberEvents
             updateFamilyMemberRequest.FamilyId = familyId;
 
             var updatedFamilyMember = await familyMemberService.UpdateFamilyMemberAsync(updateFamilyMemberRequest, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Update",
+                "FamilyMember",
+                updatedFamilyMember.Id,
+                $"Updated family member {updatedFamilyMember.FirstName} {updatedFamilyMember.LastName}",
+                familyId,
+                updatedFamilyMember.Id,
+                null,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Ok(ApiResponse<FamilyMemberDto>.Success(updatedFamilyMember, "Family member has been successfully updated.", traceId));
 

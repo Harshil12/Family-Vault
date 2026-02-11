@@ -107,6 +107,7 @@ public static class DocumentEvents
             Guid id,
             bool? download,
             IDocumentService documentService,
+            IAuditService auditService,
             IFamilyMemberService familyMemberService,
             IFamilyService familyService,
             HttpContext httpContext,
@@ -155,6 +156,22 @@ public static class DocumentEvents
             var contentType = ContentTypeByExtension.TryGetValue(extension, out var value) ? value : "application/octet-stream";
             var fileName = Path.GetFileName(fullPath);
 
+            if (download == true)
+            {
+                await auditService.LogAsync(
+                    userId,
+                    "Download",
+                    "Document",
+                    id,
+                    $"Downloaded file for document {id}",
+                    null,
+                    familyMemberId,
+                    id,
+                    httpContext.Connection.RemoteIpAddress?.ToString(),
+                    null,
+                    cancellationToken);
+            }
+
             return Results.File(
                 fileContents: await File.ReadAllBytesAsync(fullPath, cancellationToken),
                 contentType: contentType,
@@ -163,6 +180,7 @@ public static class DocumentEvents
         });
 
         documentGroup.MapDelete("/{id:guid}", async (Guid familyMemberId, Guid id, IDocumentService _documentService,
+            IAuditService auditService,
             IFamilyMemberService familyMemberService,
             IFamilyService familyService,
             HttpContext httpContext,
@@ -182,6 +200,18 @@ public static class DocumentEvents
             }
 
             await _documentService.DeleteDocumentDetailsByIdAsync(id, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Delete",
+                "Document",
+                id,
+                $"Deleted document {id}",
+                null,
+                familyMemberId,
+                id,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(null, "Document has been successfully deleted.", traceId));
 
@@ -190,6 +220,7 @@ public static class DocumentEvents
         documentGroup.MapPost("/documents", async (CreateDocumentRequest createDocumentRequest,
             Guid familyMemberId,
             IDocumentService _documentService,
+            IAuditService auditService,
             IFamilyMemberService familyMemberService,
             IFamilyService familyService,
             HttpContext httpContext,
@@ -205,6 +236,18 @@ public static class DocumentEvents
             createDocumentRequest.FamilyMemberId = familyMemberId;
 
             var createdDocument = await _documentService.CreateDocumentDetailsAsync(createDocumentRequest, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Create",
+                "Document",
+                createdDocument.Id,
+                $"Created document {createdDocument.DocumentNumber}",
+                null,
+                familyMemberId,
+                createdDocument.Id,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Created($"/documents/{createdDocument.Id}",
                 ApiResponse<DocumentDetailsDto>.Success(createdDocument, "Document has been successfully createdDocument.", traceId));
@@ -214,6 +257,7 @@ public static class DocumentEvents
         documentGroup.MapPost("/documents/upload", async (Guid familyMemberId,
             [FromForm] UploadDocumentRequest uploadDocumentRequest,
             IDocumentService documentService,
+            IAuditService auditService,
             IFamilyMemberService familyMemberService,
             IFamilyService familyService,
             IWebHostEnvironment hostEnvironment,
@@ -294,6 +338,18 @@ public static class DocumentEvents
             };
 
             var createdDocument = await documentService.CreateDocumentDetailsAsync(createDocumentRequest, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Upload",
+                "Document",
+                createdDocument.Id,
+                $"Uploaded file for document {createdDocument.DocumentNumber}",
+                family.Id,
+                familyMemberId,
+                createdDocument.Id,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Created($"/documents/{createdDocument.Id}",
                 ApiResponse<DocumentDetailsDto>.Success(createdDocument, "Document has been successfully uploaded.", traceId));
@@ -303,6 +359,7 @@ public static class DocumentEvents
             Guid id,
             [FromForm] ReplaceDocumentFileRequest replaceDocumentFileRequest,
             IDocumentService documentService,
+            IAuditService auditService,
             IFamilyMemberService familyMemberService,
             IFamilyService familyService,
             IWebHostEnvironment hostEnvironment,
@@ -392,6 +449,18 @@ public static class DocumentEvents
 
             var updatedDocument = await documentService.UpdateDocumentDetailsAsync(updateDocumentRequest, userId, cancellationToken);
             TryDeleteOldDocumentFile(existingDocument.SavedLocation, hostEnvironment.ContentRootPath);
+            await auditService.LogAsync(
+                userId,
+                "Update",
+                "Document",
+                updatedDocument.Id,
+                $"Replaced file for document {updatedDocument.DocumentNumber}",
+                family.Id,
+                familyMemberId,
+                updatedDocument.Id,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updatedDocument, "Document file has been successfully replaced.", traceId));
         });
@@ -399,6 +468,7 @@ public static class DocumentEvents
         documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest,
             Guid familyMemberId,
             IDocumentService _documentService,
+            IAuditService auditService,
             IFamilyMemberService familyMemberService,
             IFamilyService familyService,
             HttpContext httpContext,
@@ -420,6 +490,18 @@ public static class DocumentEvents
             updateDocumentRequest.FamilyMemberId = familyMemberId;
 
             var updatedDocument = await _documentService.UpdateDocumentDetailsAsync(updateDocumentRequest, userId, cancellationToken);
+            await auditService.LogAsync(
+                userId,
+                "Update",
+                "Document",
+                updatedDocument.Id,
+                $"Updated document {updatedDocument.DocumentNumber}",
+                null,
+                familyMemberId,
+                updatedDocument.Id,
+                httpContext.Connection.RemoteIpAddress?.ToString(),
+                null,
+                cancellationToken);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updatedDocument, "Document has been successfully updatedDocument.", traceId));
 

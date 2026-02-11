@@ -5,7 +5,8 @@ import { LogoutIcon } from "./ui/Icons";
 
 const links = [
   { to: "/", label: "Dashboard", end: true },
-  { to: "/families", label: "Family Profiles" }
+  { to: "/families", label: "Family Profiles" },
+  { to: "/audit", label: "Audit" }
 ];
 
 export default function AppLayout() {
