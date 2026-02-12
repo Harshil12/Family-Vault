@@ -10,9 +10,6 @@ using Moq;
 
 namespace FamilyVault.Tests.Services;
 
-/// <summary>
-/// Represents BankAccountServiceTests.
-/// </summary>
 public class BankAccountServiceTests
 {
     private readonly Mock<IBankAccountRepository> _bankAccountRepoMock;
@@ -22,9 +19,6 @@ public class BankAccountServiceTests
 
     private readonly BankAccountService _sut;
 
-    /// <summary>
-    /// Initializes a new instance of BankAccountServiceTests.
-    /// </summary>
     public BankAccountServiceTests()
     {
         _bankAccountRepoMock = new Mock<IBankAccountRepository>();
@@ -42,9 +36,6 @@ public class BankAccountServiceTests
     #region GetBankAccountByIdAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the GetBankAccountByIdAsync_ShouldDecrypt_WhenAccountExists operation.
-    /// </summary>
     public async Task GetBankAccountByIdAsync_ShouldDecrypt_WhenAccountExists()
     {
         // Arrange
@@ -73,9 +64,6 @@ public class BankAccountServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the GetBankAccountByIdAsync_ShouldNotDecrypt_WhenAccountDoesNotExist operation.
-    /// </summary>
     public async Task GetBankAccountByIdAsync_ShouldNotDecrypt_WhenAccountDoesNotExist()
     {
         // Arrange
@@ -100,9 +88,6 @@ public class BankAccountServiceTests
     #region GetBankAccountsByFamilyMemberIdAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the GetBankAccountsByFamilyMemberIdAsync_ShouldDecryptAccountNumbers operation.
-    /// </summary>
     public async Task GetBankAccountsByFamilyMemberIdAsync_ShouldDecryptAccountNumbers()
     {
         // Arrange
@@ -139,9 +124,6 @@ public class BankAccountServiceTests
     #region CreateBankAccountAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the CreateBankAccountAsync_ShouldEncryptAndPersistAccount operation.
-    /// </summary>
     public async Task CreateBankAccountAsync_ShouldEncryptAndPersistAccount()
     {
         // Arrange
@@ -187,9 +169,6 @@ public class BankAccountServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the CreateBankAccountAsync_ShouldKeepLast4AsWhole_WhenAccountNumberLengthIsFourOrLess operation.
-    /// </summary>
     public async Task CreateBankAccountAsync_ShouldKeepLast4AsWhole_WhenAccountNumberLengthIsFourOrLess()
     {
         // Arrange
@@ -232,9 +211,6 @@ public class BankAccountServiceTests
     #region UpdateBankAccountAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the UpdateBankAccountAsync_ShouldEncryptAndPersistAccount operation.
-    /// </summary>
     public async Task UpdateBankAccountAsync_ShouldEncryptAndPersistAccount()
     {
         // Arrange
@@ -284,9 +260,6 @@ public class BankAccountServiceTests
     #region DeleteBankAccountByIdAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the DeleteBankAccountByIdAsync_ShouldCallRepository operation.
-    /// </summary>
     public async Task DeleteBankAccountByIdAsync_ShouldCallRepository()
     {
         // Arrange
@@ -304,3 +277,4 @@ public class BankAccountServiceTests
 
     #endregion
 }
+

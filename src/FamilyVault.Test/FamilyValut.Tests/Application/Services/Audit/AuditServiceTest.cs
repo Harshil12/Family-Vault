@@ -8,18 +8,12 @@ using Moq;
 
 namespace FamilyVault.Tests.Services;
 
-/// <summary>
-/// Represents AuditServiceTests.
-/// </summary>
 public class AuditServiceTests
 {
     private readonly Mock<IAuditRepository> _auditRepoMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly AuditService _sut;
 
-    /// <summary>
-    /// Initializes a new instance of AuditServiceTests.
-    /// </summary>
     public AuditServiceTests()
     {
         _auditRepoMock = new Mock<IAuditRepository>();
@@ -30,9 +24,6 @@ public class AuditServiceTests
     #region LogAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the LogAsync_ShouldCreateAndPersistAuditEvent operation.
-    /// </summary>
     public async Task LogAsync_ShouldCreateAndPersistAuditEvent()
     {
         // Arrange
@@ -74,9 +65,6 @@ public class AuditServiceTests
     #region GetActivityAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the GetActivityAsync_ShouldNormalizeInvalidDaysAndTake operation.
-    /// </summary>
     public async Task GetActivityAsync_ShouldNormalizeInvalidDaysAndTake()
     {
         // Arrange
@@ -112,9 +100,6 @@ public class AuditServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the GetActivityAsync_ShouldCapDaysAndTakeAtMaxLimits operation.
-    /// </summary>
     public async Task GetActivityAsync_ShouldCapDaysAndTakeAtMaxLimits()
     {
         // Arrange
@@ -151,9 +136,6 @@ public class AuditServiceTests
     #region GetDownloadHistoryAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the GetDownloadHistoryAsync_ShouldNormalizeInvalidDaysAndTake operation.
-    /// </summary>
     public async Task GetDownloadHistoryAsync_ShouldNormalizeInvalidDaysAndTake()
     {
         // Arrange
@@ -191,9 +173,6 @@ public class AuditServiceTests
     #region BuildCsvReportAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the BuildCsvReportAsync_ShouldReturnCsvWithHeaderAndEscapedValues operation.
-    /// </summary>
     public async Task BuildCsvReportAsync_ShouldReturnCsvWithHeaderAndEscapedValues()
     {
         // Arrange
@@ -247,3 +226,4 @@ public class AuditServiceTests
 
     #endregion
 }
+

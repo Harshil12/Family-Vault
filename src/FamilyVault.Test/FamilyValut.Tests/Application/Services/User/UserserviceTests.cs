@@ -10,9 +10,6 @@ using Moq;
 
 namespace FamilyVault.Tests.Services;
 
-/// <summary>
-/// Represents UserserviceTests.
-/// </summary>
 public class UserserviceTests
 {
     private readonly Mock<IUserRepository> _userRepoMock;
@@ -22,9 +19,6 @@ public class UserserviceTests
 
     private readonly Userservice _sut;
 
-    /// <summary>
-    /// Initializes a new instance of UserserviceTests.
-    /// </summary>
     public UserserviceTests()
     {
         _userRepoMock = new Mock<IUserRepository>();
@@ -42,9 +36,6 @@ public class UserserviceTests
     #region GetUserAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the GetUserAsync_ShouldReturnMappedUsers operation.
-    /// </summary>
     public async Task GetUserAsync_ShouldReturnMappedUsers()
     {
         // Arrange
@@ -81,9 +72,6 @@ public class UserserviceTests
     #region GetUserByIdAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the GetUserByIdAsync_ShouldReturnMappedUser operation.
-    /// </summary>
     public async Task GetUserByIdAsync_ShouldReturnMappedUser()
     {
         // Arrange
@@ -113,9 +101,6 @@ public class UserserviceTests
     #region CreateUserAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the CreateUserAsync_ShouldHashPassword_AndPersistUser operation.
-    /// </summary>
     public async Task CreateUserAsync_ShouldHashPassword_AndPersistUser()
     {
         // Arrange
@@ -172,9 +157,6 @@ public class UserserviceTests
     #region RegisterUserAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the RegisterUserAsync_ShouldHashPassword_AndSetSelfRegisterCreator operation.
-    /// </summary>
     public async Task RegisterUserAsync_ShouldHashPassword_AndSetSelfRegisterCreator()
     {
         // Arrange
@@ -233,9 +215,6 @@ public class UserserviceTests
     #region DeleteUserByIdAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the DeleteUserByIdAsync_ShouldCallRepository operation.
-    /// </summary>
     public async Task DeleteUserByIdAsync_ShouldCallRepository()
     {
         // Arrange
@@ -256,9 +235,6 @@ public class UserserviceTests
     #region UpdateUserAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the UpdateUserAsync_ShouldHashPassword_AndUpdateUser operation.
-    /// </summary>
     public async Task UpdateUserAsync_ShouldHashPassword_AndUpdateUser()
     {
         // Arrange
@@ -310,3 +286,4 @@ public class UserserviceTests
 
     #endregion
 }
+

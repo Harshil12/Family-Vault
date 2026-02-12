@@ -12,18 +12,12 @@ using System.Text.Json;
 
 namespace FamilyVault.Tests.API.EndPoints.Login;
 
-/// <summary>
-/// Represents LoginApiTest.
-/// </summary>
 public class LoginApiTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly Mock<IAuthService> _authServiceMock = new();
     private readonly Mock<IUserService> _userServiceMock = new();
 
-    /// <summary>
-    /// Initializes a new instance of LoginApiTest.
-    /// </summary>
     public LoginApiTest(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder =>
@@ -39,9 +33,6 @@ public class LoginApiTest : IClassFixture<WebApplicationFactory<Program>>
     private HttpClient CreateClient() => _factory.CreateClient();
 
     [Fact]
-    /// <summary>
-    /// Performs the Login_ShouldReturnUnauthorized_WhenCredentialsAreInvalid operation.
-    /// </summary>
     public async Task Login_ShouldReturnUnauthorized_WhenCredentialsAreInvalid()
     {
         // Arrange
@@ -64,9 +55,6 @@ public class LoginApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the Login_ShouldReturnOkWithToken_WhenCredentialsAreValid operation.
-    /// </summary>
     public async Task Login_ShouldReturnOkWithToken_WhenCredentialsAreValid()
     {
         // Arrange
@@ -93,9 +81,6 @@ public class LoginApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the Register_ShouldReturnCreated operation.
-    /// </summary>
     public async Task Register_ShouldReturnCreated()
     {
         // Arrange
@@ -130,4 +115,5 @@ public class LoginApiTest : IClassFixture<WebApplicationFactory<Program>>
         response.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 }
+
 

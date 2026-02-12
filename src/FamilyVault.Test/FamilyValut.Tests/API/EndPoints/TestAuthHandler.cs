@@ -5,16 +5,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
-/// <summary>
-/// Represents TestAuthHandler.
-/// </summary>
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public static readonly Guid TestUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
-    /// <summary>
-    /// Initializes a new instance of TestAuthHandler.
-    /// </summary>
     public TestAuthHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
@@ -38,3 +32,4 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 }
+

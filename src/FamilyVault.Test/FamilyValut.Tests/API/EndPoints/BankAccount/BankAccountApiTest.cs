@@ -14,9 +14,6 @@ using System.Net.Http.Json;
 
 namespace FamilyVault.Tests.API.EndPoints.BankAccount;
 
-/// <summary>
-/// Represents BankAccountApiTest.
-/// </summary>
 public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
@@ -25,9 +22,6 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
     private readonly Mock<IFamilyService> _familyServiceMock = new();
     private readonly Mock<IAuditService> _auditServiceMock = new();
 
-    /// <summary>
-    /// Initializes a new instance of BankAccountApiTest.
-    /// </summary>
     public BankAccountApiTest(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder =>
@@ -91,9 +85,6 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the GetBankAccounts_ShouldReturnEmptyList_WhenNoBankAccounts operation.
-    /// </summary>
     public async Task GetBankAccounts_ShouldReturnEmptyList_WhenNoBankAccounts()
     {
         // Arrange
@@ -114,9 +105,6 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the GetBankAccountById_ShouldReturnNotFound_WhenBankAccountDoesNotExist operation.
-    /// </summary>
     public async Task GetBankAccountById_ShouldReturnNotFound_WhenBankAccountDoesNotExist()
     {
         // Arrange
@@ -138,9 +126,6 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the CreateBankAccount_ShouldReturnCreated operation.
-    /// </summary>
     public async Task CreateBankAccount_ShouldReturnCreated()
     {
         // Arrange
@@ -178,9 +163,6 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the UpdateBankAccount_ShouldReturnOk operation.
-    /// </summary>
     public async Task UpdateBankAccount_ShouldReturnOk()
     {
         // Arrange
@@ -220,9 +202,6 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the DeleteBankAccount_ShouldReturnOk operation.
-    /// </summary>
     public async Task DeleteBankAccount_ShouldReturnOk()
     {
         // Arrange
@@ -253,4 +232,5 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }
+
 

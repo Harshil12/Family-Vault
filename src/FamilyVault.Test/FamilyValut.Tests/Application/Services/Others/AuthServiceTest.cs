@@ -12,9 +12,6 @@ using System.Security.Claims;
 
 namespace FamilyVault.Tests.Services;
 
-/// <summary>
-/// Represents AuthServiceTests.
-/// </summary>
 public class AuthServiceTests
 {
     private readonly Mock<IUserRepository> _userRepoMock;
@@ -24,9 +21,6 @@ public class AuthServiceTests
 
     private readonly AuthService _sut;
 
-    /// <summary>
-    /// Initializes a new instance of AuthServiceTests.
-    /// </summary>
     public AuthServiceTests()
     {
         _userRepoMock = new Mock<IUserRepository>();
@@ -53,9 +47,6 @@ public class AuthServiceTests
 
     #region GetTokenAsync Tests
 
-    /// <summary>
-    /// Performs the GetTokenAsync_ShouldReturnNull_WhenUserDoesNotExist operation.
-    /// </summary>
     [Fact]
     public async Task GetTokenAsync_ShouldReturnNull_WhenUserDoesNotExist()
     {
@@ -72,9 +63,6 @@ public class AuthServiceTests
         _cryptoMock.Verify(c => c.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
-    /// <summary>
-    /// Performs the GetTokenAsync_ShouldReturnNull_WhenPasswordIsInvalid operation.
-    /// </summary>
     [Fact]
     public async Task GetTokenAsync_ShouldReturnNull_WhenPasswordIsInvalid()
     {
@@ -102,9 +90,6 @@ public class AuthServiceTests
         _mapperMock.Verify(m => m.Map<UserDto>(It.IsAny<User>()), Times.Never);
     }
 
-    /// <summary>
-    /// Performs the GetTokenAsync_ShouldReturnToken_WhenCredentialsAreValid operation.
-    /// </summary>
     [Fact]
     public async Task GetTokenAsync_ShouldReturnToken_WhenCredentialsAreValid()
     {
@@ -149,9 +134,6 @@ public class AuthServiceTests
 
     #region GenerateToken Tests
 
-    /// <summary>
-    /// Performs the GenerateToken_ShouldCreateValidJwt_WithExpectedClaims operation.
-    /// </summary>
     [Fact]
     public void GenerateToken_ShouldCreateValidJwt_WithExpectedClaims()
     {
@@ -188,3 +170,4 @@ public class AuthServiceTests
 
     #endregion
 }
+

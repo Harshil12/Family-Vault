@@ -8,18 +8,12 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FamilyVault.Tests.Infrastructure.Repositories;
 
-/// <summary>
-/// Represents FamilyMemberRepositoryTests.
-/// </summary>
 public class FamilyMemberRepositoryTests : IDisposable
 {
     private readonly AppDbContext _dbContext;
     private readonly IMemoryCache _memoryCache;
     private readonly FamilyMemberRepository _sut;
 
-    /// <summary>
-    /// Initializes a new instance of FamilyMemberRepositoryTests.
-    /// </summary>
     public FamilyMemberRepositoryTests()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -36,9 +30,6 @@ public class FamilyMemberRepositoryTests : IDisposable
     #region AddAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the AddAsync_ShouldPersistFamilyMember_AndClearCaches operation.
-    /// </summary>
     public async Task AddAsync_ShouldPersistFamilyMember_AndClearCaches()
     {
         // Arrange
@@ -72,9 +63,6 @@ public class FamilyMemberRepositoryTests : IDisposable
     #region GetAllWithDocumentsAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the GetAllWithDocumentsAsync_ShouldReturnMembers_WithDocuments_AndCache operation.
-    /// </summary>
     public async Task GetAllWithDocumentsAsync_ShouldReturnMembers_WithDocuments_AndCache()
     {
         // Arrange
@@ -140,9 +128,6 @@ public class FamilyMemberRepositoryTests : IDisposable
     #region GetByIdAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the GetByIdAsync_ShouldReturnFamilyMember_WhenExists operation.
-    /// </summary>
     public async Task GetByIdAsync_ShouldReturnFamilyMember_WhenExists()
     {
         // Arrange
@@ -167,9 +152,6 @@ public class FamilyMemberRepositoryTests : IDisposable
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the GetByIdAsync_ShouldReturnNull_WhenNotFound operation.
-    /// </summary>
     public async Task GetByIdAsync_ShouldReturnNull_WhenNotFound()
     {
         // Act
@@ -184,9 +166,6 @@ public class FamilyMemberRepositoryTests : IDisposable
     #region GetAllByFamilyIdAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the GetAllByFamilyIdAsync_ShouldReturnMembers_ForFamily_AndCache operation.
-    /// </summary>
     public async Task GetAllByFamilyIdAsync_ShouldReturnMembers_ForFamily_AndCache()
     {
         // Arrange
@@ -228,9 +207,6 @@ public class FamilyMemberRepositoryTests : IDisposable
     #region UpdateAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the UpdateAsync_ShouldUpdateFamilyMember_AndClearCaches operation.
-    /// </summary>
     public async Task UpdateAsync_ShouldUpdateFamilyMember_AndClearCaches()
     {
         // Arrange
@@ -265,9 +241,6 @@ public class FamilyMemberRepositoryTests : IDisposable
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the UpdateAsync_ShouldThrow_WhenFamilyMemberNotFound operation.
-    /// </summary>
     public async Task UpdateAsync_ShouldThrow_WhenFamilyMemberNotFound()
     {
         // Arrange
@@ -286,9 +259,6 @@ public class FamilyMemberRepositoryTests : IDisposable
     #region DeleteByIdAsync
 
     [Fact]
-    /// <summary>
-    /// Performs the DeleteByIdAsync_ShouldSoftDeleteFamilyMember_AndDocuments operation.
-    /// </summary>
     public async Task DeleteByIdAsync_ShouldSoftDeleteFamilyMember_AndDocuments()
     {
         // Arrange
@@ -341,9 +311,6 @@ public class FamilyMemberRepositoryTests : IDisposable
 
     #endregion
 
-    /// <summary>
-    /// Performs the Dispose operation.
-    /// </summary>
     public void Dispose()
     {
         _dbContext.Dispose();

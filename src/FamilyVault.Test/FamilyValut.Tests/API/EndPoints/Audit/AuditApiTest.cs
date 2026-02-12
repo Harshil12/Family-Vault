@@ -10,17 +10,11 @@ using System.Net;
 
 namespace FamilyVault.Tests.API.EndPoints.Audit;
 
-/// <summary>
-/// Represents AuditApiTest.
-/// </summary>
 public class AuditApiTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly Mock<IAuditService> _auditServiceMock = new();
 
-    /// <summary>
-    /// Initializes a new instance of AuditApiTest.
-    /// </summary>
     public AuditApiTest(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder =>
@@ -43,9 +37,6 @@ public class AuditApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the GetActivity_ShouldReturnOk operation.
-    /// </summary>
     public async Task GetActivity_ShouldReturnOk()
     {
         // Arrange
@@ -63,9 +54,6 @@ public class AuditApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the GetDownloads_ShouldReturnOk operation.
-    /// </summary>
     public async Task GetDownloads_ShouldReturnOk()
     {
         // Arrange
@@ -83,9 +71,6 @@ public class AuditApiTest : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the ExportAuditReport_ShouldReturnCsvFile operation.
-    /// </summary>
     public async Task ExportAuditReport_ShouldReturnCsvFile()
     {
         // Arrange
@@ -104,4 +89,5 @@ public class AuditApiTest : IClassFixture<WebApplicationFactory<Program>>
         response.Content.Headers.ContentType!.MediaType.Should().Be("text/csv");
     }
 }
+
 

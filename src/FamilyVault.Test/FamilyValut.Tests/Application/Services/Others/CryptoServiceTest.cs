@@ -5,16 +5,10 @@ using System.Security.Cryptography;
 
 namespace FamilyValut.Tests.Application.Services.Others;
 
-/// <summary>
-/// Represents CryptoServiceTests.
-/// </summary>
 public class CryptoServiceTests
 {
     private readonly CryptoService _sut;
 
-    /// <summary>
-    /// Initializes a new instance of CryptoServiceTests.
-    /// </summary>
     public CryptoServiceTests()
     {
         var provider = new EphemeralDataProtectionProvider();
@@ -24,9 +18,6 @@ public class CryptoServiceTests
     #region Encrypt / Decrypt
 
     [Fact]
-    /// <summary>
-    /// Performs the EncryptData_ShouldReturnProtectedValue operation.
-    /// </summary>
     public void EncryptData_ShouldReturnProtectedValue()
     {
         // Arrange
@@ -41,9 +32,6 @@ public class CryptoServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the DecryptData_ShouldRoundTrip operation.
-    /// </summary>
     public void DecryptData_ShouldRoundTrip()
     {
         // Arrange
@@ -58,9 +46,6 @@ public class CryptoServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the DecryptData_ShouldThrow_WhenProtectorThrows operation.
-    /// </summary>
     public void DecryptData_ShouldThrow_WhenProtectorThrows()
     {
         // Arrange
@@ -121,9 +106,6 @@ public class CryptoServiceTests
     #region HashPassword
 
     [Fact]
-    /// <summary>
-    /// Performs the HashPassword_ShouldReturn_NonEmptyHash operation.
-    /// </summary>
     public void HashPassword_ShouldReturn_NonEmptyHash()
     {
         // Arrange
@@ -138,9 +120,6 @@ public class CryptoServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the HashPassword_ShouldGenerateDifferentHashes_ForSamePassword operation.
-    /// </summary>
     public void HashPassword_ShouldGenerateDifferentHashes_ForSamePassword()
     {
         // Arrange
@@ -155,9 +134,6 @@ public class CryptoServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the HashPassword_ShouldThrow_WhenPasswordIsNull operation.
-    /// </summary>
     public void HashPassword_ShouldThrow_WhenPasswordIsNull()
     {
         // Act
@@ -172,9 +148,6 @@ public class CryptoServiceTests
     #region VerifyPassword
 
     [Fact]
-    /// <summary>
-    /// Performs the VerifyPassword_ShouldReturnTrue_WhenPasswordMatchesHash operation.
-    /// </summary>
     public void VerifyPassword_ShouldReturnTrue_WhenPasswordMatchesHash()
     {
         // Arrange
@@ -189,9 +162,6 @@ public class CryptoServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the VerifyPassword_ShouldReturnFalse_WhenPasswordDoesNotMatchHash operation.
-    /// </summary>
     public void VerifyPassword_ShouldReturnFalse_WhenPasswordDoesNotMatchHash()
     {
         // Arrange
@@ -207,9 +177,6 @@ public class CryptoServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the VerifyPassword_ShouldReturnFalse_WhenHashIsInvalid operation.
-    /// </summary>
     public void VerifyPassword_ShouldReturnFalse_WhenHashIsInvalid()
     {
         // Arrange
@@ -225,9 +192,6 @@ public class CryptoServiceTests
     }
 
     [Fact]
-    /// <summary>
-    /// Performs the VerifyPassword_ShouldThrow_WhenPasswordIsNull operation.
-    /// </summary>
     public void VerifyPassword_ShouldThrow_WhenPasswordIsNull()
     {
         // Arrange
@@ -270,3 +234,4 @@ public class CryptoServiceTests
 
     #endregion
 }
+
