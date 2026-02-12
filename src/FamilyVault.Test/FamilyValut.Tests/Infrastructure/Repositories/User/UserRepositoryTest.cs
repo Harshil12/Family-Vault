@@ -2,6 +2,7 @@ using FamilyVault.Domain.Entities;
 using FamilyVault.Infrastructure.Data;
 using FamilyVault.Infrastructure.Repositories;
 using FluentAssertions;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -9,18 +10,22 @@ namespace FamilyVault.Tests.Infrastructure.Repositories;
 
 public class UserRepositoryTests : IDisposable
 {
+    private readonly SqliteConnection _connection;
     private readonly AppDbContext _dbContext;
     private readonly IMemoryCache _memoryCache;
     private readonly UserRepository _sut;
 
     public UserRepositoryTests()
     {
+        _connection = new SqliteConnection("DataSource=:memory:");
+        _connection.Open();
+
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .UseSqlite(_connection)
             .Options;
 
         _dbContext = new AppDbContext(options);
+        _dbContext.Database.EnsureCreated();
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
 
         _sut = new UserRepository(_dbContext, _memoryCache);
@@ -174,7 +179,7 @@ public class UserRepositoryTests : IDisposable
         // Arrange
         _dbContext.Users.AddRange(
             new User { Id = Guid.NewGuid(), Username = "u1", FirstName = "John", Email = "john@doe", Password = "password",CreatedBy = "test-user", CreatedAt = DateTime.UtcNow },
-            new User { Id = Guid.NewGuid(), Username = "u2", FirstName = "John", Email = "john@doe", Password = "password",CreatedBy = "test-user", CreatedAt = DateTime.UtcNow }
+            new User { Id = Guid.NewGuid(), Username = "u2", FirstName = "John", Email = "john2@doe", Password = "password",CreatedBy = "test-user", CreatedAt = DateTime.UtcNow }
         );
         await _dbContext.SaveChangesAsync();
 
@@ -391,10 +396,11 @@ public class UserRepositoryTests : IDisposable
         await _sut.DeleteByIdAsync(userId, username, CancellationToken.None);
 
         // Assert
-        (await _dbContext.Users.FindAsync(userId))!.IsDeleted.Should().BeTrue();
-        (await _dbContext.Families.FindAsync(family.Id))!.IsDeleted.Should().BeTrue();
-        (await _dbContext.FamilyMembers.FindAsync(member.Id))!.IsDeleted.Should().BeTrue();
-        (await _dbContext.Documents.FindAsync(document.Id))!.IsDeleted.Should().BeTrue();
+        _dbContext.ChangeTracker.Clear();
+        (await _dbContext.Users.IgnoreQueryFilters().FirstAsync(u => u.Id == userId)).IsDeleted.Should().BeTrue();
+        (await _dbContext.Families.IgnoreQueryFilters().FirstAsync(f => f.Id == family.Id)).IsDeleted.Should().BeTrue();
+        (await _dbContext.FamilyMembers.IgnoreQueryFilters().FirstAsync(fm => fm.Id == member.Id)).IsDeleted.Should().BeTrue();
+        (await _dbContext.Documents.IgnoreQueryFilters().FirstAsync(d => d.Id == document.Id)).IsDeleted.Should().BeTrue();
     }
 
     #endregion
@@ -403,5 +409,6 @@ public class UserRepositoryTests : IDisposable
     {
         _dbContext.Dispose();
         _memoryCache.Dispose();
+        _connection.Dispose();
     }
 }

@@ -135,28 +135,11 @@ public class UserRepository : IUserRepository
                .SetProperty(fm => fm.UpdatedBy, user)
                .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
 
-        await _appDbContext.Families
-               .Where(fm => fm.UserId == userId)
-               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
-               .SetProperty(fm => fm.UpdatedBy, user)
-               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
-
-        await _appDbContext.FamilyMembers
-               .Where(fm => _appDbContext.Families
-                   .Where(f => f.UserId == userId && !f.IsDeleted)
-                   .Select(f => f.Id)
-                   .Contains(fm.FamilyId)
-               && !fm.IsDeleted)
-               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
-               .SetProperty(fm => fm.UpdatedBy, user)
-               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
-
         await (
                 from d in _appDbContext.Documents
                 join m in _appDbContext.FamilyMembers on d.FamilyMemberId equals m.Id
                 join f in _appDbContext.Families on m.FamilyId equals f.Id
                 where f.UserId == userId
-                      && !f.IsDeleted
                       && !m.IsDeleted
                       && !d.IsDeleted
                 select d
@@ -172,7 +155,6 @@ public class UserRepository : IUserRepository
                 join m in _appDbContext.FamilyMembers on b.FamilyMemberId equals m.Id
                 join f in _appDbContext.Families on m.FamilyId equals f.Id
                 where f.UserId == userId
-                      && !f.IsDeleted
                       && !m.IsDeleted
                       && !b.IsDeleted
                 select b
@@ -182,6 +164,22 @@ public class UserRepository : IUserRepository
                       .SetProperty(b => b.UpdatedBy, user)
                       .SetProperty(b => b.UpdatedAt, DateTimeOffset.UtcNow),
                 cancellationToken);
+
+        await _appDbContext.FamilyMembers
+               .Where(fm => _appDbContext.Families
+                   .Where(f => f.UserId == userId)
+                   .Select(f => f.Id)
+                   .Contains(fm.FamilyId)
+               && !fm.IsDeleted)
+               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
+               .SetProperty(fm => fm.UpdatedBy, user)
+               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
+
+        await _appDbContext.Families
+               .Where(fm => fm.UserId == userId)
+               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
+               .SetProperty(fm => fm.UpdatedBy, user)
+               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
 
         _memoryCache.Remove("UsersWithFamilies");
         _memoryCache.Remove("UsersFamilies");

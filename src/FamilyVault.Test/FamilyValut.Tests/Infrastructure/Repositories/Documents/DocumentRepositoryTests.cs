@@ -152,7 +152,7 @@ public class DocumentRepositoryTests : IDisposable
     }
 
     [Fact]
-    public async Task GetAsyncbyId_ShouldReturnSoftDeletedDocument()
+    public async Task GetAsyncbyId_ShouldReturnNull_ForSoftDeletedDocument()
     {
         // Arrange
         var document = new DocumentDetails
@@ -172,8 +172,7 @@ public class DocumentRepositoryTests : IDisposable
         var result = await _sut.GetAsyncbyId(document.Id, CancellationToken.None);
 
         // Assert
-        result.Should().NotBeNull();
-        result!.IsDeleted.Should().BeTrue();
+        result.Should().BeNull();
     }
 
     #endregion

@@ -140,13 +140,6 @@ public class FamilyRepository : IFamilyRepository
                 .SetProperty(fm => fm.UpdatedBy, user)
                 .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
 
-        // soft delete the family members
-        await _appDbContext.FamilyMembers
-               .Where(fm => fm.FamilyId == familyId)
-               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
-               .SetProperty(fm => fm.UpdatedBy, user)
-               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
-
         await _appDbContext.Documents
         .Where(d =>
             _appDbContext.FamilyMembers
@@ -172,6 +165,13 @@ public class FamilyRepository : IFamilyRepository
             s.SetProperty(b => b.IsDeleted, true)
             .SetProperty(fm => fm.UpdatedBy, user)
             .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
+
+        // soft delete the family members
+        await _appDbContext.FamilyMembers
+               .Where(fm => fm.FamilyId == familyId)
+               .ExecuteUpdateAsync(setter => setter.SetProperty(fm => fm.IsDeleted, true)
+               .SetProperty(fm => fm.UpdatedBy, user)
+               .SetProperty(fm => fm.UpdatedAt, DateTimeOffset.UtcNow), cancellationToken: cancellationToken);
 
         await tx.CommitAsync(cancellationToken);
 
