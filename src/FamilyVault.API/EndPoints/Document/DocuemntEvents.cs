@@ -353,7 +353,7 @@ public static class DocumentEvents
 
             return Results.Created($"/documents/{createdDocument.Id}",
                 ApiResponse<DocumentDetailsDto>.Success(createdDocument, "Document has been successfully uploaded.", traceId));
-        });
+        }).DisableAntiforgery();
 
         documentGroup.MapPut("/documents/{id:Guid}/file", async (Guid familyMemberId,
             Guid id,
@@ -463,7 +463,7 @@ public static class DocumentEvents
                 cancellationToken);
 
             return Results.Ok(ApiResponse<DocumentDetailsDto>.Success(updatedDocument, "Document file has been successfully replaced.", traceId));
-        });
+        }).DisableAntiforgery();
 
         documentGroup.MapPut("/documents/{id:Guid}", async (Guid id, UpdateDocumentRequest updateDocumentRequest,
             Guid familyMemberId,
