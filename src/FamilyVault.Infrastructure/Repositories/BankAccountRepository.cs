@@ -88,6 +88,7 @@ public class BankAccountRepository : IBankAccountRepository
         existingBankAccount.AccountHolderName = bankAccount.AccountHolderName;
         existingBankAccount.IFSC = bankAccount.IFSC;
         existingBankAccount.Branch = bankAccount.Branch;
+        existingBankAccount.NomineeName = bankAccount.NomineeName;
         existingBankAccount.FamilyMemberId = bankAccount.FamilyMemberId;
         existingBankAccount.UpdatedAt = bankAccount.UpdatedAt;
         existingBankAccount.UpdatedBy = bankAccount.UpdatedBy;

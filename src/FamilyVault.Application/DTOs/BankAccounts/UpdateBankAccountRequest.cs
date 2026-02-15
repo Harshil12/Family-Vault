@@ -43,6 +43,11 @@ public class UpdateBankAccountRequest
     public string? Branch { get; set; }
 
     /// <summary>
+    /// Optional nominee name.
+    /// </summary>
+    public string? NomineeName { get; set; }
+
+    /// <summary>
     /// Family member to whom the account belongs.
     /// </summary>
     public Guid FamilyMemberId { get; set; }

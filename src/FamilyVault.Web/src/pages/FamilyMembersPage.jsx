@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import CrudTable from "../components/ui/CrudTable";
+import DataGridTable from "../components/ui/DataGridTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import HelpTip from "../components/ui/HelpTip";
@@ -60,6 +60,27 @@ function toFormValues(member) {
   };
 }
 
+function maskPan(value) {
+  if (!value) {
+    return "-";
+  }
+  if (value.length <= 4) {
+    return value;
+  }
+  return `${"*".repeat(value.length - 4)}${value.slice(-4)}`;
+}
+
+function maskAadhar(value) {
+  if (!value) {
+    return "-";
+  }
+  const text = String(value);
+  if (text.length <= 4) {
+    return text;
+  }
+  return `${"*".repeat(text.length - 4)}${text.slice(-4)}`;
+}
+
 export default function FamilyMembersPage() {
   const { familyId } = useParams();
   const { token, isPreviewMode } = useAuth();
@@ -85,7 +106,31 @@ export default function FamilyMembersPage() {
         header: "Relation",
         render: (row) => optionLabelByValue(relationshipOptions, row.relationshipType)
       },
+      { key: "countryCode", header: "Code" },
+      { key: "mobile", header: "Mobile" },
+      {
+        key: "dateOfBirth",
+        header: "DOB",
+        render: (row) => (row.dateOfBirth ? new Date(row.dateOfBirth).toLocaleDateString() : "-")
+      },
+      {
+        key: "bloodGroup",
+        header: "Blood",
+        render: (row) => (row.bloodGroup === null || row.bloodGroup === undefined ? "-" : optionLabelByValue(bloodGroupOptions, row.bloodGroup))
+      },
       { key: "email", header: "Email" },
+      { key: "pan", header: "PAN", render: (row) => maskPan(row.pan) },
+      { key: "aadhar", header: "Aadhaar", render: (row) => maskAadhar(row.aadhar) },
+      {
+        key: "createdAt",
+        header: "Created",
+        render: (row) => (row.createdAt ? new Date(row.createdAt).toLocaleString() : "-")
+      },
+      {
+        key: "updatedAt",
+        header: "Updated",
+        render: (row) => (row.updatedAt ? new Date(row.updatedAt).toLocaleString() : "-")
+      },
       {
         key: "documents",
         header: "Documents",
@@ -102,13 +147,13 @@ export default function FamilyMembersPage() {
       },
       {
         key: "accounts",
-        header: "Bank Accounts",
+        header: "Financial",
         render: (row) => (
           <Link
             className="icon-link"
-            to={`/families/${familyId}/members/${row.id}/accounts`}
-            title="View bank accounts"
-            aria-label="View bank accounts"
+            to={`/families/${familyId}/members/${row.id}/financial-details`}
+            title="View financial details"
+            aria-label="View financial details"
           >
             <BankIcon />
           </Link>
@@ -243,7 +288,7 @@ export default function FamilyMembersPage() {
           ))}
         </select>
       </div>
-      {loading ? <p>Loading family members...</p> : <CrudTable columns={columns} rows={filteredMembers} onEdit={openEdit} onDelete={handleDelete} />}
+      {loading ? <p>Loading family members...</p> : <DataGridTable columns={columns} rows={filteredMembers} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
         title={editingMember ? "Edit Family Member" : "Add Family Member"}

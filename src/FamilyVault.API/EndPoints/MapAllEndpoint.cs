@@ -1,6 +1,6 @@
-using FamilyVault.API.EndPoints.BankAccount;
 using FamilyVault.API.EndPoints.Audit;
 using FamilyVault.API.EndPoints.Document;
+using FamilyVault.API.EndPoints.FinancialDetails;
 using FamilyVault.API.EndPoints.Family;
 using FamilyVault.API.EndPoints.FamilyMeMber;
 using FamilyVault.API.EndPoints.Login;
@@ -18,7 +18,7 @@ public static class MapAllEndpoint
     /// </summary>
     public static void MapAllEndpoints(this WebApplication app)
     {
-        app.MapBankAccountEndPoints();
+        app.MapFinancialDetailsEndPoints();
         app.MapAuditEndPoints();
         app.MapDocumentEndPoints();
         app.MapFamilyEndPoints();

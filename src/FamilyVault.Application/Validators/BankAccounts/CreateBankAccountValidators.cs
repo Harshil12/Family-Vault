@@ -39,5 +39,9 @@ public class CreateBankAccountValidators : AbstractValidator<CreateBankAccountRe
         RuleFor(x => x.Branch)
             .MaximumLength(150).WithMessage("Branch must be at most 150 characters.")
             .When(x => !string.IsNullOrWhiteSpace(x.Branch));
+
+        RuleFor(x => x.NomineeName)
+            .MaximumLength(150).WithMessage("Nominee name must be at most 150 characters.")
+            .When(x => !string.IsNullOrWhiteSpace(x.NomineeName));
     }
 }

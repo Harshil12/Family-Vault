@@ -91,4 +91,34 @@ public class FamilyMember : BaseEntity
     /// </summary>
     public ICollection<BankAccountDetails>? BankAccountDetails { get; set; }
 
+    /// <summary>
+    /// List of related <see cref="FixedDepositDetails"/> entities that belong to this member.
+    /// </summary>
+    public ICollection<FixedDepositDetails>? FixedDepositDetails { get; set; }
+
+    /// <summary>
+    /// List of related <see cref="LifeInsurancePolicyDetails"/> entities that belong to this member.
+    /// </summary>
+    public ICollection<LifeInsurancePolicyDetails>? LifeInsurancePolicyDetails { get; set; }
+
+    /// <summary>
+    /// List of related <see cref="MediclaimPolicyDetails"/> entities that belong to this member.
+    /// </summary>
+    public ICollection<MediclaimPolicyDetails>? MediclaimPolicyDetails { get; set; }
+
+    /// <summary>
+    /// List of mediclaim policy member links where this member is covered.
+    /// </summary>
+    public ICollection<MediclaimPolicyMember>? MediclaimPolicyMembers { get; set; }
+
+    /// <summary>
+    /// List of related <see cref="DematAccountDetails"/> entities that belong to this member.
+    /// </summary>
+    public ICollection<DematAccountDetails>? DematAccountDetails { get; set; }
+
+    /// <summary>
+    /// List of related <see cref="MutualFundHoldingDetails"/> entities that belong to this member.
+    /// </summary>
+    public ICollection<MutualFundHoldingDetails>? MutualFundHoldingDetails { get; set; }
+
 }

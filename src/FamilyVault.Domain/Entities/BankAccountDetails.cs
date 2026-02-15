@@ -43,6 +43,11 @@ public class BankAccountDetails : BaseEntity
     public string? Branch { get; set; }
 
     /// <summary>
+    /// Optional nominee name.
+    /// </summary>
+    public string? NomineeName { get; set; }
+
+    /// <summary>
     /// Identifier linking the account to a family member.
     /// </summary>
     public Guid FamilyMemberId { get; set; }

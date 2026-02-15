@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import CrudTable from "../components/ui/CrudTable";
+import DataGridTable from "../components/ui/DataGridTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import HelpTip from "../components/ui/HelpTip";
@@ -65,9 +65,25 @@ export default function DocumentsPage() {
     },
     { key: "documentNumber", header: "Document Number" },
     {
+      key: "issueDate",
+      header: "Issue",
+      render: (row) => (row.issueDate ? new Date(row.issueDate).toLocaleDateString() : "-")
+    },
+    {
       key: "expiryDate",
       header: "Expiry",
       render: (row) => (row.expiryDate ? new Date(row.expiryDate).toLocaleDateString() : "-")
+    },
+    { key: "savedLocation", header: "Saved Path" },
+    {
+      key: "createdAt",
+      header: "Created",
+      render: (row) => (row.createdAt ? new Date(row.createdAt).toLocaleString() : "-")
+    },
+    {
+      key: "updatedAt",
+      header: "Updated",
+      render: (row) => (row.updatedAt ? new Date(row.updatedAt).toLocaleString() : "-")
     },
     {
       key: "file",
@@ -286,7 +302,7 @@ export default function DocumentsPage() {
         </button>
         <HelpTip text="Turn this on to show only documents with expiry dates in the next 45 days." />
       </div>
-      {loading ? <p>Loading documents...</p> : <CrudTable columns={columns} rows={filteredDocuments} onEdit={openEdit} onDelete={handleDelete} />}
+      {loading ? <p>Loading documents...</p> : <DataGridTable columns={columns} rows={filteredDocuments} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
         title={editingDocument ? "Edit Document" : "Add Document"}

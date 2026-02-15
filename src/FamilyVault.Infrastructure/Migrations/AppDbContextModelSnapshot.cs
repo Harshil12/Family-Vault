@@ -136,6 +136,10 @@ namespace FamilyVault.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("NomineeName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -147,6 +151,75 @@ namespace FamilyVault.Infrastructure.Migrations
                     b.HasIndex("FamilyMemberId");
 
                     b.ToTable("BankAccounts");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.DematAccountDetails", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BOId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BOIdLast4")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("BrokerName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientIdLast4")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DPId")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<byte>("Depository")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<Guid>("FamilyMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte>("HoldingPattern")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NomineeName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("FamilyMemberId");
+
+                    b.ToTable("DematAccounts");
                 });
 
             modelBuilder.Entity("FamilyVault.Domain.Entities.DocumentDetails", b =>
@@ -315,6 +388,361 @@ namespace FamilyVault.Infrastructure.Migrations
                     b.ToTable("FamilyMembers");
                 });
 
+            modelBuilder.Entity("FamilyVault.Domain.Entities.FixedDepositDetails", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DepositNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DepositNumberLast4")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<byte>("DepositType")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<Guid>("FamilyMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("InstitutionName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<decimal>("InterestRate")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<bool>("IsAutoRenewal")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("MaturityAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateOnly>("MaturityDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("NomineeName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<decimal>("PrincipalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("FamilyMemberId");
+
+                    b.ToTable("FixedDeposits");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.LifeInsurancePolicyDetails", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AgentName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<decimal>("CoverAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FamilyMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("InsurerName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateOnly?>("MaturityDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("NomineeName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("PlanName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateOnly?>("PolicyEndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("PolicyNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PolicyNumberLast4")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<DateOnly>("PolicyStartDate")
+                        .HasColumnType("date");
+
+                    b.Property<byte>("PolicyType")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<decimal>("PremiumAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte>("PremiumFrequency")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("FamilyMemberId");
+
+                    b.ToTable("LifeInsurancePolicies");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.MediclaimPolicyDetails", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FamilyMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("HospitalNetworkUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("InsurerName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PlanName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateOnly>("PolicyEndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("PolicyNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PolicyNumberLast4")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<DateOnly>("PolicyStartDate")
+                        .HasColumnType("date");
+
+                    b.Property<byte>("PolicyType")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<decimal>("PremiumAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<decimal>("SumInsured")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TPAName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("FamilyMemberId");
+
+                    b.ToTable("MediclaimPolicies");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.MediclaimPolicyMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FamilyMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MediclaimPolicyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RelationshipLabel")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyMemberId");
+
+                    b.HasIndex("MediclaimPolicyId", "FamilyMemberId")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("MediclaimPolicyMembers");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.MutualFundHoldingDetails", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AMCName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("CurrentValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("FamilyMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FolioNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FolioNumberLast4")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<decimal?>("InvestedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte>("InvestmentMode")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NomineeName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<byte>("OptionType")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<byte>("PlanType")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<string>("SchemeName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<byte>("SchemeType")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal?>("Units")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("FamilyMemberId");
+
+                    b.ToTable("MutualFundHoldings");
+                });
+
             modelBuilder.Entity("FamilyVault.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -385,6 +813,17 @@ namespace FamilyVault.Infrastructure.Migrations
                     b.Navigation("FamilyMember");
                 });
 
+            modelBuilder.Entity("FamilyVault.Domain.Entities.DematAccountDetails", b =>
+                {
+                    b.HasOne("FamilyVault.Domain.Entities.FamilyMember", "FamilyMember")
+                        .WithMany("DematAccountDetails")
+                        .HasForeignKey("FamilyMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FamilyMember");
+                });
+
             modelBuilder.Entity("FamilyVault.Domain.Entities.DocumentDetails", b =>
                 {
                     b.HasOne("FamilyVault.Domain.Entities.FamilyMember", "FamilyMember")
@@ -418,6 +857,69 @@ namespace FamilyVault.Infrastructure.Migrations
                     b.Navigation("Family");
                 });
 
+            modelBuilder.Entity("FamilyVault.Domain.Entities.FixedDepositDetails", b =>
+                {
+                    b.HasOne("FamilyVault.Domain.Entities.FamilyMember", "FamilyMember")
+                        .WithMany("FixedDepositDetails")
+                        .HasForeignKey("FamilyMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FamilyMember");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.LifeInsurancePolicyDetails", b =>
+                {
+                    b.HasOne("FamilyVault.Domain.Entities.FamilyMember", "FamilyMember")
+                        .WithMany("LifeInsurancePolicyDetails")
+                        .HasForeignKey("FamilyMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FamilyMember");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.MediclaimPolicyDetails", b =>
+                {
+                    b.HasOne("FamilyVault.Domain.Entities.FamilyMember", "FamilyMember")
+                        .WithMany("MediclaimPolicyDetails")
+                        .HasForeignKey("FamilyMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FamilyMember");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.MediclaimPolicyMember", b =>
+                {
+                    b.HasOne("FamilyVault.Domain.Entities.FamilyMember", "FamilyMember")
+                        .WithMany("MediclaimPolicyMembers")
+                        .HasForeignKey("FamilyMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FamilyVault.Domain.Entities.MediclaimPolicyDetails", "MediclaimPolicy")
+                        .WithMany("CoveredMembers")
+                        .HasForeignKey("MediclaimPolicyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FamilyMember");
+
+                    b.Navigation("MediclaimPolicy");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.MutualFundHoldingDetails", b =>
+                {
+                    b.HasOne("FamilyVault.Domain.Entities.FamilyMember", "FamilyMember")
+                        .WithMany("MutualFundHoldingDetails")
+                        .HasForeignKey("FamilyMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FamilyMember");
+                });
+
             modelBuilder.Entity("FamilyVault.Domain.Entities.Family", b =>
                 {
                     b.Navigation("FamilyMembers");
@@ -427,7 +929,24 @@ namespace FamilyVault.Infrastructure.Migrations
                 {
                     b.Navigation("BankAccountDetails");
 
+                    b.Navigation("DematAccountDetails");
+
                     b.Navigation("DocumentDetails");
+
+                    b.Navigation("FixedDepositDetails");
+
+                    b.Navigation("LifeInsurancePolicyDetails");
+
+                    b.Navigation("MediclaimPolicyDetails");
+
+                    b.Navigation("MediclaimPolicyMembers");
+
+                    b.Navigation("MutualFundHoldingDetails");
+                });
+
+            modelBuilder.Entity("FamilyVault.Domain.Entities.MediclaimPolicyDetails", b =>
+                {
+                    b.Navigation("CoveredMembers");
                 });
 
             modelBuilder.Entity("FamilyVault.Domain.Entities.User", b =>

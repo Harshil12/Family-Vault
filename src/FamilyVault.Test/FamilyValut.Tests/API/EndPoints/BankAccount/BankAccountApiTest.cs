@@ -98,7 +98,7 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
         var client = CreateClient();
 
         // Act
-        var response = await client.GetAsync($"/bankaccounts/{familyMemberId}");
+        var response = await client.GetAsync($"/financial-details/{familyMemberId}/bank-accounts");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -119,7 +119,7 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
         var client = CreateClient();
 
         // Act
-        var response = await client.GetAsync($"/bankaccounts/{familyMemberId}/{bankAccountId}");
+        var response = await client.GetAsync($"/financial-details/{familyMemberId}/bank-accounts/{bankAccountId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -156,7 +156,7 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
         var client = CreateClient();
 
         // Act
-        var response = await client.PostAsJsonAsync($"/bankaccounts/{familyMemberId}/bankaccounts", request);
+        var response = await client.PostAsJsonAsync($"/financial-details/{familyMemberId}/bank-accounts", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -195,7 +195,7 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
         var client = CreateClient();
 
         // Act
-        var response = await client.PutAsJsonAsync($"/bankaccounts/{familyMemberId}/bankaccounts/{bankAccountId}", request);
+        var response = await client.PutAsJsonAsync($"/financial-details/{familyMemberId}/bank-accounts/{bankAccountId}", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -226,10 +226,24 @@ public class BankAccountApiTest : IClassFixture<WebApplicationFactory<Program>>
         var client = CreateClient();
 
         // Act
-        var response = await client.DeleteAsync($"/bankaccounts/{familyMemberId}/{bankAccountId}");
+        var response = await client.DeleteAsync($"/financial-details/{familyMemberId}/bank-accounts/{bankAccountId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task GetFinancialDetails_ShouldReturnBadRequest_WhenCategoryIsUnsupported()
+    {
+        // Arrange
+        var familyMemberId = Guid.NewGuid();
+        var client = CreateClient();
+
+        // Act
+        var response = await client.GetAsync($"/financial-details/{familyMemberId}/unsupported-category");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }
 

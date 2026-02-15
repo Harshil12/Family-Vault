@@ -43,6 +43,11 @@ public class BankAccountDetailsDto : BaseDto
     public string? Branch { get; set; }
 
     /// <summary>
+    /// Optional nominee name.
+    /// </summary>
+    public string? NomineeName { get; set; }
+
+    /// <summary>
     /// Family member id.
     /// </summary>
     public Guid FamilyMemberId { get; set; }

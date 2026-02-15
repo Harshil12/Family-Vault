@@ -17,7 +17,7 @@ Use this when moving `src/FamilyVault.Web` into a separate repository.
    3. `/family/{userId}/*`
    4. `/familymember/{familyId}/*`
    5. `/documents/{familyMemberId}/*`
-   6. `/bankaccounts/{familyMemberId}/*`
+   6. `/financial-details/{familyMemberId}/*`
 2. Confirm auth contract:
    1. JWT `sub` claim must be user id.
    2. Protected APIs require `Authorization: Bearer <token>`.
@@ -59,5 +59,5 @@ Use this when moving `src/FamilyVault.Web` into a separate repository.
 3. Create family.
 4. Create family member.
 5. Create document.
-6. Create bank account.
+6. Create financial detail record (bank/fd/life/mediclaim/demat/mutual-fund).
 7. Verify dashboard counts and expiry list.

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import CrudTable from "../components/ui/CrudTable";
+import DataGridTable from "../components/ui/DataGridTable";
 import FormModal from "../components/ui/FormModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import HelpTip from "../components/ui/HelpTip";
@@ -27,6 +27,16 @@ export default function FamiliesPage() {
   const columns = useMemo(
     () => [
       { key: "name", header: "Family Name" },
+      {
+        key: "createdAt",
+        header: "Created",
+        render: (row) => (row.createdAt ? new Date(row.createdAt).toLocaleString() : "-")
+      },
+      {
+        key: "updatedAt",
+        header: "Updated",
+        render: (row) => (row.updatedAt ? new Date(row.updatedAt).toLocaleString() : "-")
+      },
       {
         key: "members",
         header: "Members",
@@ -164,7 +174,7 @@ export default function FamiliesPage() {
           onChange={(event) => setSearchText(event.target.value)}
         />
       </div>
-      {loading ? <p>Loading families...</p> : <CrudTable columns={columns} rows={filteredFamilies} onEdit={openEdit} onDelete={handleDelete} />}
+      {loading ? <p>Loading families...</p> : <DataGridTable columns={columns} rows={filteredFamilies} onEdit={openEdit} onDelete={handleDelete} />}
 
       <FormModal
         title={editingFamily ? "Edit Family" : "Create Family"}

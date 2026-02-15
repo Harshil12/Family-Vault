@@ -24,6 +24,8 @@ function AuditTable({ title, rows, emptyMessage }) {
               <th>Action</th>
               <th>Entity</th>
               <th>Description</th>
+              <th>IP</th>
+              <th>Metadata</th>
               <th>By</th>
             </tr>
           </thead>
@@ -35,12 +37,16 @@ function AuditTable({ title, rows, emptyMessage }) {
                   <td>{row.action}</td>
                   <td>{row.entityType}</td>
                   <td>{row.description || "-"}</td>
+                  <td>{row.ipAddress || "-"}</td>
+                  <td title={row.metadataJson || ""}>
+                    {row.metadataJson ? `${String(row.metadataJson).slice(0, 60)}${String(row.metadataJson).length > 60 ? "..." : ""}` : "-"}
+                  </td>
                   <td>{row.createdBy || row.userId}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td className="empty-row" colSpan={5}>
+                <td className="empty-row" colSpan={7}>
                   {emptyMessage}
                 </td>
               </tr>

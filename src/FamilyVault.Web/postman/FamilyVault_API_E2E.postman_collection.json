@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "FamilyVault API E2E",
-    "description": "End-to-end flow for FamilyVault: register, login, families, members, documents, bank accounts.",
+    "description": "End-to-end flow for FamilyVault: register, login, families, members, documents, financial details.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -346,9 +346,9 @@
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/bankaccounts/{{memberId}}",
+              "raw": "{{baseUrl}}/financial-details/{{memberId}}/bank-accounts",
               "host": ["{{baseUrl}}"],
-              "path": ["bankaccounts", "{{memberId}}"]
+              "path": ["financial-details", "{{memberId}}", "bank-accounts"]
             }
           }
         },
@@ -361,9 +361,9 @@
               { "key": "Content-Type", "value": "application/json" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/bankaccounts/{{memberId}}/bankaccounts",
+              "raw": "{{baseUrl}}/financial-details/{{memberId}}/bank-accounts",
               "host": ["{{baseUrl}}"],
-              "path": ["bankaccounts", "{{memberId}}", "bankaccounts"]
+              "path": ["financial-details", "{{memberId}}", "bank-accounts"]
             },
             "body": {
               "mode": "raw",
@@ -395,9 +395,9 @@
               { "key": "Content-Type", "value": "application/json" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/bankaccounts/{{memberId}}/bankaccounts/{{bankAccountId}}",
+              "raw": "{{baseUrl}}/financial-details/{{memberId}}/bank-accounts/{{bankAccountId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["bankaccounts", "{{memberId}}", "bankaccounts", "{{bankAccountId}}"]
+              "path": ["financial-details", "{{memberId}}", "bank-accounts", "{{bankAccountId}}"]
             },
             "body": {
               "mode": "raw",
@@ -413,9 +413,9 @@
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{baseUrl}}/bankaccounts/{{memberId}}/{{bankAccountId}}",
+              "raw": "{{baseUrl}}/financial-details/{{memberId}}/bank-accounts/{{bankAccountId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["bankaccounts", "{{memberId}}", "{{bankAccountId}}"]
+              "path": ["financial-details", "{{memberId}}", "bank-accounts", "{{bankAccountId}}"]
             }
           }
         }

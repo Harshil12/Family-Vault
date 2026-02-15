@@ -16,7 +16,7 @@ Separate React frontend project for the existing FamilyVault API.
   - Families (`/families`)
   - Family Members (`/families/:familyId/members`)
   - Documents (`/families/:familyId/members/:memberId/documents`)
-  - Bank Accounts (`/families/:familyId/members/:memberId/accounts`)
+  - Financial Details (`/families/:familyId/members/:memberId/financial-details`)
 
 ## API mapping
 
@@ -39,10 +39,30 @@ This app is mapped to current backend routes:
 - `PUT /documents/{familyMemberId}/documents/{id}/file` (multipart/form-data, replace file)
 - `PUT /documents/{familyMemberId}/documents/{id}`
 - `DELETE /documents/{familyMemberId}/{id}`
-- `GET /bankaccounts/{familyMemberId}`
-- `POST /bankaccounts/{familyMemberId}/bankaccounts`
-- `PUT /bankaccounts/{familyMemberId}/bankaccounts/{id}`
-- `DELETE /bankaccounts/{familyMemberId}/{id}`
+- `GET /financial-details/{familyMemberId}/bank-accounts`
+- `POST /financial-details/{familyMemberId}/bank-accounts`
+- `PUT /financial-details/{familyMemberId}/bank-accounts/{id}`
+- `DELETE /financial-details/{familyMemberId}/bank-accounts/{id}`
+- `GET /financial-details/{familyMemberId}/fd`
+- `POST /financial-details/{familyMemberId}/fd`
+- `PUT /financial-details/{familyMemberId}/fd/{id}`
+- `DELETE /financial-details/{familyMemberId}/fd/{id}`
+- `GET /financial-details/{familyMemberId}/life-insurance`
+- `POST /financial-details/{familyMemberId}/life-insurance`
+- `PUT /financial-details/{familyMemberId}/life-insurance/{id}`
+- `DELETE /financial-details/{familyMemberId}/life-insurance/{id}`
+- `GET /financial-details/{familyMemberId}/mediclaim`
+- `POST /financial-details/{familyMemberId}/mediclaim`
+- `PUT /financial-details/{familyMemberId}/mediclaim/{id}`
+- `DELETE /financial-details/{familyMemberId}/mediclaim/{id}`
+- `GET /financial-details/{familyMemberId}/demat-accounts`
+- `POST /financial-details/{familyMemberId}/demat-accounts`
+- `PUT /financial-details/{familyMemberId}/demat-accounts/{id}`
+- `DELETE /financial-details/{familyMemberId}/demat-accounts/{id}`
+- `GET /financial-details/{familyMemberId}/mutual-funds`
+- `POST /financial-details/{familyMemberId}/mutual-funds`
+- `PUT /financial-details/{familyMemberId}/mutual-funds/{id}`
+- `DELETE /financial-details/{familyMemberId}/mutual-funds/{id}`
 
 ## Setup
 

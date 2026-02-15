@@ -6,7 +6,7 @@ import DashboardPage from "./pages/DashboardPage";
 import FamiliesPage from "./pages/FamiliesPage";
 import FamilyMembersPage from "./pages/FamilyMembersPage";
 import DocumentsPage from "./pages/DocumentsPage";
-import BankAccountsPage from "./pages/BankAccountsPage";
+import FinancialDetailsPage from "./pages/FinancialDetailsPage";
 import AuditPage from "./pages/AuditPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -30,7 +30,7 @@ export default function App() {
         <Route path="audit" element={<AuditPage />} />
         <Route path="families/:familyId/members" element={<FamilyMembersPage />} />
         <Route path="families/:familyId/members/:memberId/documents" element={<DocumentsPage />} />
-        <Route path="families/:familyId/members/:memberId/accounts" element={<BankAccountsPage />} />
+        <Route path="families/:familyId/members/:memberId/financial-details" element={<FinancialDetailsPage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/home" element={<Navigate to="/" replace />} />

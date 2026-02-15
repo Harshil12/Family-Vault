@@ -97,5 +97,79 @@ export function validateBankAccount(values) {
   if (values.accountHolderName && values.accountHolderName.length > 150) errors.accountHolderName = "Account holder name must be at most 150 characters.";
   if (values.ifsc && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(values.ifsc)) errors.ifsc = "IFSC must be in valid format.";
   if (values.branch && values.branch.length > 150) errors.branch = "Branch must be at most 150 characters.";
+  if (values.nomineeName && values.nomineeName.length > 150) errors.nomineeName = "Nominee name must be at most 150 characters.";
+  return errors;
+}
+
+export function validateFixedDeposit(values) {
+  const errors = {};
+  if (!values.institutionName?.trim()) errors.institutionName = "Institution name is required.";
+  if (!values.depositNumber?.trim()) errors.depositNumber = "Deposit number is required.";
+  if (values.depositType === "" || Number(values.depositType) === 0) errors.depositType = "Deposit type is required.";
+  if (!values.principalAmount && values.principalAmount !== 0) errors.principalAmount = "Principal amount is required.";
+  if (Number(values.principalAmount) <= 0) errors.principalAmount = "Principal amount must be greater than 0.";
+  if (!values.interestRate && values.interestRate !== 0) errors.interestRate = "Interest rate is required.";
+  if (Number(values.interestRate) < 0) errors.interestRate = "Interest rate cannot be negative.";
+  if (!values.startDate) errors.startDate = "Start date is required.";
+  if (!values.maturityDate) errors.maturityDate = "Maturity date is required.";
+  if (values.startDate && values.maturityDate && new Date(values.maturityDate) < new Date(values.startDate)) {
+    errors.maturityDate = "Maturity date must be after start date.";
+  }
+  if (values.nomineeName && values.nomineeName.length > 150) errors.nomineeName = "Nominee name must be at most 150 characters.";
+  return errors;
+}
+
+export function validateLifeInsurance(values) {
+  const errors = {};
+  if (!values.insurerName?.trim()) errors.insurerName = "Insurer name is required.";
+  if (!values.policyNumber?.trim()) errors.policyNumber = "Policy number is required.";
+  if (values.policyType === "" || Number(values.policyType) === 0) errors.policyType = "Policy type is required.";
+  if (!values.coverAmount && values.coverAmount !== 0) errors.coverAmount = "Cover amount is required.";
+  if (Number(values.coverAmount) <= 0) errors.coverAmount = "Cover amount must be greater than 0.";
+  if (!values.premiumAmount && values.premiumAmount !== 0) errors.premiumAmount = "Premium amount is required.";
+  if (Number(values.premiumAmount) <= 0) errors.premiumAmount = "Premium amount must be greater than 0.";
+  if (values.premiumFrequency === "" || Number(values.premiumFrequency) === 0) errors.premiumFrequency = "Premium frequency is required.";
+  if (values.status === "" || Number(values.status) === 0) errors.status = "Status is required.";
+  if (!values.policyStartDate) errors.policyStartDate = "Policy start date is required.";
+  return errors;
+}
+
+export function validateMediclaim(values) {
+  const errors = {};
+  if (!values.insurerName?.trim()) errors.insurerName = "Insurer name is required.";
+  if (!values.policyNumber?.trim()) errors.policyNumber = "Policy number is required.";
+  if (values.policyType === "" || Number(values.policyType) === 0) errors.policyType = "Policy type is required.";
+  if (!values.sumInsured && values.sumInsured !== 0) errors.sumInsured = "Sum insured is required.";
+  if (Number(values.sumInsured) <= 0) errors.sumInsured = "Sum insured must be greater than 0.";
+  if (!values.premiumAmount && values.premiumAmount !== 0) errors.premiumAmount = "Premium amount is required.";
+  if (Number(values.premiumAmount) <= 0) errors.premiumAmount = "Premium amount must be greater than 0.";
+  if (values.status === "" || Number(values.status) === 0) errors.status = "Status is required.";
+  if (!values.policyStartDate) errors.policyStartDate = "Policy start date is required.";
+  if (!values.policyEndDate) errors.policyEndDate = "Policy end date is required.";
+  if (values.policyStartDate && values.policyEndDate && new Date(values.policyEndDate) < new Date(values.policyStartDate)) {
+    errors.policyEndDate = "Policy end date must be after start date.";
+  }
+  return errors;
+}
+
+export function validateDematAccount(values) {
+  const errors = {};
+  if (!values.brokerName?.trim()) errors.brokerName = "Broker name is required.";
+  if (values.depository === "" || Number(values.depository) === 0) errors.depository = "Depository is required.";
+  if (!values.dpId?.trim()) errors.dpId = "DP ID is required.";
+  if (!values.clientId?.trim()) errors.clientId = "Client ID is required.";
+  if (values.holdingPattern === "" || Number(values.holdingPattern) === 0) errors.holdingPattern = "Holding pattern is required.";
+  return errors;
+}
+
+export function validateMutualFund(values) {
+  const errors = {};
+  if (!values.amcName?.trim()) errors.amcName = "AMC name is required.";
+  if (!values.folioNumber?.trim()) errors.folioNumber = "Folio number is required.";
+  if (!values.schemeName?.trim()) errors.schemeName = "Scheme name is required.";
+  if (values.schemeType === "" || Number(values.schemeType) === 0) errors.schemeType = "Scheme type is required.";
+  if (values.planType === "" || Number(values.planType) === 0) errors.planType = "Plan type is required.";
+  if (values.optionType === "" || Number(values.optionType) === 0) errors.optionType = "Option type is required.";
+  if (values.investmentMode === "" || Number(values.investmentMode) === 0) errors.investmentMode = "Investment mode is required.";
   return errors;
 }

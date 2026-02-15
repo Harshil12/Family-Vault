@@ -108,6 +108,11 @@ public class Program
         builder.Services.AddScoped<IFamilyService, FamilyService>();
         builder.Services.AddScoped<IDocumentService, DocumentService>();
         builder.Services.AddScoped<IBankAccountService, BankAccountService>();
+        builder.Services.AddScoped<IFixedDepositService, FixedDepositService>();
+        builder.Services.AddScoped<ILifeInsuranceService, LifeInsuranceService>();
+        builder.Services.AddScoped<IMediclaimService, MediclaimService>();
+        builder.Services.AddScoped<IDematAccountService, DematAccountService>();
+        builder.Services.AddScoped<IMutualFundService, MutualFundService>();
         builder.Services.AddScoped<ICryptoService, CryptoService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IAuditService, AuditService>();

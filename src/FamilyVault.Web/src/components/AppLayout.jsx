@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -14,10 +14,22 @@ const links = [
 export default function AppLayout() {
   const { userId, logout, isPreviewMode } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("fv_sidebar_visible");
+    if (stored === "false") {
+      setIsSidebarVisible(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("fv_sidebar_visible", String(isSidebarVisible));
+  }, [isSidebarVisible]);
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
+    <div className={`app-shell ${isSidebarVisible ? "" : "sidebar-hidden"}`}>
+      <aside className="sidebar" aria-hidden={!isSidebarVisible}>
         <div className="brand-wrap">
           <img className="brand-logo" src={logo} alt="Family Vault" />
         </div>
@@ -48,6 +60,18 @@ export default function AppLayout() {
           )}
         </div>
       </aside>
+
+      <button
+        type="button"
+        className="panel-arrow-toggle"
+        onClick={() => setIsSidebarVisible((current) => !current)}
+        aria-label={isSidebarVisible ? "Hide side panel" : "Show side panel"}
+        title={isSidebarVisible ? "Hide side panel" : "Show side panel"}
+      >
+        <span className="panel-arrow-glyph" aria-hidden="true">
+          {isSidebarVisible ? "❮" : "❯"}
+        </span>
+      </button>
 
       <main className="content">
         <Outlet />
