@@ -41,6 +41,9 @@ export default function DashboardPage() {
   const { token, userId, isPreviewMode } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [insightSourceFilter, setInsightSourceFilter] = useState("all");
+  const [showAllRenewals, setShowAllRenewals] = useState(false);
+  const [showAllAlerts, setShowAllAlerts] = useState(false);
   const [summary, setSummary] = useState({
     families: [],
     members: [],
@@ -245,6 +248,7 @@ export default function DashboardPage() {
               type: "Document",
               title: item.documentNumber || "Document",
               memberName: item.memberName || "-",
+              source: "documents",
               date,
               daysLeft: daysBetween(now, date),
               to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/documents` : "/families"
@@ -263,6 +267,7 @@ export default function DashboardPage() {
               type: "FD",
               title: item.institutionName || "Fixed Deposit",
               memberName: item.memberName || "-",
+              source: "financial",
               date,
               daysLeft: daysBetween(now, date),
               to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=fd` : "/families"
@@ -281,6 +286,7 @@ export default function DashboardPage() {
               type: "Life Insurance",
               title: item.policyNumberLast4 ? `Policy ****${item.policyNumberLast4}` : (item.policyNumber || "Policy"),
               memberName: item.memberName || "-",
+              source: "financial",
               date,
               daysLeft: daysBetween(now, date),
               to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=life-insurance` : "/families"
@@ -299,6 +305,7 @@ export default function DashboardPage() {
               type: "Mediclaim",
               title: item.policyNumberLast4 ? `Policy ****${item.policyNumberLast4}` : (item.policyNumber || "Policy"),
               memberName: item.memberName || "-",
+              source: "financial",
               date,
               daysLeft: daysBetween(now, date),
               to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=mediclaim` : "/families"
@@ -308,8 +315,7 @@ export default function DashboardPage() {
       .filter(Boolean);
 
     return [...documentItems, ...fdItems, ...lifeItems, ...mediclaimItems]
-      .sort((a, b) => a.date - b.date)
-      .slice(0, 10);
+      .sort((a, b) => a.date - b.date);
   }, [summary.documents, summary.financialDetails]);
 
   const missingDetailAlerts = useMemo(() => {
@@ -320,6 +326,8 @@ export default function DashboardPage() {
         alerts.push({
           id: `doc-missing-${item.id}`,
           message: `${item.memberName || "Member"}: document ${item.documentNumber || item.id} has no expiry date`,
+          source: "documents",
+          severity: "critical",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/documents` : "/families"
         });
       }
@@ -330,6 +338,8 @@ export default function DashboardPage() {
         alerts.push({
           id: `bank-nominee-${item.id}`,
           message: `${item.memberName || "Member"}: bank account missing nominee`,
+          source: "financial",
+          severity: "warning",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=bank-accounts` : "/families"
         });
       }
@@ -340,6 +350,8 @@ export default function DashboardPage() {
         alerts.push({
           id: `fd-nominee-${item.id}`,
           message: `${item.memberName || "Member"}: FD missing nominee`,
+          source: "financial",
+          severity: "warning",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=fd` : "/families"
         });
       }
@@ -347,6 +359,8 @@ export default function DashboardPage() {
         alerts.push({
           id: `fd-maturity-${item.id}`,
           message: `${item.memberName || "Member"}: FD missing maturity date`,
+          source: "financial",
+          severity: "critical",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=fd` : "/families"
         });
       }
@@ -357,6 +371,8 @@ export default function DashboardPage() {
         alerts.push({
           id: `life-nominee-${item.id}`,
           message: `${item.memberName || "Member"}: life insurance missing nominee`,
+          source: "financial",
+          severity: "warning",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=life-insurance` : "/families"
         });
       }
@@ -364,6 +380,8 @@ export default function DashboardPage() {
         alerts.push({
           id: `life-end-${item.id}`,
           message: `${item.memberName || "Member"}: life insurance missing end or maturity date`,
+          source: "financial",
+          severity: "critical",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=life-insurance` : "/families"
         });
       }
@@ -374,6 +392,8 @@ export default function DashboardPage() {
         alerts.push({
           id: `med-end-${item.id}`,
           message: `${item.memberName || "Member"}: mediclaim missing policy end date`,
+          source: "financial",
+          severity: "critical",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=mediclaim` : "/families"
         });
       }
@@ -381,6 +401,8 @@ export default function DashboardPage() {
         alerts.push({
           id: `med-tpa-${item.id}`,
           message: `${item.memberName || "Member"}: mediclaim missing TPA name`,
+          source: "financial",
+          severity: "warning",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=mediclaim` : "/families"
         });
       }
@@ -391,6 +413,8 @@ export default function DashboardPage() {
         alerts.push({
           id: `demat-nominee-${item.id}`,
           message: `${item.memberName || "Member"}: demat account missing nominee`,
+          source: "financial",
+          severity: "warning",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=demat-accounts` : "/families"
         });
       }
@@ -401,13 +425,32 @@ export default function DashboardPage() {
         alerts.push({
           id: `mf-nominee-${item.id}`,
           message: `${item.memberName || "Member"}: mutual fund missing nominee`,
+          source: "financial",
+          severity: "warning",
           to: item.memberId && item.familyId ? `/families/${item.familyId}/members/${item.memberId}/financial-details?category=mutual-funds` : "/families"
         });
       }
     });
 
-    return alerts.slice(0, 12);
+    return alerts;
   }, [summary.documents, summary.financialDetails]);
+
+  const filteredUpcomingRenewals = useMemo(() => {
+    if (insightSourceFilter === "all") {
+      return upcomingRenewals;
+    }
+    return upcomingRenewals.filter((item) => item.source === insightSourceFilter);
+  }, [upcomingRenewals, insightSourceFilter]);
+
+  const filteredMissingAlerts = useMemo(() => {
+    if (insightSourceFilter === "all") {
+      return missingDetailAlerts;
+    }
+    return missingDetailAlerts.filter((item) => item.source === insightSourceFilter);
+  }, [missingDetailAlerts, insightSourceFilter]);
+
+  const visibleRenewals = showAllRenewals ? filteredUpcomingRenewals : filteredUpcomingRenewals.slice(0, 6);
+  const visibleAlerts = showAllAlerts ? filteredMissingAlerts : filteredMissingAlerts.slice(0, 8);
 
   if (loading) {
     return <p>Loading dashboard...</p>;
@@ -471,17 +514,37 @@ export default function DashboardPage() {
         <StatCard title="Bank Accounts" value={summary.bankAccounts.length} hint="Financial profiles tracked" />
       </div>
 
+      <div className="insights-filter-row">
+        {["all", "documents", "financial"].map((filterKey) => (
+          <button
+            key={filterKey}
+            type="button"
+            className={`filter-pill ${insightSourceFilter === filterKey ? "active" : ""}`}
+            onClick={() => setInsightSourceFilter(filterKey)}
+          >
+            {filterKey === "all" ? "All" : filterKey === "documents" ? "Documents" : "Financial"}
+          </button>
+        ))}
+      </div>
+
       <div className="dashboard-insights-grid">
         <section className="panel">
           <div className="panel-head">
             <h3>Upcoming Renewals (Next 60 Days)</h3>
-            <span className="subtle">{upcomingRenewals.length} items</span>
+            <div className="panel-head-actions">
+              <span className="subtle">{filteredUpcomingRenewals.length} items</span>
+              {filteredUpcomingRenewals.length > 6 && (
+                <button type="button" className="inline-link panel-link-btn" onClick={() => setShowAllRenewals((prev) => !prev)}>
+                  {showAllRenewals ? "Show less" : "View all"}
+                </button>
+              )}
+            </div>
           </div>
-          {!upcomingRenewals.length ? (
+          {!visibleRenewals.length ? (
             <p className="empty-state">No upcoming renewals in the next 60 days.</p>
           ) : (
             <ul className="simple-list">
-              {upcomingRenewals.map((item) => (
+              {visibleRenewals.map((item) => (
                 <li key={item.id}>
                   <strong>{item.type}: {item.title}</strong>
                   <p className="subtle">
@@ -497,14 +560,22 @@ export default function DashboardPage() {
         <section className="panel">
           <div className="panel-head">
             <h3>Missing Details Alerts</h3>
-            <span className="subtle">{missingDetailAlerts.length} issues</span>
+            <div className="panel-head-actions">
+              <span className="subtle">{filteredMissingAlerts.length} issues</span>
+              {filteredMissingAlerts.length > 8 && (
+                <button type="button" className="inline-link panel-link-btn" onClick={() => setShowAllAlerts((prev) => !prev)}>
+                  {showAllAlerts ? "Show less" : "View all"}
+                </button>
+              )}
+            </div>
           </div>
-          {!missingDetailAlerts.length ? (
+          {!visibleAlerts.length ? (
             <p className="empty-state">No missing detail alerts right now.</p>
           ) : (
             <ul className="simple-list">
-              {missingDetailAlerts.map((alert) => (
+              {visibleAlerts.map((alert) => (
                 <li key={alert.id}>
+                  <span className={`alert-severity ${alert.severity}`}>{alert.severity}</span>
                   <span>{alert.message}</span>
                   <Link className="inline-link" to={alert.to}>Fix now</Link>
                 </li>
